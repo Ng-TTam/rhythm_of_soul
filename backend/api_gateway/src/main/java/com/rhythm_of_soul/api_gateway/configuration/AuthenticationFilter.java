@@ -3,7 +3,7 @@ package com.rhythm_of_soul.api_gateway.configuration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rhythm_of_soul.api_gateway.dto.ApiResponse;
-import com.rhythm_of_soul.api_gateway.service.IdentityService;
+import com.rhythm_of_soul.api_gateway.service.impl.IdentityServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +32,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     private static final int UNAUTHENTICATED_CODE = 3999;
     private static final String UNAUTHENTICATED_MESSAGE = "Unauthenticated";
 
-    private final IdentityService identityService;
+    private final IdentityServiceImpl identityService;
     private final ObjectMapper objectMapper;
 
     @Value("${app.api-prefix}")

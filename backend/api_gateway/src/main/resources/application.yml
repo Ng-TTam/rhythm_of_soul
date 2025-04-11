@@ -1,45 +1,4 @@
-server:
-  port: 8888
-
-app:
-  api-prefix: /api/v1
-  services:
-    identity: http://localhost:8080
-    user: http://localhost:8081
-    artist: http://localhost:8082
-    admin: http://localhost:8083
-    content: http://localhost:8084
-    notification: http://localhost:8085
-
 spring:
-  application:
-    name: api-gateway
-  cloud:
-    gateway:
-      default-filters:
-        - StripPrefix=2
-      routes:
-        - id: identity_service
-          uri: ${app.services.identity}
-          predicates:
-            - Path=${app.api-prefix}/identity/**
-        - id: user_service
-          uri: ${app.services.user}
-          predicates:
-            - Path=${app.api-prefix}/users/**
-        - id: artist_service
-          uri: ${app.services.artist}
-          predicates:
-            - Path=${app.api-prefix}/artists/**
-        - id: admin_service
-          uri: ${app.services.admin}
-          predicates:
-            - Path=${app.api-prefix}/admin/**
-        - id: content_service
-          uri: ${app.services.content}
-          predicates:
-            - Path=${app.api-prefix}/contents/**
-        - id: notification_service
-          uri: ${app.services.notification}
-          predicates:
-            - Path=${app.api-prefix}/notifications/**
+  profiles:
+    active: dev
+#    active: prod

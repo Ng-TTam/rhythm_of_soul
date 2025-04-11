@@ -3,15 +3,17 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
-      <profile name="Annotation profile for api_gateway" enabled="true">
+      <profile name="Annotation profile for content_service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
+        <module name="content_service" />
         <module name="admin_service" />
         <module name="api_gateway" />
+        <module name="artist_service" />
       </profile>
     </annotationProcessing>
   </component>
@@ -19,6 +21,8 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="admin_service" options="-parameters" />
       <module name="api_gateway" options="-parameters" />
+      <module name="artist_service" options="-parameters" />
+      <module name="content_service" options="-parameters" />
     </option>
   </component>
 </project>
