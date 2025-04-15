@@ -53,8 +53,8 @@ export default function SongRecentlyPlayback() {
             key={index}
             className="card me-3 flex-grow-1"
             style={{
-              flex: "0 0 16.666%", // 6 card/row -> 100/6 = ~16.66%
-              minWidth: "150px", // đảm bảo responsive
+              flex: "0 0 16.666%",
+              minWidth: "150px",
               maxWidth: "200px",
             }}
           >

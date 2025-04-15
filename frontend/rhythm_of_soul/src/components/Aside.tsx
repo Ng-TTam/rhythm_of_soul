@@ -1,6 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 export default function Aside() {
+  // useEffect(() => {
+  //   const script = document.createElement('script');
+  //   script.src = '/assets/js/sidebarf700.js?v=1.0.1';
+  //   document.body.appendChild(script);
+  //   return () => {
+  //     document.body.removeChild(script);
+  //   };
+  // }, []);
+
   return (
     <>
       <aside
@@ -661,6 +670,24 @@ export default function Aside() {
               </li>
             </ul>
           </div>
+        </div>
+        <div
+          className="scrollbar-track scrollbar-track-x"
+          style={{ display: "none" }}
+        >
+          <div
+            className="scrollbar-thumb scrollbar-thumb-x"
+            style={{ width: 258, transform: "translate3d(0px, 0px, 0px)" }}
+          />
+        </div>
+        <div
+          className="scrollbar-track scrollbar-track-y"
+          style={{ display: "none" }}
+        >
+          <div
+            className="scrollbar-thumb scrollbar-thumb-y"
+            style={{ height: 724, transform: "translate3d(0px, 0px, 0px)" }}
+          />
         </div>
         <div className="sidebar-footer"></div>
       </aside>
