@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
 
-export default function Aside() {
-  // useEffect(() => {
-  //   const script = document.createElement('script');
-  //   script.src = '/assets/js/sidebarf700.js?v=1.0.1';
-  //   document.body.appendChild(script);
-  //   return () => {
-  //     document.body.removeChild(script);
-  //   };
-  // }, []);
+export default function Sidebar() {
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = '/assets/js/sidebarf700.js?v=1.0.1';
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   return (
     <>
@@ -53,10 +53,11 @@ export default function Aside() {
               />
             </div>
           </a>
-          <div
+          <button
             className="sidebar-toggle"
             data-toggle="sidebar"
             data-active="true"
+            style={{border: 'none'}}
           >
             <i className="icon">
               <svg
@@ -77,7 +78,7 @@ export default function Aside() {
                 />
               </svg>
             </i>
-          </div>
+          </button>
         </div>
         <div className="sidebar-body pt-0 data-scrollbar">
           <div className="sidebar-list">

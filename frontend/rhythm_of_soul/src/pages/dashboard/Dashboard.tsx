@@ -1,5 +1,3 @@
-import React, { useEffect } from "react";
-import Aside from "../../components/Aside";
 import Nav from "../../components/Nav";
 import PlaybackBar from "../../components/songs/PlaybackBar";
 import SongTop from "../../components/songs/SongTop";
@@ -8,35 +6,9 @@ import SongRecentlyPlayback from "../../components/songs/SongRecentlyPlayback";
 import GenresTop from "../../components/songs/GenresTop";
 import ArtistTop from "../../components/artists/ArtistTop";
 import FloatMenu from "../../components/floatMenu/FloatMenu";
+import Sidebar from "../../components/Sidebar";
 
 export default function Dashboard() {
-  // useEffect(() => {
-  //   const scripts = [
-  //     "../assets/js/core/libs.min.js",
-  //     "../assets/vendor/sheperd/dist/js/sheperd.min.js",
-  //     "../assets/js/plugins/tour.js",
-  //     "../assets/js/plugins/slider-tabs.js",
-  //     "../assets/vendor/swiperSlider/swiper-bundle.min.js",
-  //     "../assets/js/plugins/swiper-slider.js",
-  //     "../assets/vendor/lodash/lodash.min.js",
-  //     "../assets/js/iqonic-script/utility.min.js",
-  //     "../assets/js/iqonic-script/setting.min.js",
-  //     "../assets/js/setting-init.js",
-  //     "../assets/js/core/external.min.js",
-  //     "../assets/js/charts/widgetchartsf700.js?v=1.0.1",
-  //     "../assets/js/charts/dashboardf700.js?v=1.0.1",
-  //     "../assets/js/music-playerf700.js?v=1.0.1",
-  //     "../assets/js/muzikf700.js?v=1.0.1",
-  //     "../assets/js/sidebarf700.js?v=1.0.1",
-  //   ];
-
-  //   scripts.forEach((src) => {
-  //     const script = document.createElement("script");
-  //     script.src = "/" + src;
-  //     script.defer = true;
-  //     document.body.appendChild(script);
-  //   });
-  // }, []);
 
   return (
     <>
@@ -44,7 +16,7 @@ export default function Dashboard() {
         <div className="loader simple-loader">
           <div className="loader-body ">
             <img
-              src="../assets/images/loader.gif"
+              src="assets/images/loader.gif"
               alt="loader"
               className=" img-fluid "
             />
@@ -52,7 +24,7 @@ export default function Dashboard() {
         </div>
       </div> */}
 
-      <Aside />
+      <Sidebar />
 
       <main className="main-content">
         <Nav /> 
