@@ -1,0 +1,18 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login</title>
+</head>
+<body>
+<form class="form" method="post" th:action="@{/auth/log}">
+    <input class="input" name="username" placeholder="Email" type="text" required />
+    <input class="input" name="password" placeholder="Password" type="password" required />
+    <input type="checkbox" name="remember-me" /> Remember me
+    <button class="form-btn" type="submit">Login</button>
+
+    <p th:if="${param.error}" style="color:red;">Đăng nhập thất bại</p>
+    <p th:if="${param.logout}" style="color:green;">Đăng xuất thành công</p>
+</form>
+</body>
+</html>
