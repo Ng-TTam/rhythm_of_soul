@@ -5,11 +5,15 @@ import './App.css';
 // import Error500 from './pages/errors/error500';
 import Maintenance from './pages/errors/Maintenance';
 import Dashboard from './pages/dashboard/Dashboard';
+import AdminDashboard from './pages/admin/Dashboard';
+import AdminUser from './pages/admin/AdminUser';
+import UserProfile from './pages/user/UserProfile';
+import AddSong from './components/songs/AddSong';
 
 function App() {
   return (
     <>
-      <Dashboard />
+      <AddSong />
     </>
   );
 }
