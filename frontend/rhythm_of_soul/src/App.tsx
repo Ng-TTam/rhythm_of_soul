@@ -9,11 +9,12 @@ import AdminDashboard from './pages/admin/Dashboard';
 import AdminUser from './pages/admin/AdminUser';
 import UserProfile from './pages/user/UserProfile';
 import AddSong from './components/songs/AddSong';
+import CreateAlbum from './pages/artist/CreateAlbum';
 
 function App() {
   return (
     <>
-      <AddSong />
+      <CreateAlbum />
     </>
   );
 }
