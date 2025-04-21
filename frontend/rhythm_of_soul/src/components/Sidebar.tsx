@@ -1,6 +1,10 @@
 import React, { useEffect } from "react";
-
+import { Outlet, useNavigate } from 'react-router-dom';
 export default function Sidebar() {
+  const navigate = useNavigate();
+    const redirectPath = (url : string) => {
+        navigate(url);
+    }
   useEffect(() => {
     const script = document.createElement('script');
     script.src = '/assets/js/sidebarf700.js?v=1.0.1';
@@ -9,7 +13,9 @@ export default function Sidebar() {
       document.body.removeChild(script);
     };
   }, []);
-
+  const handlePlaylist = () => {
+    redirectPath('/playlist');
+  }
   return (
     <>
       <aside
@@ -641,7 +647,7 @@ export default function Sidebar() {
                     </a>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link " href="app/user-list.html">
+                    <button className="nav-link " style={{border : "0px",backgroundColor : "white"}} onClick={handlePlaylist}>
                       <i className="icon">
                         <svg
                           className="icon-10"
@@ -664,7 +670,34 @@ export default function Sidebar() {
                         {" "}
                         U
                       </i>
-                      <span className="item-name">User List</span>
+                      <span className="item-name">Playlist</span>
+                    </button>
+                  </li>
+                  <li className="nav-item">
+                    <a className="nav-link " href="app/user-add.html">
+                      <i className="icon">
+                        <svg
+                          className="icon-10"
+                          width={10}
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <g>
+                            <circle cx={12} cy={12} r={8} fill="currentColor" />
+                          </g>
+                        </svg>
+                      </i>
+                      <i
+                        className="sidenav-mini-icon"
+                        data-bs-toggle="tooltip"
+                        title="Add User"
+                        data-bs-placement="right"
+                      >
+                        {" "}
+                        A
+                      </i>
+                      <span className="item-name">Add User</span>
                     </a>
                   </li>
                 </ul>

@@ -1,7 +1,18 @@
 import React, { useEffect } from "react";
-
+import LoginService from "../services/service";
+import { useNavigate } from "react-router-dom";
 export default function Nav() {
-
+  const handleLogout = () => {
+    const response = LoginService.logout();
+    console.log(response);
+  }
+  const navigate = useNavigate();
+    const redirectPath = (url : string) => {
+        navigate(url);
+    }
+  const handleToFeed = () => {
+    redirectPath('/feed');
+  }
   return (
     <>
       <div className="position-relative ">
@@ -73,13 +84,14 @@ export default function Nav() {
                       </a>
                     </li>
                     <li className="nav-item">
-                      <a
+                      <button
                         className="nav-link "
                         aria-current="page"
-                        href="release.html"
+                       style={{ border: "none", background: "none" }}
+                        onClick={handleToFeed}
                       >
-                        <span className="item-name">Release</span>
-                      </a>
+                        <span className="item-name">Feed</span>
+                      </button>
                     </li>
                     <li className="nav-item">
                       <a
@@ -577,7 +589,7 @@ export default function Nav() {
                       <hr className="dropdown-divider" />
                     </li>
                     <li>
-                      <a className="dropdown-item" href="auth/sign-in.html">
+                      <a className="dropdown-item" href="/login" onClick={handleLogout}>
                         Logout
                       </a>
                     </li>
