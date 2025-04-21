@@ -26,6 +26,17 @@ class LoginService {
     );
     return response.data;
   }
+  async logout(): Promise<APIResponse<any>> {
+    const response = await axios.post<APIResponse<any>>(
+      `${API_URL}/logout`, 
+      {},  // Body nếu có dữ liệu cần gửi, nếu không thì truyền {} (một object rỗng)
+      {
+        withCredentials: true  // Đặt config ở đây
+      }
+    );
+    return response.data;
+  }
+  
 }
 export default new LoginService();
 

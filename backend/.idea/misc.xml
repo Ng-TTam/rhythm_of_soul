@@ -5,8 +5,6 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/identity_service/pom.xml" />
-        <option value="$PROJECT_DIR$/api_gateway/pom.xml" />
-        <option value="$PROJECT_DIR$/artist_service/pom.xml" />
       </list>
     </option>
   </component>

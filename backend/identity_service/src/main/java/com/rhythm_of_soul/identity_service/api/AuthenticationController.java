@@ -1,4 +1,4 @@
-package com.rhythm_of_soul.identity_service.controller;
+package com.rhythm_of_soul.identity_service.api;
 
 import com.nimbusds.jose.JOSEException;
 import com.rhythm_of_soul.identity_service.constant.SecurityConstants;
@@ -59,8 +59,20 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
-        authenticationService.logout(request);
+    ApiResponse<Void> logout(@CookieValue("access_token") String accessToken,
+                             @CookieValue(value = "refresh_token",required = false) String refreshToken,
+                             HttpServletResponse httpResponse,
+                             HttpServletRequest httpRequest) throws ParseException, JOSEException {
+
+        CookieUtil.deleteCookieByName(SecurityConstants.ACCESS_TOKEN, httpRequest, httpResponse);
+        if(refreshToken != null) {
+            LogoutRequest request = LogoutRequest.builder()
+                    .token(refreshToken)
+                    .build();
+            authenticationService.logout(request);
+            CookieUtil.deleteCookieByName(SecurityConstants.REFRESH_TOKEN, httpRequest, httpResponse);
+        }
+
         return ApiResponse.<Void>builder().build();
     }
 

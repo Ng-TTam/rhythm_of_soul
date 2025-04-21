@@ -21,28 +21,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ServerAuthController {
     AuthenticationService authenticationService;
 
-//    @GetMapping("/sign-in")
-//    public String signIn(Model model) {
-//        model.addAttribute("authRequest", new AuthenticationRequest());
-//        return "sign_in";
-//    }
-//
-//    @PostMapping("/login")
-//    public String login(@Valid @ModelAttribute("authRequest") AuthenticationRequest authRequest,
-//                        BindingResult result, Model model) {
-//        if (result.hasErrors()) {
-//            return "sign-in";
-//        }
-//
-//        try {
-//            authenticationService.authenticate(authRequest);
-//            return "home";
-//        } catch (Exception e) {
-//            model.addAttribute("error", e.getMessage());
-//            return "sign-in";
-//        }
-//    }
-
     @GetMapping("/sign-in")
     public String showSignInForm(Model model) {
         model.addAttribute("authRequest", new AuthenticationRequest());
@@ -54,7 +32,6 @@ public class ServerAuthController {
                         RedirectAttributes redirectAttributes) {
         try {
             AuthenticationResponse response = authenticationService.authenticate(authRequest);
-            // Lưu token nếu cần (hoặc xử lý trong session/cookie)
             redirectAttributes.addFlashAttribute("message", "Đăng nhập thành công");
             return "redirect:/home";
         } catch (RuntimeException e) {

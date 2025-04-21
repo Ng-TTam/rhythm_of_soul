@@ -1,6 +1,21 @@
-import React from "react";
-
-export default function Aside() {
+import React, { useEffect } from "react";
+import { Outlet, useNavigate } from 'react-router-dom';
+export default function Sidebar() {
+  const navigate = useNavigate();
+    const redirectPath = (url : string) => {
+        navigate(url);
+    }
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = '/assets/js/sidebarf700.js?v=1.0.1';
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+  const handlePlaylist = () => {
+    redirectPath('/playlist');
+  }
   return (
     <>
       <aside
@@ -44,10 +59,11 @@ export default function Aside() {
               />
             </div>
           </a>
-          <div
+          <button
             className="sidebar-toggle"
             data-toggle="sidebar"
             data-active="true"
+            style={{border: 'none'}}
           >
             <i className="icon">
               <svg
@@ -68,7 +84,7 @@ export default function Aside() {
                 />
               </svg>
             </i>
-          </div>
+          </button>
         </div>
         <div className="sidebar-body pt-0 data-scrollbar">
           <div className="sidebar-list">
@@ -631,7 +647,7 @@ export default function Aside() {
                     </a>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link " href="app/user-list.html">
+                    <button className="nav-link " style={{border : "0px",backgroundColor : "white"}} onClick={handlePlaylist}>
                       <i className="icon">
                         <svg
                           className="icon-10"
@@ -654,13 +670,58 @@ export default function Aside() {
                         {" "}
                         U
                       </i>
-                      <span className="item-name">User List</span>
+                      <span className="item-name">Playlist</span>
+                    </button>
+                  </li>
+                  <li className="nav-item">
+                    <a className="nav-link " href="app/user-add.html">
+                      <i className="icon">
+                        <svg
+                          className="icon-10"
+                          width={10}
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <g>
+                            <circle cx={12} cy={12} r={8} fill="currentColor" />
+                          </g>
+                        </svg>
+                      </i>
+                      <i
+                        className="sidenav-mini-icon"
+                        data-bs-toggle="tooltip"
+                        title="Add User"
+                        data-bs-placement="right"
+                      >
+                        {" "}
+                        A
+                      </i>
+                      <span className="item-name">Add User</span>
                     </a>
                   </li>
                 </ul>
               </li>
             </ul>
           </div>
+        </div>
+        <div
+          className="scrollbar-track scrollbar-track-x"
+          style={{ display: "none" }}
+        >
+          <div
+            className="scrollbar-thumb scrollbar-thumb-x"
+            style={{ width: 258, transform: "translate3d(0px, 0px, 0px)" }}
+          />
+        </div>
+        <div
+          className="scrollbar-track scrollbar-track-y"
+          style={{ display: "none" }}
+        >
+          <div
+            className="scrollbar-thumb scrollbar-thumb-y"
+            style={{ height: 724, transform: "translate3d(0px, 0px, 0px)" }}
+          />
         </div>
         <div className="sidebar-footer"></div>
       </aside>

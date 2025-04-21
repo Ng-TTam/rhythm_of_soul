@@ -1,34 +1,18 @@
 import React, { useEffect } from "react";
-
+import LoginService from "../services/service";
+import { useNavigate } from "react-router-dom";
 export default function Nav() {
-
-  useEffect(() => {
-    const scripts = [
-      "../assets/js/core/libs.min.js",
-      "../assets/vendor/sheperd/dist/js/sheperd.min.js",
-      "../assets/js/plugins/tour.js",
-      // "../assets/js/plugins/slider-tabs.js",
-      // "../assets/vendor/swiperSlider/swiper-bundle.min.js",
-      // "../assets/js/plugins/swiper-slider.js",
-      // "../assets/vendor/lodash/lodash.min.js",
-      // "../assets/js/iqonic-script/utility.min.js",
-      // "../assets/js/iqonic-script/setting.min.js",
-      // // "../assets/js/setting-init.js",
-      // "../assets/js/core/external.min.js",
-      // "../assets/js/charts/widgetchartsf700.js?v=1.0.1",
-      // "../assets/js/charts/dashboardf700.js?v=1.0.1",
-      // "../assets/js/music-playerf700.js?v=1.0.1",
-      // "../assets/js/muzikf700.js?v=1.0.1",
-    ];
-
-    scripts.forEach((src) => {
-      const script = document.createElement("script");
-      script.src = "/" + src;
-      script.defer = true;
-      document.body.appendChild(script);
-    });
-  }, []);
-
+  const handleLogout = () => {
+    const response = LoginService.logout();
+    console.log(response);
+  }
+  const navigate = useNavigate();
+    const redirectPath = (url : string) => {
+        navigate(url);
+    }
+  const handleToFeed = () => {
+    redirectPath('/feed');
+  }
   return (
     <>
       <div className="position-relative ">
@@ -100,13 +84,14 @@ export default function Nav() {
                       </a>
                     </li>
                     <li className="nav-item">
-                      <a
+                      <button
                         className="nav-link "
                         aria-current="page"
-                        href="release.html"
+                       style={{ border: "none", background: "none" }}
+                        onClick={handleToFeed}
                       >
-                        <span className="item-name">Release</span>
-                      </a>
+                        <span className="item-name">Feed</span>
+                      </button>
                     </li>
                     <li className="nav-item">
                       <a
@@ -604,7 +589,7 @@ export default function Nav() {
                       <hr className="dropdown-divider" />
                     </li>
                     <li>
-                      <a className="dropdown-item" href="auth/sign-in.html">
+                      <a className="dropdown-item" href="/login" onClick={handleLogout}>
                         Logout
                       </a>
                     </li>

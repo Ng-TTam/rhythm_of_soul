@@ -1,20 +1,6 @@
 package com.rhythm_of_soul.identity_service.service.Impl;
 
-import java.text.ParseException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.UUID;
-
-import com.rhythm_of_soul.identity_service.entity.RefreshToken;
-import com.rhythm_of_soul.identity_service.repository.RefreshTokenRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import com.nimbusds.jose.*;
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -25,17 +11,28 @@ import com.rhythm_of_soul.identity_service.dto.request.LogoutRequest;
 import com.rhythm_of_soul.identity_service.dto.request.RefreshRequest;
 import com.rhythm_of_soul.identity_service.dto.response.AuthenticationResponse;
 import com.rhythm_of_soul.identity_service.dto.response.IntrospectResponse;
+import com.rhythm_of_soul.identity_service.entity.RefreshToken;
 import com.rhythm_of_soul.identity_service.entity.User;
 import com.rhythm_of_soul.identity_service.exception.AppException;
 import com.rhythm_of_soul.identity_service.exception.ErrorCode;
+import com.rhythm_of_soul.identity_service.repository.RefreshTokenRepository;
 import com.rhythm_of_soul.identity_service.repository.UserRepository;
 import com.rhythm_of_soul.identity_service.service.AuthenticationService;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -71,25 +68,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return IntrospectResponse.builder().valid(isValid).build();
     }
 
-//    public AuthenticationResponse authenticate(AuthenticationRequest request) {
-//        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-//        User user = userRepository
-//                .findByEmail(request.getEmail())
-//                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-//
-//        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
-//
-//        if (!authenticated) throw new AppException(ErrorCode.UNAUTHENTICATED);
-//
-//        var accessToken = generateToken(user, false);
-//        var refreshToken = generateToken(user, true);
-//
-//        return AuthenticationResponse.builder()
-//                .token(accessToken)
-//                .refreshToken(refreshToken)
-//                .build();
-//    }
-
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         User user = userRepository
@@ -100,10 +78,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         if (!authenticated) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
-        String accessToken = generateToken(user, false);
-        String refreshToken = null;
-        if(Boolean.TRUE.equals(request.getRemember()))
-            refreshToken = generateToken(user, true);
+
+        var accessToken = generateToken(user, false);
+        if(Boolean.FALSE.equals(request.getRemember())) {
+            return AuthenticationResponse.builder()
+                    .token(accessToken)
+                    .build();
+        }
+        var refreshToken = generateToken(user, true);
 
         return AuthenticationResponse.builder()
                 .token(accessToken)

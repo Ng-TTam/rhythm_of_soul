@@ -3,30 +3,6 @@ import React, { useEffect } from "react";
 
 export default function Error404() {
 
-  useEffect(() => {
-    const scripts = [
-      "assets/js/core/libs.min.js",
-      "assets/js/plugins/slider-tabs.js",
-      "assets/vendor/lodash/lodash.min.js",
-      "assets/js/iqonic-script/utility.min.js",
-      "assets/js/iqonic-script/setting.min.js",
-      "assets/js/setting-init.js",
-      "assets/js/core/external.min.js",
-      "assets/js/charts/widgetchartsf700.js?v=1.0.1",
-      "assets/js/charts/dashboardf700.js?v=1.0.1",
-      "assets/js/music-playerf700.js?v=1.0.1",
-      "assets/js/muzikf700.js?v=1.0.1",
-      "assets/js/sidebarf700.js?v=1.0.1",
-    ];
-
-    scripts.forEach((src) => {
-      const script = document.createElement("script");
-      script.src = "/" + src;
-      script.defer = true;
-      document.body.appendChild(script);
-    });
-  }, []);
-
   return (
     <>
       {/* <div id="loading">

@@ -1,4 +1,4 @@
-package com.rhythm_of_soul.identity_service.controller;
+package com.rhythm_of_soul.identity_service.api;
 
 import jakarta.validation.Valid;
 
@@ -13,7 +13,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.servlet.function.EntityResponse;
 
 @RestController
 @RequestMapping("/users")
