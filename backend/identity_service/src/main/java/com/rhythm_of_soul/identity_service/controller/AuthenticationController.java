@@ -1,26 +1,21 @@
 package com.rhythm_of_soul.identity_service.controller;
 
-import java.text.ParseException;
-import java.util.Base64;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rhythm_of_soul.identity_service.constant.SecurityConstants;
-import com.rhythm_of_soul.identity_service.utils.CookieUtil;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.*;
-
 import com.nimbusds.jose.JOSEException;
+import com.rhythm_of_soul.identity_service.constant.SecurityConstants;
 import com.rhythm_of_soul.identity_service.dto.request.*;
 import com.rhythm_of_soul.identity_service.dto.response.AuthenticationResponse;
 import com.rhythm_of_soul.identity_service.dto.response.IntrospectResponse;
 import com.rhythm_of_soul.identity_service.service.AuthenticationService;
-
+import com.rhythm_of_soul.identity_service.utils.CookieUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.web.bind.annotation.*;
+
+import java.text.ParseException;
 
 @RestController
 @RequestMapping("/auth")
@@ -44,6 +39,7 @@ public class AuthenticationController {
 
         return ApiResponse.<AuthenticationResponse>builder().result(result).build();
     }
+
     @GetMapping("/introspect")
     ApiResponse<IntrospectResponse> authenticate(@CookieValue("access_token") String token) {
         IntrospectRequest request = IntrospectRequest.builder().token(token).build();

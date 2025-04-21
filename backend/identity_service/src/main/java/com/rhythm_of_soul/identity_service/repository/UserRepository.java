@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.rhythm_of_soul.identity_service.entity.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, String> {
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
     // Define custom query methods if needed

@@ -47,7 +47,7 @@ public class ApplicationInitConfig {
                         .email(ADMIN_EMAIL)
                         .password(passwordEncoder.encode(ADMIN_PASSWORD))
                         .role(Role.ADMIN)
-                        .verify_email(true)
+                        .isVerify(true)
                         .build();
                 userRepository.save(user);
                 log.warn("Admin user and account created with default password '{}'", ADMIN_PASSWORD);

@@ -1,4 +1,4 @@
-package com.rhythm_of_soul.identity_service.config;
+package com.rhythm_of_soul.identity_service.config.jwt;
 
 import java.util.Objects;
 import javax.crypto.spec.SecretKeySpec;

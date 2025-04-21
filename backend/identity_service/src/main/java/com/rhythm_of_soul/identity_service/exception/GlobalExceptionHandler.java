@@ -15,7 +15,7 @@ import com.rhythm_of_soul.identity_service.dto.request.ApiResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
-@ControllerAdvice
+@ControllerAdvice(basePackages = "com.rhythm_of_soul.identity_service.api")
 @Slf4j
 public class GlobalExceptionHandler {
 

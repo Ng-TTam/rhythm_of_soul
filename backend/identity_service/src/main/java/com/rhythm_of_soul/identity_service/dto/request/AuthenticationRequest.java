@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AuthenticationRequest {
     @NotEmpty
-    String username;
+    String email;
     @NotEmpty
     String password;
     Boolean remember;

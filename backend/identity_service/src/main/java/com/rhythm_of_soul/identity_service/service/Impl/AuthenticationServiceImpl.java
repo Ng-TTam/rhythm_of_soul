@@ -71,21 +71,42 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return IntrospectResponse.builder().valid(isValid).build();
     }
 
+//    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+//        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+//        User user = userRepository
+//                .findByEmail(request.getEmail())
+//                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+//
+//        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+//
+//        if (!authenticated) throw new AppException(ErrorCode.UNAUTHENTICATED);
+//
+//        var accessToken = generateToken(user, false);
+//        var refreshToken = generateToken(user, true);
+//
+//        return AuthenticationResponse.builder()
+//                .token(accessToken)
+//                .refreshToken(refreshToken)
+//                .build();
+//    }
+
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         User user = userRepository
-                .findByEmail(request.getUsername())
+                .findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
 
         if (!authenticated) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
-        var accessToken = generateToken(user, false);
-        var refreshToken = generateToken(user, true);
+        String accessToken = generateToken(user, false);
+        String refreshToken = null;
+        if(Boolean.TRUE.equals(request.getRemember()))
+            refreshToken = generateToken(user, true);
 
-        return AuthenticationResponse.builder().
-                token(accessToken)
+        return AuthenticationResponse.builder()
+                .token(accessToken)
                 .refreshToken(refreshToken)
                 .build();
     }

@@ -17,7 +17,7 @@ public interface UserMapper {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
-                .verify_email(user.isVerify_email())
+                .verify_email(user.isVerify())
                 .role(user.getRole())
                 .build();
     }
@@ -30,8 +30,7 @@ public interface UserMapper {
                 .email(userRequest.getEmail())
                 .password(passwordEncoder.encode(userRequest.getPassword()))
                 .role(Role.USER)
-                .verify_email(false)
+                .isVerify(false)
                 .build();
     }
-    ;
 }
