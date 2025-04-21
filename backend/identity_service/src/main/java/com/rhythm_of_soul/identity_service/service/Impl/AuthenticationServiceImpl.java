@@ -82,6 +82,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (!authenticated) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
         var accessToken = generateToken(user, false);
+        if(Boolean.FALSE.equals(request.getRemember())) {
+            return AuthenticationResponse.builder()
+                    .token(accessToken)
+                    .build();
+        }
         var refreshToken = generateToken(user, true);
 
         return AuthenticationResponse.builder().

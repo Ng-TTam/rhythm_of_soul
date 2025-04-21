@@ -1,18 +1,19 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import Dashboard from './pages/dashboard/Dashboard';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import LoginForm from './pages/login/login';
-import SignUpForm from './pages/login/sign-up';
+import { BrowserRouter as Router, useRoutes } from "react-router-dom";
+import { indexRouter } from './router/indexRouter';
+import { authRouter } from './router/authRouter';
+function AppRouter() {
+  const routes = useRoutes([
+    ...authRouter,
+    indexRouter
+  ]);
+  return routes;
+}
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/sign-up" element={<SignUpForm />} />
-      </Routes>
+      <AppRouter />
     </Router>
   );
 }

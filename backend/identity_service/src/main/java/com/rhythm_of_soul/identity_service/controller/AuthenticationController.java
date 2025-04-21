@@ -63,8 +63,20 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
-        authenticationService.logout(request);
+    ApiResponse<Void> logout(@CookieValue("access_token") String accessToken,
+                             @CookieValue(value = "refresh_token",required = false) String refresh_token,
+                             HttpServletResponse httpResponse,
+                             HttpServletRequest httpRequest) throws ParseException, JOSEException {
+
+        CookieUtil.deleteCookieByName(SecurityConstants.ACCESS_TOKEN, httpRequest, httpResponse);
+        if(refresh_token != null) {
+            LogoutRequest request = LogoutRequest.builder()
+                    .token(refresh_token)
+                    .build();
+            authenticationService.logout(request);
+            CookieUtil.deleteCookieByName(SecurityConstants.REFRESH_TOKEN, httpRequest, httpResponse);
+        }
+
         return ApiResponse.<Void>builder().build();
     }
 
