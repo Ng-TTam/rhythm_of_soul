@@ -4,8 +4,9 @@ import { FaPlayCircle     } from '@react-icons/all-files/fa/FaPlayCircle'; // Th
 import { FaHeart } from '@react-icons/all-files/fa/FaHeart';
 import { FaRetweet } from '@react-icons/all-files/fa/FaRetweet';
 import { FaComment } from '@react-icons/all-files/fa/FaComment';
-import { FaPlus } from '@react-icons/all-files/fa/FaPlus'; // Import icon for new post button
 import PostModal from './PostModal';
+import { useNavigate } from 'react-router-dom';
+
 interface Track {
   id: number;
   username: string;
@@ -67,7 +68,7 @@ const currentUser = {
   avatar: 'https://i1.sndcdn.com/avatars-6zJmWE24BNXpCEdL-qVvuHg-t120x120.jpg'
 };
 const mockPlaylist: Playlist = {
-  id: 1,
+  id: 3,
   title: 'Lift Me Higher',
   userAvatar: 'https://i1.sndcdn.com/avatars-6zJmWE24BNXpCEdL-qVvuHg-t120x120.jpg',
   username: 'Kurt Fitzgerald',
@@ -125,7 +126,10 @@ const LayOut: React.FC = () => {
     username: 'Kurt Fitzgerald', // Example user
     userAvatar: 'https://i1.sndcdn.com/avatars-6zJmWE24BNXpCEdL-qVvuHg-t120x120.jpg'
   };
-
+  const navigate = useNavigate();
+  const handlePostClick = (postId: number) => {
+    navigate(`/post/${postId}`);
+  };
   const handleLike = (id: number) => {
     const alreadyLiked = likedTracks[id];
     setPosts((prev) =>
@@ -324,7 +328,7 @@ const LayOut: React.FC = () => {
               <span>
                 <FaPlayCircle className="me-1 text-info" /> {track.plays}
               </span>
-              <span style={{ cursor: 'pointer' }} onClick={() => toggleComment(track.id)}>
+              <span style={{ cursor: 'pointer' }}  onClick={() => navigate(`/post/${track.id}`)}>
                 <FaComment className="me-1 text-warning" /> Comment
               </span>
             </div>
@@ -432,7 +436,7 @@ const LayOut: React.FC = () => {
               <span>
                 <FaPlayCircle className="me-1 text-info" /> {playlist.plays}
               </span>
-              <span style={{ cursor: 'pointer' }} onClick={() => toggleComment(playlist.id)}>
+              <span style={{ cursor: 'pointer' }} onClick={() => navigate(`/post/${playlist.id}`)}>
                 <FaComment className="me-1 text-warning" /> Comment
               </span>
             </div>

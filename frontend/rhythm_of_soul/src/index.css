@@ -62,5 +62,11 @@ code {
 .track-image:hover {
   transform: scale(1.05);
 }
-
-
+/*Sidebar */
+.btn-sidebar {
+  background-color: white;
+    border: none;
+    width: 100%;
+    text-align: left;
+}
+/* PostDetail */

@@ -14,6 +14,7 @@
     "@types/react-dom": "^19.1.2",
     "axios": "^1.8.4",
     "bootstrap": "^5.3.5",
+    "jquery": "^3.7.1",
     "lucide-react": "^0.501.0",
     "react": "^19.1.0",
     "react-bootstrap": "^2.10.9",
@@ -25,7 +26,7 @@
     "sweetalert2": "^11.18.0",
     "swiper": "^11.2.6",
     "typescript": "^4.9.5",
-    "wavesurfer.js": "^7.9.4",
+    "wavesurfer.js": "^6.6.4",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -54,6 +55,7 @@
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.10",
-    "@types/react-router-dom": "^5.3.3"
+    "@types/react-router-dom": "^5.3.3",
+    "@types/wavesurfer.js": "^6.0.12"
   }
 }

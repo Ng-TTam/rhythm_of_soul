@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Button } from "react-bootstrap";
 import { Outlet, useNavigate } from 'react-router-dom';
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -15,6 +16,9 @@ export default function Sidebar() {
   }, []);
   const handlePlaylist = () => {
     redirectPath('/playlist');
+  }
+  const handleProfileUser = () => {
+    redirectPath('/profile');
   }
   return (
     <>
@@ -593,7 +597,7 @@ export default function Sidebar() {
                   data-bs-parent="#sidebar-menu"
                 >
                   <li className="nav-item">
-                    <a className="nav-link " href="app/user-profile.html">
+                    <button className="nav-link btn-sidebar" onClick={handleProfileUser}>
                       <i className="icon">
                         <svg
                           className="icon-10"
@@ -617,7 +621,7 @@ export default function Sidebar() {
                         U{" "}
                       </i>
                       <span className="item-name">User Profile</span>
-                    </a>
+                    </button>
                   </li>
                   <li className="nav-item">
                     <a className="nav-link " href="app/user-add.html">
@@ -647,7 +651,7 @@ export default function Sidebar() {
                     </a>
                   </li>
                   <li className="nav-item">
-                    <button className="nav-link " style={{border : "0px",backgroundColor : "white"}} onClick={handlePlaylist}>
+                    <button className="nav-link btn-sidebar" onClick={handlePlaylist}>
                       <i className="icon">
                         <svg
                           className="icon-10"
