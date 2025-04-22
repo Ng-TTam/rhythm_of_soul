@@ -2,6 +2,18 @@ import React from 'react'
 import ListSongs from '../../components/songs/ListSongs'
 
 export default function CreateAlbum() {
+    const songs = [
+        {
+          id: 1,
+          image: '/assets/images/dashboard/14.png',
+          name: 'Heart Is Beating',
+          genre: 'Romantic Song',
+          writer: 'Edyta Gorniak',
+          singer: 'Jhone Steben',
+          listener: '4.6k',
+          reviews: 12,
+        },
+      ];
     return (
         <>
             <div>
@@ -40,7 +52,8 @@ export default function CreateAlbum() {
                             <label htmlFor="writerdescription" className="form-label">Album Description:</label>
                             <textarea className="form-control" id="writerdescription" rows={5} defaultValue={""} />
                         </div>
-                        <ListSongs />
+                        <ListSongs songs={songs} />;
+
                         <button type="submit" className="btn btn-primary">Submit</button>
                         <button type="reset" className="btn btn-danger">Reset</button>
                     </form>
