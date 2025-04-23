@@ -7,8 +7,9 @@
     import PlayListOwner from '../components/playlist/PlayListOwner'
     import APlayList  from '../components/playlist/PlayListDetail'
     import Feed from '../pages/feed/Feed'
+    import PostTrackDetail from '../pages/feed/PostTrackDetail'
+    import PostPlaylistDetail from '../pages/feed/PostPlaylistDetail'
     import UserProfile from '../pages/user/UserProfile'
-    import PostDetail from '../pages/feed/PostDetail'
     export const indexRouter : any = {
         path:'/',
         element : (<Dashboard />),
@@ -22,9 +23,10 @@
                 ]
             
             },
-            {path : 'profile',element : (<UserProfile />)},
+            {path : 'userProfile/:id',element : (<UserProfile />)},
             {path : 'feed',element : (<Feed />)},
-            {path: "post/:postId", element:(<PostDetail />)},
+            {path: "postTrack/:postId", element:(<PostTrackDetail />)},
+            {path: "postPlaylist/:postId", element:(<PostPlaylistDetail />)},
             {path : 'aplaylist', element :<APlayList />},
             {path : '',element : (<MainContent />)},
         ]

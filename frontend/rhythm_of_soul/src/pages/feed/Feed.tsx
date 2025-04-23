@@ -127,9 +127,6 @@ const LayOut: React.FC = () => {
     userAvatar: 'https://i1.sndcdn.com/avatars-6zJmWE24BNXpCEdL-qVvuHg-t120x120.jpg'
   };
   const navigate = useNavigate();
-  const handlePostClick = (postId: number) => {
-    navigate(`/post/${postId}`);
-  };
   const handleLike = (id: number) => {
     const alreadyLiked = likedTracks[id];
     setPosts((prev) =>
@@ -271,6 +268,7 @@ const LayOut: React.FC = () => {
           <img
             src={track.userAvatar}
             alt={track.username}
+            
             className="me-2"
             style={{ width: 40, height: 40, borderRadius: '50%' }}
           />
@@ -287,6 +285,7 @@ const LayOut: React.FC = () => {
             src={track.imageUrl}
             alt={track.title}
             className="me-3"
+            onClick={() => navigate(`/postTrack/${track.id}`)}
             style={{ width: 150, borderRadius: 10 }}
           />
           <div className="flex-grow-1">
@@ -328,19 +327,7 @@ const LayOut: React.FC = () => {
               <span>
                 <FaPlayCircle className="me-1 text-info" /> {track.plays}
               </span>
-              <span style={{ cursor: 'pointer' }}  onClick={() => navigate(`/post/${track.id}`)}>
-                <FaComment className="me-1 text-warning" /> Comment
-              </span>
             </div>
-            {commentVisible[track.id] && (
-              <Form className="mt-3">
-                <Form.Control
-                  type="text"
-                  placeholder="Write a comment..."
-                  className="bg-light text-dark"
-                />
-              </Form>
-            )}
           </div>
         </Card.Body>
       </Card>
@@ -372,6 +359,7 @@ const LayOut: React.FC = () => {
             <img
               src={playlist.imageUrl}
               alt={playlist.title}
+              onClick={() => navigate(`/postPlaylist/${playlist.id}`)}
               style={{ width: 150, height: 150, borderRadius: 10, marginRight: '20px' }}
             />
             <div>
@@ -388,6 +376,7 @@ const LayOut: React.FC = () => {
               <img
                 src={track.imageUrl}
                 alt={track.title}
+                onClick={() => navigate(`/postTrack/${track.id}`)}
                 style={{ width: 50, height: 50, borderRadius: 5, marginRight: '10px' }}
               />
               <div className="flex-grow-1">
@@ -436,19 +425,7 @@ const LayOut: React.FC = () => {
               <span>
                 <FaPlayCircle className="me-1 text-info" /> {playlist.plays}
               </span>
-              <span style={{ cursor: 'pointer' }} onClick={() => navigate(`/post/${playlist.id}`)}>
-                <FaComment className="me-1 text-warning" /> Comment
-              </span>
             </div>
-            {commentVisible[playlist.id] && (
-              <Form className="mt-3">
-                <Form.Control
-                  type="text"
-                  placeholder="Write a comment..."
-                  className="bg-light text-dark"
-                />
-              </Form>
-            )}
           </div>
         </Card.Body>
       </Card>

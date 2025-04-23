@@ -17,8 +17,8 @@ export default function Sidebar() {
   const handlePlaylist = () => {
     redirectPath('/playlist');
   }
-  const handleProfileUser = () => {
-    redirectPath('/profile');
+  const handleProfileUser = (id :number) => {
+    redirectPath(`/userProfile/${id}`);
   }
   return (
     <>
@@ -597,7 +597,7 @@ export default function Sidebar() {
                   data-bs-parent="#sidebar-menu"
                 >
                   <li className="nav-item">
-                    <button className="nav-link btn-sidebar" onClick={handleProfileUser}>
+                    <button className="nav-link btn-sidebar" onClick={() => handleProfileUser(1)}>
                       <i className="icon">
                         <svg
                           className="icon-10"

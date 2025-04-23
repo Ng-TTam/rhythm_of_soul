@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Container, Card, Button, Row, Col, Form, ListGroup, CardBody } from 'react-bootstrap';
-import { useParams, useNavigate, Navigate } from 'react-router-dom';
+import { Container, Card, Button, Row, Col, Form } from 'react-bootstrap';
+import { useParams, useNavigate } from 'react-router-dom';
 import { FaPlay } from '@react-icons/all-files/fa/FaPlay';
 import { FaPause } from '@react-icons/all-files/fa/FaPause';
 import { FaHeart } from '@react-icons/all-files/fa/FaHeart';
 import { FaRetweet } from '@react-icons/all-files/fa/FaRetweet';
 import { FaComment } from '@react-icons/all-files/fa/FaComment';
-import { FaArrowLeft } from '@react-icons/all-files/fa/FaArrowLeft';
 import { FaPaperPlane } from '@react-icons/all-files/fa/FaPaperPlane';
-import { Columns } from 'lucide-react';
 
 interface Comment {
     id: number;
@@ -34,20 +32,6 @@ interface Track {
     comments?: Comment[];
 }
 
-interface Playlist {
-    id: number;
-    title: string;
-    username: string;
-    userAvatar: string;
-    content: string;
-    likes: number;
-    retweets: number;
-    plays: number;
-    imageUrl: string;
-    timePosted: string;
-    tracks: Track[];
-    comments?: Comment[];
-}
 
 // Mock data - in a real app, this would come from a global state manager or API
 const mockTracks: Track[] = [
@@ -96,61 +80,37 @@ const mockTracks: Track[] = [
         plays: 148,
         comments: []
     },
+    {
+        id: 3,
+        username: 'Arcane, League Of Legends, Stromae, Pommer',
+        userAvatar: 'https://i1.sndcdn.com/avatars-6zJmWE24BNXpCEdL-qVvuHg-t120x120.jpg',
+        timePosted: '2 hours ago',
+        title: 'Ma Meill...',
+        content: 'A timeless classic.',
+        duration: '2:57',
+        imageUrl: 'https://i1.sndcdn.com/artworks-bEaCVtUyQtiSRt4G-K2gvog-t500x500.png',
+        likes: 1,
+        retweets: 1,
+        plays: 168000,
+      },
+      {
+        id: 4,
+        username: 'Macklemore feat. Kesha',
+        userAvatar: 'https://i1.sndcdn.com/avatars-6zJmWE24BNXpCEdL-qVvuHg-t120x120.jpg',
+        timePosted: '6 hours ago',
+        title: 'Good Old Days (feat. Kesha)',
+        content: 'Get pumped with this high-energy track!',
+        duration: '1:53',
+        imageUrl: 'https://i1.sndcdn.com/artworks-bEaCVtUyQtiSRt4G-K2gvog-t500x500.png',
+        likes: 6,
+        retweets: 1,
+        plays: 11900000,
+      },
 ];
 
-const mockPlaylist: Playlist = {
-    id: 3,
-    title: 'Lift Me Higher',
-    userAvatar: 'https://i1.sndcdn.com/avatars-6zJmWE24BNXpCEdL-qVvuHg-t120x120.jpg',
-    username: 'Kurt Fitzgerald',
-    content: 'A collection of uplifting tracks to start your day right.',
-    imageUrl: 'https://i1.sndcdn.com/artworks-bEaCVtUyQtiSRt4G-K2gvog-t500x500.png',
-    timePosted: '1 month ago',
-    likes: 10,
-    retweets: 5,
-    plays: 10000,
-    tracks: [
-        {
-            id: 4,
-            username: 'Arcane, League Of Legends, Stromae, Pommer',
-            userAvatar: 'https://i1.sndcdn.com/avatars-6zJmWE24BNXpCEdL-qVvuHg-t120x120.jpg',
-            timePosted: '2 hours ago',
-            title: 'Ma Meill...',
-            content: 'A timeless classic.',
-            duration: '2:57',
-            imageUrl: 'https://i1.sndcdn.com/artworks-bEaCVtUyQtiSRt4G-K2gvog-t500x500.png',
-            likes: 1,
-            retweets: 1,
-            plays: 168000,
-        },
-        {
-            id: 5,
-            username: 'Macklemore feat. Kesha',
-            userAvatar: 'https://i1.sndcdn.com/avatars-6zJmWE24BNXpCEdL-qVvuHg-t120x120.jpg',
-            timePosted: '6 hours ago',
-            title: 'Good Old Days (feat. Kesha)',
-            content: 'Get pumped with this high-energy track!',
-            duration: '1:53',
-            imageUrl: 'https://i1.sndcdn.com/artworks-bEaCVtUyQtiSRt4G-K2gvog-t500x500.png',
-            likes: 6,
-            retweets: 1,
-            plays: 11900000,
-        },
-    ],
-    comments: [
-        {
-            id: 3,
-            username: 'Jane Doe',
-            userAvatar: 'https://i1.sndcdn.com/avatars-000987654321-ef5gh6-t120x120.jpg',
-            text: 'This playlist is just what I needed today!',
-            timestamp: '3 days ago',
-            likes: 12,
-        }
-    ]
-};
 
 // Mock posts data
-const mockPosts: Array<Track | Playlist> = [...mockTracks, mockPlaylist];
+const mockPosts: Array<Track > = [...mockTracks];
 
 const currentUser = {
     username: 'Current User',
@@ -167,8 +127,10 @@ const PostDetail: React.FC = () => {
     const [newComment, setNewComment] = useState<string>('');
     const [likedComments, setLikedComments] = useState<{ [key: number]: boolean }>({});
     const [isLiked, setIsLiked] = useState<boolean>(false);
-    const [isReported, setIsReported] = useState<boolean>(false);
+    const [isReposted, setIsReposted] = useState<boolean>(false);
     const [playingTrackId, setPlayingTrackId] = useState<number | null>(null);
+    const [likesCount, setLikesCount] = useState<number>(post?.likes || 0);
+    const [repostsCount, setRepostsCount] = useState<number>(post?.retweets || 0);
 
     const commentInputRef = useRef<HTMLTextAreaElement>(null);
     const [showAllComments, setShowAllComments] = useState<boolean>(false);
@@ -181,19 +143,17 @@ const PostDetail: React.FC = () => {
     }, [post]);
 
     // If post not found, show error
-        if (!post) {
-            return (
-                <Container className="my-5 text-center">
-                    <h2>Post not found</h2>
-                    <p>The post you're looking for doesn't exist or has been removed.</p>
-                    <Button variant="primary" onClick={() => navigate('/')}>
-                        Back to Home
-                    </Button>
-                </Container>
-            );
-        }
-
-    const isPlaylist = 'tracks' in post;
+    if (!post) {
+        return (
+            <Container className="my-5 text-center">
+                <h2>Post not found</h2>
+                <p>The post you're looking for doesn't exist or has been removed.</p>
+                <Button variant="primary" onClick={() => navigate('/')}>
+                    Back to Home
+                </Button>
+            </Container>
+        );
+    }
     const displayedComments = showAllComments ? comments : comments.slice(0, 3);
 
     const handleCommentSubmit = (e: React.FormEvent) => {
@@ -235,23 +195,12 @@ const PostDetail: React.FC = () => {
 
     const handleLike = () => {
         setIsLiked(!isLiked);
-        if(isLiked) {
-            post.likes -= 1;
-        }else {
-            post.likes += 1;
-        }
-        // In a real app, update the post like count in state or API
+        setLikesCount(prev => prev + (isLiked ? -1 : 1));
     };
 
     const handleRepost = () => {
-        setIsReported(!isReported);
-        if(isReported) {
-            post.retweets -= 1;
-        }
-        else {
-            post.retweets += 1;
-        }
-        // In a real app, update the post repost count in state or API
+        setIsReposted(!isReposted);
+        setRepostsCount(prev => prev + (isReposted ? -1 : 1));
     };
 
     const handlePlayPause = (id: number) => {
@@ -263,6 +212,15 @@ const PostDetail: React.FC = () => {
         }
     };
 
+    const formatPlays = (plays: number): string => {
+        if (plays >= 1000000) {
+            return `${(plays / 1000000).toFixed(1)}M`;
+        } else if (plays >= 1000) {
+            return `${(plays / 1000).toFixed(1)}K`;
+        }
+        return plays.toString();
+    };
+
     return (
         <Container className="my-4 pb-5">
             <Row>
@@ -271,7 +229,8 @@ const PostDetail: React.FC = () => {
                         <Card.Img
                             variant="top"
                             src={post.imageUrl}
-                            alt={isPlaylist ? post.title : post.title}
+                            alt={post.title}
+                            className="img-fluid"
                         />
                     </Card>
 
@@ -282,100 +241,74 @@ const PostDetail: React.FC = () => {
                                     src={post.userAvatar}
                                     alt={post.username}
                                     className="me-2 rounded-circle"
-                                    style={{ width: 40, height: 40 }}
+                                    style={{ width: 40, height: 40, objectFit: 'cover' }}
                                 />
                                 <div>
                                     <div className="text-muted small">Artist</div>
                                     <div className="fw-bold">{post.username}</div>
                                 </div>
-                                <div className="mb-3" style={{ width: "80%", textAlign: "end" }}>
+                                <div className="ms-auto text-end">
                                     <div className="text-muted small">Posted</div>
                                     <div>{post.timePosted}</div>
-
                                 </div>
                             </div>
-                            <div className="mb-3 small" style={{paddingLeft:"50px"}}>
+                            <div className="mb-3 small" style={{ paddingLeft: "50px" }}>
                                 <p>{post.content}</p>
                             </div>
-                            <div className="d-flex align-items-center mb-3" style={{marginTop :"20px",borderTop :"1px solid white",paddingTop:"10px"}}>
-                                {!isPlaylist && (
+                            <div className="d-flex align-items-center mb-3" style={{ marginTop: "20px", borderTop: "1px solid rgba(255,255,255,0.2)", paddingTop: "10px" }}>
                                     <Button
                                         variant={playingTrackId === post.id ? "danger" : "primary"}
-                                        className="me-3 rounded-circle"
-                                        style={{ width: 75, height: 75, background: "none", borderRadius: 30, border: "4px solid" }}
-
-                                        onClick={() => handlePlayPause(isPlaylist ? -1 : post.id)}
+                                        className="me-3 d-flex align-items-center justify-content-center"
+                                        style={{ 
+                                            width: 75, 
+                                            height: 75, 
+                                            background: "none", 
+                                            borderRadius: "50%", 
+                                            border: "4px solid",
+                                            borderColor: playingTrackId === post.id ? "#dc3545" : "#0d6efd"
+                                        }}
+                                        onClick={() => handlePlayPause(post.id)}
                                     >
                                         {playingTrackId === post.id ? <FaPause size={24} /> : <FaPlay size={24} />}
                                     </Button>
-                                )}
                                 <div>
-                                    <h2 className="mb-1 text-white ">{isPlaylist ? post.title : post.title}</h2>
-                                   
-                                </div>
-                            </div>
-
-                        </Card.Body>
-                        <Card.Body style={{ alignContent: "end" }}>
-                            <div className="mb-3" >
-                                <div className="d-flex justify-content-between" style={{ margin: "auto", width: "50%" }}>
-                                    <span ><FaPlay className="me-1 text-info"  /> {post.plays}</span>
-                                    <span ><FaHeart className="me-1 text-danger" onClick={handleLike} /> {post.likes}</span>
-                                    <span ><FaRetweet className="me-1 text-success" onClick={handleRepost} /> {post.retweets}</span>
+                                    <h2 className="mb-1 text-white">{post.title}</h2>
+                                    <div className="text-muted">{post.duration}</div>
                                 </div>
                             </div>
                         </Card.Body>
+                        <Card.Footer>
+                            <div className="mb-2">
+                                <div className="d-flex justify-content-center gap-5">
+                                    <span>
+                                        <FaPlay className="me-1 text-info" /> {formatPlays(post.plays)}
+                                    </span>
+                                    <span>
+                                        <FaHeart 
+                                            className={`me-1 ${isLiked ? 'text-danger' : 'text-secondary'}`} 
+                                            onClick={handleLike}
+                                            style={{ cursor: 'pointer' }}
+                                        /> {likesCount}
+                                    </span>
+                                    <span>
+                                        <FaRetweet 
+                                            className={`me-1 ${isReposted ? 'text-success' : 'text-secondary'}`} 
+                                            onClick={handleRepost}
+                                            style={{ cursor: 'pointer' }}
+                                        /> {repostsCount}
+                                    </span>
+                                </div>
+                            </div>
+                        </Card.Footer>
                     </Card>
-
                 </Row>
-                {isPlaylist && (
-                    <>
-                        <Col lg={4}>
-                            <CardBody className=" mb-4">
-                                <div className=" mb-3 " style={{ textAlign: "center" }}>
-                                    <img
-                                        src={post.userAvatar}
-                                        alt={post.username}
-                                        className="me-2 rounded-circle"
-                                        style={{ width: "50%", height: "50%" }}
-                                    />
-
-                                    <div style={{ marginTop: "10px" }}>
-                                        <div className="fw-bold ">{post.username}</div>
-                                    </div>
-                                </div>
-                            </CardBody>
-                        </Col>
-                        <Col lg={8}>
-                                <Card className="bg-white text-black mb-4 col-lg-11">
-                                    <Card.Header>
-                                        <h5 className="mb-0">Playlist Tracks</h5>
-                                    </Card.Header>
-                                    <ListGroup variant="flush">
-                                        {post.tracks.map((track, index) => (
-                                            <ListGroup.Item key={track.id} className="bg-white text-black border-secondary">
-                                                <div className="d-flex align-items-center">
-                                                    <div className="me-2">{index + 1}.</div>
-                                                    <div className="flex-grow-1">
-                                                        <div className="text-truncate">{track.title}</div>
-                                                        <small className="text-muted">{track.username}</small>
-                                                    </div>
-                                                    <div style={{ cursor: 'pointer' }} onClick={() => handlePlayPause(track.id)}>
-                                                        {playingTrackId === track.id ? <FaPause /> : <FaPlay />}
-                                                    </div>
-                                                </div>
-                                            </ListGroup.Item>
-                                        ))}
-                                    </ListGroup>
-                                </Card>
-                        </Col>
-                    </>
-                )}
-                <Col >
-
+                
+                
+                <Col>
                     <Card className="bg-white text-dark">
-                        <Card.Header>
+                        <Card.Header className="d-flex justify-content-between align-items-center">
                             <h4 className="mb-0">Comments ({comments.length})</h4>
+                            <FaComment />
                         </Card.Header>
                         <Card.Body>
                             <Form className="mb-4" onSubmit={handleCommentSubmit}>
@@ -421,7 +354,7 @@ const PostDetail: React.FC = () => {
                                                 style={{ width: 40, height: 40 }}
                                             />
                                             <div className="flex-grow-1">
-                                                <div className="bg-secondary bg-opacity-25 p-3 rounded">
+                                                <div className="bg-secondary bg-opacity-10 p-3 rounded">
                                                     <div className="d-flex justify-content-between align-items-center mb-2">
                                                         <strong>{comment.username}</strong>
                                                         <small className="text-muted">{comment.timestamp}</small>
@@ -450,7 +383,7 @@ const PostDetail: React.FC = () => {
                                 {comments.length > 3 && (
                                     <div className="text-center mt-3">
                                         <Button
-                                            variant="outline-light"
+                                            variant="outline-secondary"
                                             size="sm"
                                             onClick={() => setShowAllComments(!showAllComments)}
                                         >

@@ -6,6 +6,7 @@
 * Design and Developed by: iqonic.design
 * Description: This file contains the script for initialize & listener Template.
 */
+
 (function(){
     "use strict";
     const sidebarInit = () => {
@@ -69,7 +70,7 @@
                 const childMenu = elem.closest('ul')
                 const parentMenu = childMenu.closest('li').querySelector('.nav-link')
                 parentMenu.classList.add('active')
-                new window.bootstrap.Collapse(childMenu, {
+                new bootstrap.Collapse(childMenu, {
                 toggle: true
                 });
             }

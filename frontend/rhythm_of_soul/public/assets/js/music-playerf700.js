@@ -1,4 +1,3 @@
-
 let now_playing = document.querySelector(".now-playing");
 let track_art = document.querySelector(".track-art");
 let track_name = document.querySelector(".track-name");
@@ -19,7 +18,6 @@ let updateTimer;
 
 // Create new audio element
 let curr_track = document.createElement('audio');
-// eslint-disable-next-line no-undef
 const path = $('[name="root_path"]').attr('content')
 // Define the tracks that have to be played
 let track_list = [
@@ -115,7 +113,7 @@ function prevTrack() {
 }
 
 function seekTo() {
-  let seekto = curr_track.duration * (seek_slider.value / 100);
+  seekto = curr_track.duration * (seek_slider.value / 100);
   curr_track.currentTime = seekto;
 }
 

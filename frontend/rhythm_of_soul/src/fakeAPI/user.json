@@ -1,0 +1,60 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "Austin Robertson",
+      "position": "Web Developer",
+      "avatar": "/assets/images/dashboard/64.jpg",
+      "description": "Passionate dev",
+      "bio": "Lover of music",
+      "joined": "Feb 15, 2021",
+      "location": "United States of America",
+      "email": "austin@gmail.com",
+      "url": "https://austin.dev",
+      "contact": "(001) 4544 565 456",
+      "role": "artist"
+    },
+    {
+      "id": "2",
+      "name": "Lana Byrd",
+      "position": "UI/UX Designer",
+      "avatar": "/assets/images/dashboard/63.jpg",
+      "description": "Creative designer",
+      "bio": "Minimalist & traveler",
+      "joined": "Mar 12, 2022",
+      "location": "Canada",
+      "email": "lana@gmail.com",
+      "url": "https://lana.design",
+      "contact": "(002) 1234 567 890",
+      "role": "designer"
+    },
+    {
+      "id": "3",
+      "name": "Mark Smith",
+      "position": "Backend Developer",
+      "avatar": "/assets/images/dashboard/62.jpg",
+      "description": "Node.js and Java enthusiast",
+      "bio": "Coder by day, gamer by night",
+      "joined": "Jan 5, 2023",
+      "location": "United Kingdom",
+      "email": "marksmith@gmail.com",
+      "url": "https://markbackend.dev",
+      "contact": "(003) 2222 333 444",
+      "role": "developer"
+    },
+    {
+      "id": "4",
+      "name": "Emily Carter",
+      "position": "Content Creator",
+      "avatar": "/assets/images/dashboard/61.jpg",
+      "description": "Social media wizard",
+      "bio": "Content is king",
+      "joined": "Nov 23, 2020",
+      "location": "Australia",
+      "email": "emily.carter@gmail.com",
+      "url": "https://emilycreator.com",
+      "contact": "(004) 9999 888 777",
+      "role": "creator"
+    }
+  ]
+}
