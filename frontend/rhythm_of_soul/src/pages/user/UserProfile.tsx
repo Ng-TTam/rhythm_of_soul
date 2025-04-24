@@ -1,15 +1,12 @@
-import React, { useState,useEffect,useRef } from "react";
-import Feeds from "./Feeds";
-import Profile from "./Profile";
-import Follows from "./Follows";
-import EditProfileDialog from "./EditProfileDialog";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams, Outlet } from "react-router-dom";
 import { User } from "../../model/UserProfile";
-import { useParams } from 'react-router-dom';
-import  ProfileService  from "../../services/profileService";
-// Removed the conflicting import of User from "lucide-react"
+import ProfileService from "../../services/profileService";
 
 export default function UserProfile() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [userData, setUserData] = useState<User>({
     id: "",
     name: "",
@@ -24,42 +21,20 @@ export default function UserProfile() {
     contact: "",
     role: "user",
   });
-const userRef = useRef<User>({
-    id: "",
-    name: "",
-    position: "",
-    avatar: "",
-    description: "",
-    bio: "",
-    joined: "",
-    location: "",
-    email: "",
-    url: "",
-    contact: "",
-    role: "user"
-  });
+
   useEffect(() => {
     const fetchUserData = async () => {
-        try {
-          const response = await ProfileService.getUserProfile(id?.toString() || "");
-          setUserData(response);
-          userRef.current = response;
-        }catch (error) {
-          console.error("Error fetching user data:", error);
-        }
+      try {
+        const response = await ProfileService.getUserProfile(id?.toString() || "");
+        setUserData(response);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
     };
     fetchUserData();
   }, [id]);
-  const [showEditDialog, setShowEditDialog] = useState(false);
-  const handleSave = (updated: any) => {  
-    setUserData((prev) => ({
-      ...prev,
-      ...updated,
-      name: updated.firstName + " " + updated.lastName,
-      location: updated.city + ", " + updated.country,
-    }));
-    setShowEditDialog(false);
-  };
+
+  const goTo = (path: string) => {navigate(path);console.log(path);}
 
   return (
     <div className="content-inner container-fluid pb-0" id="page_layout">
@@ -82,28 +57,29 @@ const userRef = useRef<User>({
                     <span> - {userData.position}</span>
                   </div>
                 </div>
+
                 <ul className="d-flex nav nav-pills mb-0 text-center profile-tab" role="tablist">
                   <li className="nav-item">
-                    <a className="nav-link active" data-bs-toggle="pill" href="#profile-feeds" role="tab">Feeds</a>
+                    <button className="nav-link btn" onClick={() => goTo("feeds")}>Feeds</button>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link" data-bs-toggle="pill" href="#profile-follows" role="tab">Follows</a>
+                    <button className="nav-link btn" onClick={() => goTo("follows")}>Follows</button>
                   </li>
-                  {userRef.current.role === "artist" && (
+                  {userData.role === "artist" && (
                     <>
                       <li className="nav-item">
-                        <a className="nav-link" data-bs-toggle="pill" href="#profile-songs" role="tab">Songs</a>
+                        <button className="nav-link btn" onClick={() => goTo("songs")}>Songs</button>
                       </li>
                       <li className="nav-item">
-                        <a className="nav-link" data-bs-toggle="pill" href="#profile-albums" role="tab">Albums</a>
+                        <button className="nav-link btn" onClick={() => goTo("albums")}>Albums</button>
                       </li>
                     </>
                   )}
                   <li className="nav-item">
-                    <a className="nav-link" data-bs-toggle="pill" href="#profile-playlists" role="tab">Playlists</a>
+                    <button className="nav-link btn" onClick={() => goTo("playlists")}>Playlists</button>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link" data-bs-toggle="pill" href="#profile-settings" role="tab">Profile</a>
+                    <button className="nav-link btn" onClick={() => goTo("settings")}>Profile</button>
                   </li>
                 </ul>
               </div>
@@ -112,91 +88,9 @@ const userRef = useRef<User>({
         </div>
 
         <div className="col-lg-12">
-          <div className="tab-content">
-            <div id="profile-feeds" className="tab-pane fade show active" role="tabpanel">
-              <Feeds
-                userName="Anna Sthesia"
-                userRole="Colleague"
-                userAvatar="/assets/images/dashboard/64.jpg"
-                postImage="/assets/images/pages/03-page.jpg"
-                postTime="29 mins"
-                comments={[
-                  {
-                    avatar: "/assets/images/dashboard/55.png",
-                    name: "Monty Carlo",
-                    content: "Lorem ipsum dolor sit amet",
-                    time: "5 min"
-                  },
-                  {
-                    avatar: "/assets/images/dashboard/60.png",
-                    name: "Paul Molive",
-                    content: "Lorem ipsum dolor sit amet",
-                    time: "5 min"
-                  }
-                ]}
-              />
-            </div>
-
-            <div id="profile-follows" className="tab-pane fade" role="tabpanel">
-              <Follows
-                follows={[
-                  {
-                    avatar: "/assets/images/dashboard/55.png",
-                    name: "Paul Molive",
-                    job: "Web Designer",
-                    dropdownId: "dropdownMenuButton9"
-                  },
-                  {
-                    avatar: "/assets/images/dashboard/58.png",
-                    name: "Paul Molive",
-                    job: "Trainee",
-                    dropdownId: "dropdownMenuButton10"
-                  },
-                  {
-                    avatar: "/assets/images/dashboard/59.png",
-                    name: "Anna Mull",
-                    job: "Web Developer",
-                    dropdownId: "dropdownMenuButton11"
-                  },
-                ]}
-              />
-            </div>
-
-            <div id="profile-settings" className="tab-pane fade" role="tabpanel">
-              <Profile
-                name={userData.name}
-                role={userData.position}
-                description={userData.description}
-                avatar={userData.avatar}
-                bio={userData.bio}
-                joined={userData.joined}
-                location={userData.location}
-                email={userData.email}
-                url={userData.url}
-                contact={userData.contact}
-                onEdit={() => setShowEditDialog(true)}
-              />
-            </div>
-          </div>
+          <Outlet />
         </div>
       </div>
-
-      {/* Hộp thoại chỉnh sửa */}
-      <EditProfileDialog
-        visible={showEditDialog}
-        onClose={() => setShowEditDialog(false)}
-        onSave={handleSave}
-        initialData={{
-          name: userData.name,
-          firstName: userData.name.split(" ")[0] || "",
-          lastName: userData.name.split(" ").slice(1).join(" ") || "",
-          avatar: userData.avatar,
-          url: userData.url,
-          city: userData.location.split(",")[0]?.trim() || "",
-          country: userData.location.split(",")[1]?.trim() || "",
-          bio: userData.bio,
-        }}
-      />
     </div>
   );
 }

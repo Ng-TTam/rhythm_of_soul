@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
-interface ProfileProps {
+interface ProfileData {
   name: string;
   role: string;
   description: string;
@@ -11,22 +12,37 @@ interface ProfileProps {
   email: string;
   url: string;
   contact: string;
-  onEdit?: () => void; // thêm prop onEdit
 }
 
-export default function Profile({
-  name,
-  role,
-  description,
-  avatar,
-  bio,
-  joined,
-  location,
-  email,
-  url,
-  contact,
-  onEdit
-}: ProfileProps) {
+export default function Profile() {
+  const { id } = useParams();
+  const [userData, setUserData] = useState<ProfileData>({
+    name: "",
+    role: "",
+    description: "",
+    avatar: "",
+    bio: "",
+    joined: "",
+    location: "",
+    email: "",
+    url: "",
+    contact: ""
+  });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch(`/api/users/${id}/profile`);
+        const data = await response.json();
+        setUserData(data);
+      } catch (error) {
+        console.error("Failed to fetch profile data", error);
+      }
+    };
+
+    fetchProfile();
+  }, [id]);
+
   return (
     <>
       <div className="card">
@@ -38,12 +54,12 @@ export default function Profile({
         <div className="card-body">
           <div className="text-center">
             <div>
-              <img src={avatar} alt="profile-img" className="rounded-pill avatar-130 img-fluid" loading="lazy" />
+              <img src={userData.avatar} alt="profile-img" className="rounded-pill avatar-130 img-fluid" loading="lazy" />
             </div>
             <div className="mt-3">
-              <h3 className="d-inline-block">{name}</h3>
-              <p className="d-inline-block ps-2">- {role}</p>
-              <p className="mb-0">{description}</p>
+              <h3 className="d-inline-block">{userData.name}</h3>
+              <p className="d-inline-block ps-2">- {userData.role}</p>
+              <p className="mb-0">{userData.description}</p>
             </div>
           </div>
         </div>
@@ -57,36 +73,33 @@ export default function Profile({
         </div>
         <div className="card-body">
           <div className="user-bio">
-            <p>{bio}</p>
+            <p>{userData.bio}</p>
           </div>
           <div className="mt-2">
             <h6 className="mb-1">Joined:</h6>
-            <p>{joined}</p>
+            <p>{userData.joined}</p>
           </div>
           <div className="mt-2">
             <h6 className="mb-1">Lives:</h6>
-            <p>{location}</p>
+            <p>{userData.location}</p>
           </div>
           <div className="mt-2">
             <h6 className="mb-1">Email:</h6>
-            <p><a href={`mailto:${email}`} className="text-body">{email}</a></p>
+            <p><a href={`mailto:${userData.email}`} className="text-body">{userData.email}</a></p>
           </div>
           <div className="mt-2">
             <h6 className="mb-1">Url:</h6>
-            <p><a href={url} className="text-body" target="_blank" rel="noopener noreferrer">{url}</a></p>
+            <p><a href={userData.url} className="text-body" target="_blank" rel="noopener noreferrer">{userData.url}</a></p>
           </div>
           <div className="mt-2">
             <h6 className="mb-1">Contact:</h6>
-            <p><a href={`tel:${contact}`} className="text-body">{contact}</a></p>
+            <p><a href={`tel:${userData.contact}`} className="text-body">{userData.contact}</a></p>
           </div>
-
-          {/* Nút Edit Profile */}
-          <div className="mt-4 d-flex justify-content-center">
-            <button className="btn btn-primary" onClick={onEdit}>
-              ✏️ Edit Profile
-            </button>
-          </div>
-
+        </div>
+        <div className="mt-4 d-flex justify-content-center">
+          <button className="btn btn-primary" onClick={() => alert("Edit Profile")}>
+            ✏️ Edit Profile
+          </button>
         </div>
       </div>
     </>

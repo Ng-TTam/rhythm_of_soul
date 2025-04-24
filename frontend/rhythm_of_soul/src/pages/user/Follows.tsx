@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 interface Follow {
   avatar: string;
@@ -7,11 +8,24 @@ interface Follow {
   dropdownId: string;
 }
 
-interface FollowsProps {
-  follows: Follow[];
-}
+export default function Follows() {
+  const { id } = useParams();
+  const [follows, setFollows] = useState<Follow[]>([]);
 
-export default function Follows({ follows }: FollowsProps) {
+  useEffect(() => {
+    const fetchFollows = async () => {
+      try {
+        const response = await fetch(`/api/users/${id}/follows`);
+        const data = await response.json();
+        setFollows(data);
+      } catch (error) {
+        console.error("Failed to fetch follows", error);
+      }
+    };
+
+    fetchFollows();
+  }, [id]);
+
   return (
     <div className="card">
       <div className="card-header">
