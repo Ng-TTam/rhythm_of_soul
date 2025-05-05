@@ -1,7 +1,6 @@
 package com.rhythm_of_soul.identity_service.entity;
 
-import com.rhythm_of_soul.identity_service.constant.Gender;
-import com.rhythm_of_soul.identity_service.constant.Role;
+import com.rhythm_of_soul.identity_service.constant.ArtistProfileStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -10,7 +9,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
-import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -20,37 +18,29 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class User{
+public class ArtistProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    @Column(nullable = false, length = 100)
+    String stageName;
+
+    @Column(length = 5000)
+    String bio;
+
+    String facebookUrl;
+
+    String instagramUrl;
+
+    String youtubeUrl;
+
+    ArtistProfileStatus status = ArtistProfileStatus.PENDING;
+
     @OneToOne
-    @JoinColumn(name = "account_id")
-    Account account;
-
-    @Column(nullable = false)
-    String firstName;
-
-    @Column(nullable = false)
-    String lastName;
-
-    LocalDate dateOfBirth;
-
-    @Enumerated(EnumType.STRING)
-    Gender gender;
-
-    String phoneNumber;
-
-    Boolean isArtist;
-
-    String avatar;
-
-    String cover;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    ArtistProfile artistProfile;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @CreatedDate
     Instant createdAt;

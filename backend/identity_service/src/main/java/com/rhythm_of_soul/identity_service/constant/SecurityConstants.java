@@ -6,9 +6,13 @@ public class SecurityConstants {
     public static final String ACCESS_TOKEN = "access_token";
     public static final String ACCESS_TOKEN_SSO = "access_token_sso";
     public static final String REFRESH_TOKEN = "refresh_token";
-    public static final String USERNAME = "username";
-    public static final String PASSWORD = "password";
+    public static final String ADMIN_EMAIL= "admin@gmail.com";
+    public static final String ADMIN_PASSWORD = "admin_admin";
     public static final String REDIRECT_URI_KEY = "redirect_uri";
-    public static final String VERIFY_KEY = "verify_key";
+    public static final String VERIFY_OTP = "VERIFY_OTP";
+    public static final String RESET_OTP = "RESET";
+    public static final String PRE_RESET_PASS = "TOKEN_RESET_PASS_";
+    public static final int TTL_TOKEN_RESET_CACHE = 5;
+    public static final String STREAM_KEY = "STREAM_KEY";
 }
 

@@ -1,7 +1,7 @@
 package com.rhythm_of_soul.identity_service.controller;
 
 import com.rhythm_of_soul.identity_service.dto.request.AuthenticationRequest;
-import com.rhythm_of_soul.identity_service.dto.request.UserCreatedRequest;
+import com.rhythm_of_soul.identity_service.dto.request.UserCreationRequest;
 import com.rhythm_of_soul.identity_service.dto.response.AuthenticationResponse;
 import com.rhythm_of_soul.identity_service.service.AuthenticationService;
 import lombok.AccessLevel;
@@ -42,7 +42,7 @@ public class ServerAuthController {
 
     @GetMapping("/sign-up")
     public String showSignUpForm(Model model) {
-        model.addAttribute("signUpRequest", new UserCreatedRequest());
+        model.addAttribute("signUpRequest", new UserCreationRequest());
         return "sign-up";
     }
 

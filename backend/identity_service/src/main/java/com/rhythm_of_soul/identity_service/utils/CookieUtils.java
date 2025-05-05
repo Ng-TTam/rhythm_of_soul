@@ -1,19 +1,13 @@
 package com.rhythm_of_soul.identity_service.utils;
 
-
 import org.springframework.util.SerializationUtils;
-
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Base64;
 import java.util.Optional;
 
-/**
- * @author tiennd
- * Created date 2024-12-03
- */
-public class CookieUtil {
+public class CookieUtils {
     private static final int MAX_AGE = 8 * 3600;
 
     public static void addCookie(HttpServletResponse response, String name, String value) {

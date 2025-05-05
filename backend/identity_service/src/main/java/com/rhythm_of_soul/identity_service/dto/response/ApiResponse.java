@@ -1,4 +1,4 @@
-package com.rhythm_of_soul.identity_service.dto.request;
+package com.rhythm_of_soul.identity_service.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -13,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
     @Builder.Default
-    private int code = 1000;
+    private int code = 200;
 
     private String message;
     private T result;

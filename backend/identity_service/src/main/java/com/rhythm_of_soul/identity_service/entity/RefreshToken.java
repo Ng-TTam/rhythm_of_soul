@@ -20,10 +20,10 @@ public class RefreshToken {
     String id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    User user;
+    @JoinColumn(name = "account_id")
+    Account account;
 
-    @Column(nullable = false, unique = true)
+    @Column(length = 400, nullable = false, unique = true)
     String token;
 
     @Column(nullable = false)

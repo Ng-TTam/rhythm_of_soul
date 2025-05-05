@@ -11,7 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.rhythm_of_soul.identity_service.dto.request.ApiResponse;
+import com.rhythm_of_soul.identity_service.dto.response.ApiResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 public class GlobalExceptionHandler {
 
     private static final String MIN_ATTRIBUTE = "min";
+    private static final String MAX_ATTRIBUTE = "max";
 
     @ExceptionHandler(value = Exception.class)
     ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException exception) {
@@ -54,40 +55,54 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
-    @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    ResponseEntity<ApiResponse> handlingValidation(MethodArgumentNotValidException exception) {
-        String enumKey = exception.getFieldError().getDefaultMessage();
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse> handleValidationException(MethodArgumentNotValidException exception) {
+        var fieldError = exception.getFieldError();
 
-        ErrorCode errorCode = ErrorCode.INVALID_KEY;
+        String enumKey = fieldError.getDefaultMessage();
+        ErrorCode errorCode = null;
         Map<String, Object> attributes = null;
+
         try {
             errorCode = ErrorCode.valueOf(enumKey);
 
-            var constraintViolation =
-                    exception.getBindingResult().getAllErrors().get(0).unwrap(ConstraintViolation.class);
+            var constraintViolation = exception.getBindingResult()
+                    .getAllErrors()
+                    .get(0)
+                    .unwrap(ConstraintViolation.class);
 
             attributes = constraintViolation.getConstraintDescriptor().getAttributes();
-
-            log.info(attributes.toString());
-
-        } catch (IllegalArgumentException e) {
-
+            log.info("Validation attributes: {}", attributes);
+        } catch (IllegalArgumentException ex) {
         }
 
-        ApiResponse apiResponse = new ApiResponse();
+        String message;
+        int code;
 
-        apiResponse.setCode(errorCode.getCode());
-        apiResponse.setMessage(
-                Objects.nonNull(attributes)
-                        ? mapAttribute(errorCode.getMessage(), attributes)
-                        : errorCode.getMessage());
+            code = errorCode.getCode();
+            message = (attributes != null)
+                    ? mapAttribute(errorCode.getMessage(), attributes)
+                    : errorCode.getMessage();
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(code)
+                .message(message)
+                .build();
 
         return ResponseEntity.badRequest().body(apiResponse);
     }
 
-    private String mapAttribute(String message, Map<String, Object> attributes) {
-        String minValue = String.valueOf(attributes.get(MIN_ATTRIBUTE));
 
-        return message.replace("{" + MIN_ATTRIBUTE + "}", minValue);
+    private String mapAttribute(String message, Map<String, Object> attributes) {
+        if (attributes == null || attributes.isEmpty()) return message;
+
+        if (attributes.containsKey(MIN_ATTRIBUTE)) {
+            message = message.replace("{" + MIN_ATTRIBUTE + "}", String.valueOf(attributes.get(MIN_ATTRIBUTE)));
+        }
+        if (attributes.containsKey(MAX_ATTRIBUTE)) {
+            message = message.replace("{" + MAX_ATTRIBUTE + "}", String.valueOf(attributes.get(MAX_ATTRIBUTE)));
+        }
+
+        return message;
     }
 }

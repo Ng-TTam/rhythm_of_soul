@@ -10,7 +10,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rhythm_of_soul.identity_service.dto.request.ApiResponse;
+import com.rhythm_of_soul.identity_service.dto.response.ApiResponse;
 import com.rhythm_of_soul.identity_service.exception.ErrorCode;
 
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {

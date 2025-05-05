@@ -1,4 +1,4 @@
-package com.rhythm_of_soul.identity_service.service.Impl;
+package com.rhythm_of_soul.identity_service.service.impl;
 
 import com.rhythm_of_soul.identity_service.service.EmailService;
 import lombok.RequiredArgsConstructor;
@@ -7,9 +7,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class EmailServiceImpl implements EmailService {
     private final JavaMailSender mailSender;
     @Override
