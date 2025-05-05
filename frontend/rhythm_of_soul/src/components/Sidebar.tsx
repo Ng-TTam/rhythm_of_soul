@@ -1,14 +1,15 @@
 import React, { useEffect } from "react";
-import { Button } from "react-bootstrap";
-import { Outlet, useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
+
 export default function Sidebar() {
   const navigate = useNavigate();
+  
     const redirectPath = (url : string) => {
         navigate(url);
     }
   useEffect(() => {
     const script = document.createElement('script');
-    script.src = '/assets/js/sidebarf700.js?v=1.0.1';
+    script.src = '/assets/js/sidebarf700.js';
     document.body.appendChild(script);
     return () => {
       document.body.removeChild(script);
@@ -17,8 +18,8 @@ export default function Sidebar() {
   const handlePlaylist = () => {
     redirectPath('/playlist');
   }
-  const handleProfileUser = (id :number) => {
-    redirectPath(`/userProfile/${id}`);
+  const handleProfileUser = () => {
+    redirectPath(`/userProfile`);
   }
   return (
     <>
@@ -597,7 +598,7 @@ export default function Sidebar() {
                   data-bs-parent="#sidebar-menu"
                 >
                   <li className="nav-item">
-                    <button className="nav-link btn-sidebar" onClick={() => handleProfileUser(1)}>
+                    <button className="nav-link btn-sidebar" onClick={() => handleProfileUser()}>
                       <i className="icon">
                         <svg
                           className="icon-10"
@@ -647,7 +648,7 @@ export default function Sidebar() {
                         {" "}
                         A
                       </i>
-                      <span className="item-name">Add User</span>
+                      <span className="item-name">Songs</span>
                     </a>
                   </li>
                   <li className="nav-item">
@@ -701,7 +702,7 @@ export default function Sidebar() {
                         {" "}
                         A
                       </i>
-                      <span className="item-name">Add User</span>
+                      <span className="item-name">Follows</span>
                     </a>
                   </li>
                 </ul>
