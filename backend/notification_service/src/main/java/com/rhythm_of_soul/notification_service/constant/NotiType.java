@@ -7,6 +7,7 @@ public enum NotiType {
   NEW_SONG,
   NEW_POST,
   BAN_USER,
+  RESET_PASSWORD,
   WARNING;
 }
 

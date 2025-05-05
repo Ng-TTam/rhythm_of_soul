@@ -1,8 +1,5 @@
 package com.rhythm_of_soul.notification_service.controller;
 
-
-import com.rhythm_of_soul.notification_service.dto.request.OtpRequest;
-import com.rhythm_of_soul.notification_service.dto.response.NotificationResponse;
 import com.rhythm_of_soul.notification_service.service.NotificationService;
 import com.rhythm_of_soul.notification_service.service.OtpService;
 import lombok.RequiredArgsConstructor;
@@ -55,12 +52,6 @@ public class NotificationController {
   @GetMapping("/top5/{userId}")
   public ResponseEntity<?> getTop5Noti(@PathVariable String userId) {
     return notificationService.getTop5LatestNotifications(userId);
-  }
-
-  @PostMapping("/auth/send-reset-otp")
-  public ResponseEntity<?> sendResetOtp(@RequestBody OtpRequest request) {
-    otpService.sendResetPasswordOtp(request.getEmail(), request.getOtp());
-    return ResponseEntity.ok("OTP sent successfully");
   }
 
 

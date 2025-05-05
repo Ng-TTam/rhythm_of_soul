@@ -4,6 +4,7 @@ package com.rhythm_of_soul.notification_service.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rhythm_of_soul.notification_service.dto.request.BanUserRequest;
 import com.rhythm_of_soul.notification_service.dto.request.NewContentEvent;
+import com.rhythm_of_soul.notification_service.dto.request.OtpRequest;
 import com.rhythm_of_soul.notification_service.util.AESUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,60 +26,85 @@ public class TestPublishController {
   private final RedisTemplate<String, Object> redisTemplate;
   private final ObjectMapper objectMapper;
 
-  @Value("${redis.stream.key}")
-  private String streamKey;
+  @Value("${redis.stream.newcontent.key}")
+  private String streamKeyNewContent;
+
+  @Value("${redis.stream.ban.key}")
+  private String streamKeyBanUser;
+
+  @Value("${redis.stream.otp.key}")
+  private String streamKeyOtp;
 
   private final SecretKey secretKey;
-
 
   @PostMapping("/publish-test-event")
   public String publishTestEvent(@RequestBody NewContentEvent event) {
     try {
-      // Convert event -> JSON
-      String json = objectMapper.writeValueAsString(event);
+      // Add contentType để consumer nhận diện
+      Map<String, Object> data = objectMapper.convertValue(event, Map.class);
 
-      // Encrypt JSON
+      // Convert to JSON & Encrypt
+      String json = objectMapper.writeValueAsString(data);
       String encryptedJson = AESUtil.encrypt(json, secretKey);
 
       // Push vào Redis Stream
-      Map<String, Object> map = Map.of("message", encryptedJson);
-      for(int i=0; i<5;i++) {
-        redisTemplate.opsForStream().add(
-                StreamRecords.mapBacked(map).withStreamKey(streamKey)
-        );
-      }
+      Map<String, Object> redisData = Map.of("message", encryptedJson);
+      redisTemplate.opsForStream().add(
+              StreamRecords.mapBacked(redisData).withStreamKey(streamKeyNewContent)
+      );
 
-      log.info("Published test event: {}", event);
-      return "Test event published successfully!";
+      log.info("Published NEW_CONTENT event: {}", event);
+      return "Published NEW_CONTENT event successfully!";
     } catch (Exception e) {
-      log.error("Error publishing test event", e);
-      return "Failed to publish test event: " + e.getMessage();
+      log.error("Error publishing NEW_CONTENT event", e);
+      return "Failed to publish NEW_CONTENT event: " + e.getMessage();
     }
   }
 
   @PostMapping("/publish-ban-user-event")
   public String publishBanUserEvent(@RequestBody BanUserRequest requestData) {
     try {
+      // Add contentType để consumer nhận diện
+      Map<String, Object> data = objectMapper.convertValue(requestData, Map.class);
 
-      // Chuyển thành JSON
-      String json = objectMapper.writeValueAsString(requestData);
-
-      // Encrypt JSON
+      // Convert to JSON & Encrypt
+      String json = objectMapper.writeValueAsString(data);
       String encryptedJson = AESUtil.encrypt(json, secretKey);
 
       // Push vào Redis Stream
-      Map<String, Object> map = Map.of("message", encryptedJson);
-      for (int i = 0; i < 2; i++) {
-        redisTemplate.opsForStream().add(
-                StreamRecords.mapBacked(map).withStreamKey(streamKey)
-        );
-      }
+      Map<String, Object> redisData = Map.of("message", encryptedJson);
+      redisTemplate.opsForStream().add(
+              StreamRecords.mapBacked(redisData).withStreamKey(streamKeyBanUser)
+      );
 
-      log.info("Published test BAN_USER event: {}", requestData);
-      return "Test BAN_USER event published successfully!";
+      log.info("Published BAN_USER event: {}", requestData);
+      return "Published BAN_USER event successfully!";
     } catch (Exception e) {
       log.error("Error publishing BAN_USER event", e);
       return "Failed to publish BAN_USER event: " + e.getMessage();
+    }
+  }
+
+  @PostMapping("/publish-otp-event")
+  public String publishOtpEvent(@RequestBody OtpRequest otpRequest) {
+    try {
+      // Add contentType
+      Map<String, Object> data = objectMapper.convertValue(otpRequest, Map.class);
+      // Convert to JSON & Encrypt
+      String json = objectMapper.writeValueAsString(data);
+      String encryptedJson = AESUtil.encrypt(json, secretKey);
+
+      // Push to Redis Stream
+      Map<String, Object> redisData = Map.of("message", encryptedJson);
+      redisTemplate.opsForStream().add(
+              StreamRecords.mapBacked(redisData).withStreamKey(streamKeyOtp)
+      );
+
+      log.info("Published OTP event: {}", otpRequest);
+      return "Published OTP event successfully!";
+    } catch (Exception e) {
+      log.error("Error publishing OTP event", e);
+      return "Failed to publish OTP event: " + e.getMessage();
     }
   }
 

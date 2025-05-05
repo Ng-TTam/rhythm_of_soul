@@ -33,36 +33,36 @@ public class NotificationServiceImpl implements NotificationService {
 
   @Override
   public void sendBanNotification(BanUserRequest request) {
-    String content = """
-                    <html>
-                    <body style="font-family: Arial, sans-serif; line-height: 1.6;">
-                        <h2 style="color: #d9534f;">Tài khoản của bạn đã bị khóa</h2>
-                        <p>Xin chào,</p>
-                        <p>Tài khoản của bạn đã bị <strong>cấm</strong> do vi phạm các điều khoản sử dụng.</p>
-                        <p><strong>Lý do:</strong> %s</p>
-                        <p>Nếu bạn nghĩ rằng đây là sự nhầm lẫn, vui lòng liên hệ với bộ phận hỗ trợ.</p>
-                        <br>
-                        <p>Trân trọng,</p>
-                        <p><em>Rhythm of Soul</em></p>
-                    </body>
-                    </html>
-                """.formatted(request.getReason());
-
-    Notification notification = Notification.builder()
-            .recipientId(request.getUserId())
-            .senderId("ADMIN") // admin system
-            .type(NotiType.BAN_USER)
-            .referenceId(null)
-            .referenceType("BAN")
-            .message(content)
-            .isRead(false)
-            .createdAt(LocalDateTime.now())
-            .build();
-
-    notificationRepository.save(notification);
-    log.info("noti saved");
 
     try {
+      String content = """
+                  <html>
+                  <body style="font-family: Arial, sans-serif; line-height: 1.6;">
+                      <h2 style="color: #d9534f;">Tài khoản của bạn đã bị khóa</h2>
+                      <p>Xin chào,</p>
+                      <p>Tài khoản của bạn đã bị <strong>cấm</strong> do vi phạm các điều khoản sử dụng.</p>
+                      <p><strong>Lý do:</strong> %s</p>
+                      <p>Nếu bạn nghĩ rằng đây là sự nhầm lẫn, vui lòng liên hệ với bộ phận hỗ trợ.</p>
+                      <br>
+                      <p>Trân trọng,</p>
+                      <p><em>Rhythm of Soul</em></p>
+                  </body>
+                  </html>
+              """.formatted(request.getReason());
+
+      Notification notification = Notification.builder()
+              .recipientId(request.getUserId())
+              .senderId("ADMIN") // admin system
+              .type(NotiType.BAN_USER)
+              .referenceId(null)
+              .referenceType("BAN")
+              .message(content)
+              .isRead(false)
+              .createdAt(LocalDateTime.now())
+              .build();
+
+      notificationRepository.save(notification);
+      log.info("noti saved");
       emailService.sendEmail(request.getEmail(), "BAN ACCOUNT", content);
     } catch (Exception e) {
       log.error("Failed to send email to {}: {}", request.getEmail(), e.getMessage());
@@ -72,59 +72,73 @@ public class NotificationServiceImpl implements NotificationService {
   @Override
   public void handleNewContentEvent(NewContentEvent event) {
 
-    String message = "%s vừa đăng %s mới".formatted(
-            event.getAuthorName(), event.getContentType().toLowerCase()
-    );
+    try {
+      String message = "%s vừa đăng %s mới".formatted(
+              event.getAuthorName(), event.getContentType().toLowerCase()
+      );
 
-    NotiType type = switch (event.getContentType()) {
-      case "POST" -> NotiType.NEW_POST;
-      case "SONG" -> NotiType.NEW_SONG;
-      default -> throw new IllegalArgumentException("Unknown content type: " + event.getContentType());
-    };
+      NotiType type = switch (event.getContentType()) {
+        case "POST" -> NotiType.NEW_POST;
+        case "SONG" -> NotiType.NEW_SONG;
+        default -> throw new IllegalArgumentException("Unknown content type: " + event.getContentType());
+      };
 
-    Notification noti = Notification.builder()
-            .recipientId(event.getFollowerId())
-            .senderId(event.getAuthorId())
-            .type(type)
-            .referenceId(event.getReferenceId())
-            .referenceType(event.getContentType())
-            .message(message)
-            .isRead(false)
-            .createdAt(LocalDateTime.now())
-            .build();
+      Notification notification = Notification.builder()
+              .recipientId(event.getFollowerId())
+              .senderId(event.getAuthorId())
+              .type(type)
+              .referenceId(event.getReferenceId())
+              .referenceType(event.getContentType())
+              .message(message)
+              .isRead(false)
+              .createdAt(LocalDateTime.now())
+              .build();
 
-    notificationRepository.save(noti);
-    NotificationPayload payload = new NotificationPayload(
-            message,
-            event.getReferenceId(),
-            noti.getId()
-    );
+      notificationRepository.save(notification);
+      NotificationPayload payload = new NotificationPayload(
+              message,
+              event.getReferenceId(),
+              notification.getId()
+      );
 
-    websocketService.sendNotification(event.getFollowerId(), payload);
+      websocketService.sendNotification(event.getFollowerId(), payload);
 
-    log.info("Saved notification for followerId {}", event.getFollowerId());
+      log.info("Saved notification for followerId {}", event.getFollowerId());
+
+    } catch (Exception e) {
+      log.error("Failed: {}", e.getMessage());
+    }
   }
 
   @Override
   public ResponseEntity<NotificationResponse> getNotificationList(String userId) {
-    List<String> allowedTypes = List.of("NEW_POST", "NEW_SONG");
+    try {
+      List<String> allowedTypes = List.of("NEW_POST", "NEW_SONG");
 
-    // Lọc các notification chưa đọc và có type là POST hoặc SONG
-    List<Notification> notifications = notificationRepository
-            .findByRecipientIdAndIsReadFalseAndTypeIn(userId, allowedTypes);
+      List<Notification> notifications = notificationRepository
+              .findByRecipientIdAndIsReadFalseAndTypeIn(userId, allowedTypes);
 
-    if (notifications.isEmpty()) {
-      return new ResponseEntity<>(new NotificationResponse(0, List.of()), HttpStatus.OK);
+      if (notifications.isEmpty()) {
+        return new ResponseEntity<>(new NotificationResponse(0, List.of()), HttpStatus.OK);
+      }
+
+      long total = notifications.size();
+      List<NotificationResponse.NotificationData> notificationDataList = notifications.stream()
+              .map(notification -> new NotificationResponse.NotificationData(
+                      notification.getId(),
+                      notification.getMessage(),
+                      notification.getReferenceId()))
+              .collect(Collectors.toList());
+
+      NotificationResponse response = new NotificationResponse(total, notificationDataList);
+      return new ResponseEntity<>(response, HttpStatus.OK);
+
+    } catch (Exception e) {
+      log.error("Failed to getNotificationList: {}", e.getMessage());
+      return new ResponseEntity<>(new NotificationResponse(0, List.of()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    long total = notifications.size();
-    List<NotificationResponse.NotificationData> notificationDataList = notifications.stream()
-            .map(notification -> new NotificationResponse.NotificationData(notification.getId(), notification.getMessage(), notification.getReferenceId()))
-            .collect(Collectors.toList());
-
-    NotificationResponse response = new NotificationResponse(total, notificationDataList);
-    return new ResponseEntity<>(response, HttpStatus.OK);
   }
+
 
   @Override
 //    @Transactional
