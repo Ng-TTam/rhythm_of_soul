@@ -12,7 +12,10 @@ import PostPlaylistDetail from '../pages/feed/PostPlaylistDetail'
 import UserProfile from '../pages/user/UserProfile'
 import Feeds from '../pages/user/Feeds'
 import Follows from '../pages/user/Follows'
-import Profile from '../pages/user/Profile'
+import AlbumPage from '../components/album/AlbumPage'
+import AlbumsCollectionPage from '../components/album/AlbumCollectionPage'
+import path from 'path'
+import AlbumMain from '../components/album/AlbumMain'
 export const indexRouter: any = {
     path: '/',
     element: (<Dashboard />),
@@ -28,7 +31,7 @@ export const indexRouter: any = {
 
         },
         {
-          path: 'userProfile/:id',
+          path: 'userProfile',
           element: <UserProfile />,
           children: [
             { path: 'feeds', element: <Feeds /> },
@@ -36,10 +39,15 @@ export const indexRouter: any = {
             { path: 'songs', element: <div>Songs</div> },
             { path: 'albums', element: <div>Albums</div> },
             { path: 'playlists', element: <div>Playlists</div> },
-            { path: 'settings', element: <Profile /> },
             { index: true, element: <Feeds /> } // mặc định là feeds
           ]
         },
+        { path: 'albums', element: (<AlbumMain />),
+          children: [
+            {path: '', element: (<AlbumsCollectionPage />) },
+            {path: 'album/:ablumId', element: (<AlbumPage />) },
+          ]
+         },
         { path: 'feed', element: (<Feed />) },
         { path: "postTrack/:postId", element: (<PostTrackDetail />) },
         { path: "postPlaylist/:postId", element: (<PostPlaylistDetail />) },

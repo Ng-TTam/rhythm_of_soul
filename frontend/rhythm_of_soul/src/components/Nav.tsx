@@ -7,11 +7,14 @@ export default function Nav() {
     console.log(response);
   }
   const navigate = useNavigate();
-    const redirectPath = (url : string) => {
-        navigate(url);
-    }
+  const redirectPath = (url: string) => {
+    navigate(url);
+  }
   const handleToFeed = () => {
     redirectPath('/feed');
+  }
+  const handleToAlbums = () => {
+    redirectPath('/albums');
   }
   return (
     <>
@@ -87,20 +90,21 @@ export default function Nav() {
                       <button
                         className="nav-link "
                         aria-current="page"
-                       style={{ border: "none", background: "none" }}
+                        style={{ border: "none", background: "none" }}
                         onClick={handleToFeed}
                       >
                         <span className="item-name">Feed</span>
                       </button>
                     </li>
                     <li className="nav-item">
-                      <a
+                      <button
                         className="nav-link "
                         aria-current="page"
-                        href="albums.html"
+                        style={{ border: "none", background: "none" }}
+                        onClick={handleToAlbums}
                       >
                         <span className="item-name">Albums</span>
-                      </a>
+                      </button>
                     </li>
                   </ul>
                 </div>
@@ -550,30 +554,17 @@ export default function Nav() {
                       className="theme-color-default-img img-fluid avatar avatar-40 avatar-rounded"
                       loading="lazy"
                     />
-                    <div className="iq-profile-badge  bg-success" />
+                    <div className="iq-profile-badge bg-success" />
                   </a>
                   <ul
                     className="dropdown-menu dropdown-menu-end"
                     aria-labelledby="profile-setting"
                   >
-                    <a
-                      className="p-0 ps-3 nav-link d-flex align-items-center position-relative"
-                      href="#"
-                      id="profile-setting"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    ></a>
                     <li>
                       <a
-                        className="p-0 ps-3 nav-link d-flex align-items-center position-relative"
-                        href="#"
-                        id="profile-setting"
-                        role="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      />
-                      <a className="dropdown-item" href="app/user-profile.html">
+                        className="dropdown-item"
+                        href="app/user-profile.html"
+                      >
                         Profile
                       </a>
                     </li>

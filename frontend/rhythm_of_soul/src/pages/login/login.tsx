@@ -3,42 +3,46 @@ import { useNavigate } from "react-router-dom";
 import { Account } from "../../model/account";
 import LoginService from "../../services/service";
 import { Tooltip } from 'bootstrap';
+import { useAppDispatch, useAppSelector } from '../../store/hook';
+import { setToken } from "../../reducers/tokenReducer";
 import Swal from 'sweetalert2'; 
 
 const LoginForm: React.FC = () => {
   const [form, setForm] = useState<Account>({
-    username: "",
+    email: "",
     password: "",
     remember: false,
   });
-
-  const checkAuth = async () => {
-    try {
-      const res = await LoginService.verifyToken();
-      if (res.result.valid) {
-        navigate("/"); // đã đăng nhập, chuyển hướng sang trang chính
-      }
-    } catch (err) {
-      // Token không hợp lệ hoặc không tồn tại
-      console.log("Token không hợp lệ hoặc không tồn tại");
-    }
-  };
+  const dispatch = useAppDispatch();
+  
 
   useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await LoginService.verifyToken();
+        if (res.result.valid) {
+          dispatch(setToken({ accessToken: res.result.token }));
+          navigate("/");// đã đăng nhập, chuyển hướng sang trang chính
+        }
+      } catch (err) {
+        // Token không hợp lệ hoặc không tồn tại
+        console.log("Token không hợp lệ hoặc không tồn tại");
+      }
+    };
     checkAuth();
   }, []);
 
   const [errors, setErrors] = useState({
-    username: "",
+    email: "",
     password: "",
   });
 
   const validate = () => {
     let valid = true;
-    const newErrors = { username: "", password: "" };
+    const newErrors = { email: "", password: "" };
 
-    if (!form.username.endsWith("@gmail.com")) {
-      newErrors.username = "Email phải kết thúc bằng @gmail.com";
+    if (!form.email.endsWith("@gmail.com")) {
+      newErrors.email = "Email phải kết thúc bằng @gmail.com";
       valid = false;
     }
 
@@ -77,6 +81,8 @@ const LoginForm: React.FC = () => {
     try {
       const response = await LoginService.login(form);
       if (response.code === 1000) {
+        dispatch(setToken({ accessToken: response.result.token})); 
+        console.log("Token: " + response.result.token); 
         Swal.fire({
           icon: 'success',
           title: 'Đăng nhập thành công',
@@ -126,13 +132,13 @@ const LoginForm: React.FC = () => {
                                 <label htmlFor="email" className="form-label">Email</label>
                                 <input
                                   type="gmail"
-                                  name="username"
-                                  className={`form-control ${errors.username ? "is-invalid" : ""}`}
+                                  name="email"
+                                  className={`form-control ${errors.email ? "is-invalid" : ""}`}
                                   id="email"
                                   onChange={handleChange}
-                                  value={form.username}
+                                  value={form.email}
                                   placeholder="xyz@gmail.com"
-                                  title={errors.username} // Tooltip
+                                  title={errors.email} // Tooltip
                                   data-bs-toggle="tooltip"
                                 />
                               </div>

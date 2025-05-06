@@ -3,11 +3,13 @@ import axios from "axios";
 import { APIResponse } from "../model/APIResponse";
 import { Introspect } from "../model/Introspect";
 import { User } from "../model/User";
+import { Auth } from "../model/Auth";
 const API_URL = "http://localhost:8080/identity/auth";
 
 class LoginService {
-  async login(account: Account): Promise<APIResponse<any>> {
-    const response = await axios.post<APIResponse<any>>(
+  async login(account: Account): Promise<APIResponse<Auth>> {
+    console.log("LoginService: ", account);
+    const response = await axios.post<APIResponse<Auth>>(
       `${API_URL}/login`,
       account,{ withCredentials: true }
     );
@@ -17,6 +19,7 @@ class LoginService {
     const response = await axios.get<APIResponse<Introspect>>(
       `${API_URL}/introspect`,{withCredentials: true}
     );
+    console.log("LoginService: ", response.data);
     return response.data;
   }
   async sign_up(User: User): Promise<APIResponse<any>> {
