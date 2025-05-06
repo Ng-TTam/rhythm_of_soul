@@ -13,6 +13,6 @@ public class SecurityConstants {
     public static final String RESET_OTP = "RESET";
     public static final String PRE_RESET_PASS = "TOKEN_RESET_PASS_";
     public static final int TTL_TOKEN_RESET_CACHE = 5;
-    public static final String STREAM_KEY = "STREAM_KEY";
+    public static final String STREAM_KEY = "otp";
 }
 

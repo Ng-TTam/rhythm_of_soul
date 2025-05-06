@@ -1,7 +1,6 @@
 package com.rhythm_of_soul.identity_service.entity;
 
 import com.rhythm_of_soul.identity_service.constant.Gender;
-import com.rhythm_of_soul.identity_service.constant.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -43,7 +42,7 @@ public class User{
 
     String phoneNumber;
 
-    Boolean isArtist;
+    boolean isArtist = false;
 
     String avatar;
 

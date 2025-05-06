@@ -1,5 +1,6 @@
 package com.rhythm_of_soul.identity_service.api;
 
+import com.rhythm_of_soul.identity_service.dto.request.ArtistProfileRequest;
 import com.rhythm_of_soul.identity_service.dto.request.UserUpdateRequest;
 import com.rhythm_of_soul.identity_service.dto.response.ApiResponse;
 import com.rhythm_of_soul.identity_service.dto.response.PageResponse;
@@ -51,4 +52,30 @@ public class UserController {
                 .result(userService.getAllUsers(page, size))
                 .build();
     }
+
+    @PostMapping("/assign-artist")
+    ApiResponse<Void> assignArtist(@Valid @RequestBody ArtistProfileRequest artistProfileRequest){
+        userService.assignRoleArtist(artistProfileRequest);
+        return ApiResponse.<Void>builder()
+                .message("Assign artist successful!!!")
+                .build();
+    }
+
+    @PostMapping("/upgrade-artist/{userId}")
+    ApiResponse<Void> upgradeArtist(@PathVariable String userId){
+        userService.upgradeRoleArtist(userId);
+        return ApiResponse.<Void>builder()
+                .message("Upgrade artist successful!!!")
+                .build();
+    }
+
+    @PostMapping("/revoke-artist/{userId}")
+    ApiResponse<Void> revokeArtist(@PathVariable String userId){
+        userService.revokeRoleArtist(userId);
+        return ApiResponse.<Void>builder()
+                .message("Revoke artist successful!!!")
+                .build();
+    }
+
+
 }

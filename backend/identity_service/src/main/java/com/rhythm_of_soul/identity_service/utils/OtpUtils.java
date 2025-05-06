@@ -25,7 +25,7 @@ public class OtpUtils {
 
     /**
      * Send otp when sign up or reset pass
-     * type: VERIFY_ACCOUNT, RESET_PASS
+     * type: VERIFY_OTP, RESET
      */
     @Async("taskExecutor")
     public void send(String type, String email){

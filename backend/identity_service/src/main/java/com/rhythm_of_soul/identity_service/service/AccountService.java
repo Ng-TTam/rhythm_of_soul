@@ -38,33 +38,6 @@ public interface AccountService {
     boolean isAccountVerified(String accountId);
 
     /**
-     * User assign ARTIST role for account.
-     *
-     * @param artistProfileRequest extra profile of artist
-     * @throws AccessDeniedException if user haven't permission
-     * @throws IllegalArgumentException if accountId or roleName invalid
-     */
-    void assignRoleArtist(ArtistProfileRequest artistProfileRequest);
-
-    /**
-     * Admin submit ARTIST role of account.
-     *
-     * @param accountId ID account
-     * @throws AccessDeniedException if user haven't permission -> ADMIN can
-     * @throws IllegalArgumentException if accountId or roleName invalid
-     */
-    void upgradeRoleArtist(String accountId);
-
-    /**
-     * Admin revoke ARTIST role of account.
-     *
-     * @param accountId ID account
-     * @throws AccessDeniedException if user haven't permission -> ADMIN can
-     * @throws IllegalArgumentException if accountId or roleName invalid
-     */
-    void revokeRoleArtist(String accountId);
-
-    /**
      * Send request reset pass (send otp by email).
      *
      * @param email Email of user

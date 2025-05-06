@@ -1,6 +1,7 @@
 package com.rhythm_of_soul.identity_service.repository;
 
 import com.rhythm_of_soul.identity_service.entity.Account;
+import com.rhythm_of_soul.identity_service.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,4 +11,5 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account, String> {
     Optional<Account> findByEmail(String email);
     boolean existsByEmail(String email);
+    Optional<Account> findByUser(User user);
 }

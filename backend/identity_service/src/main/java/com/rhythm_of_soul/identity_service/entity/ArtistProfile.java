@@ -36,6 +36,7 @@ public class ArtistProfile {
 
     String youtubeUrl;
 
+    @Enumerated(EnumType.STRING)
     ArtistProfileStatus status = ArtistProfileStatus.PENDING;
 
     @OneToOne
