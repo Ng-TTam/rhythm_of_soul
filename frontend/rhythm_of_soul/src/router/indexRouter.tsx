@@ -36,7 +36,6 @@ export const indexRouter: any = {
           element: <UserProfile />,
           children: [
             { path: 'feeds', element: <Feeds /> },
-            { path: 'follows', element: <Follows /> },
             { path: 'songs', element: <div>Songs</div> },
             { path: 'albums', element: <div>Albums</div> },
             { path: 'playlists', element: <div>Playlists</div> },
@@ -50,6 +49,7 @@ export const indexRouter: any = {
           ]
          },
         { path: 'feed', element: (<Feed />) },
+        { path: 'follows', element: <Follows /> },
         { path: "postTrack/:postId", element: (<PostTrackDetail />) },
         { path: "postPlaylist/:postId", element: (<PostPlaylistDetail />) },
         { path: 'aplaylist', element: <APlayList /> },

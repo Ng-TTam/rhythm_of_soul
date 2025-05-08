@@ -28,7 +28,7 @@ export default function Sidebar() {
     { id: "admin", label: "Admin", short: "A", path: "#" },
     { id: "category", label: "Category", short: "C", path: "admin/admin-category.html" },
     { id: "writer", label: "Writer", short: "W", path: "admin/admin-writer.html" },
-    { id: "singer", label: "Singer", short: "S", path: "singers" },
+    { id: "user", label: "User", short: "U", path: "/admin/admin-user" },
     { id: "muzic", label: "Muzic", short: "M", path: "admin/admin-song.html" }
   ];
 
