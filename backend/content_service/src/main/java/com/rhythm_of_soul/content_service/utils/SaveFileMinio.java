@@ -1,11 +1,9 @@
 package com.rhythm_of_soul.content_service.utils;
 
 import com.rhythm_of_soul.content_service.config.MinioConfig;
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
 import io.minio.errors.*;
+import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,6 +41,21 @@ public class SaveFileMinio {
                             .contentType(file.getContentType())
                             .build()
             );
-            return minioConfig.getUrl() + "/" + bucket + "/" + filename;
+            return filename;
         }
+    public String generatePresignedUrl(String bucketName, String objectName) {
+        try {
+            return minioClient.getPresignedObjectUrl(
+                    GetPresignedObjectUrlArgs.builder()
+                            .method(Method.GET)
+                            .bucket(bucketName)
+                            .object(objectName)
+                            .expiry(60 * 60 * 24) // 1 day
+                            .build()
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     }

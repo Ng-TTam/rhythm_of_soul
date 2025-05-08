@@ -9,13 +9,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class CORSConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        // Cấu hình CORS cho toàn bộ ứng dụng
         registry.addMapping("/**")
-                .allowedOrigins("*")  // Cho phép tất cả các nguồn
-                .allowedMethods("GET", "POST", "PUT", "DELETE")  // Các phương thức HTTP
-                .allowedHeaders("*")  // Các headers được phép
-                .allowCredentials(true)  // Cho phép cookies hoặc thông tin xác thực
-                .maxAge(3600);  // Thời gian cache CORS
+                .allowedOriginPatterns("http://localhost:3000") // hoặc "https://*.example.com"
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowCredentials(true);
     }
 }
 

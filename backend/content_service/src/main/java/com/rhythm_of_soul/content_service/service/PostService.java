@@ -2,6 +2,7 @@ package com.rhythm_of_soul.content_service.service;
 
 import com.rhythm_of_soul.content_service.common.Tag;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
+import com.rhythm_of_soul.content_service.dto.response.PlaylistResponse;
 import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
 import com.rhythm_of_soul.content_service.dto.resquest.PostRequest;
 import io.minio.errors.*;
@@ -13,9 +14,14 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public interface PostService {
-    PostResponse storeFile(MultipartFile song, MultipartFile cover , MultipartFile image , String user_id, List<Tag> tags,String title) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+    PostResponse storeFile(MultipartFile song, MultipartFile cover , MultipartFile image , String user_id, List<Tag> tags,String title, String caption,String isPublic)
+            throws IOException, ServerException, InsufficientDataException,
+            ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException,
+            InvalidResponseException, XmlParserException, InternalException;
     PostResponse createPost(PostRequest postRequest);
     PostResponse addSong(String postId, List<String> songIds);
     List<PostResponse> getPosts(String userId);
     PostDetailResponse getPost(String postId);
+    List<PostResponse> getSongs(String userId);
+    List<PlaylistResponse> getPlaylists(String userId);
 }

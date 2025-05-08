@@ -4,6 +4,7 @@ import com.rhythm_of_soul.content_service.dto.ContentResponse;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
 import com.rhythm_of_soul.content_service.dto.resquest.PostRequest;
 import com.rhythm_of_soul.content_service.entity.Post;
+import com.rhythm_of_soul.content_service.utils.SaveFileMinio;
 import org.mapstruct.Mapper;
 
 import java.time.Instant;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 @Mapper(componentModel = "spring")
 public interface PostMapper {
+
     default PostResponse toPostResponse(Post post) {
         ContentResponse contentResponse = null;
         if(post.getContent() != null) {
@@ -19,8 +21,6 @@ public interface PostMapper {
                     .originalPostId(post.getContent().getOriginalPostId())
                     .title(post.getContent().getTitle())
                     .mediaUrl(post.getContent().getMediaUrl())
-                    .imageUrl(post.getContent().getImageUrl())
-                    .coverUrl(post.getContent().getCoverUrl())
                     .tags(post.getContent().getTags())
                     .build();
         }

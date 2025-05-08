@@ -1,13 +1,17 @@
 server:
- port: 8484
+  port: 8484
 
 spring:
- autoconfigure:
-  exclude:
-   - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
- data:
-  mongodb:
-   uri: mongodb://localhost:27017/rhythm_db
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/rhythm_db
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
 
 minio:
   url: http://localhost:9000
@@ -17,5 +21,3 @@ minio:
     songs: songs
     images: images
     covers: covers
-
-

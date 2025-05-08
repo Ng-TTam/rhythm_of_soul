@@ -6,6 +6,7 @@ import com.rhythm_of_soul.content_service.config.MinioConfig;
 import com.rhythm_of_soul.content_service.dto.ContentResponse;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
 import com.rhythm_of_soul.content_service.dto.response.CommentResponse;
+import com.rhythm_of_soul.content_service.dto.response.PlaylistResponse;
 import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
 import com.rhythm_of_soul.content_service.dto.resquest.PostRequest;
 import com.rhythm_of_soul.content_service.dto.response.SongResponse;
@@ -55,7 +56,7 @@ public class PostServiceImpl implements  PostService {
     MinioConfig minioConfig;
 
     @Override
-    public PostResponse storeFile(MultipartFile song, MultipartFile cover , MultipartFile image, String user_id, List<Tag> tags, String title) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public PostResponse storeFile(MultipartFile song, MultipartFile cover , MultipartFile image, String user_id, List<Tag> tags, String title,String caption,String isPublic) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         String songUrl = saveFileMinio.saveFile(song, minioConfig.getSongsBucket());
         String coverUrl = saveFileMinio.saveFile(cover, minioConfig.getCoversBucket());
         String imageUrl = saveFileMinio.saveFile(image, minioConfig.getImagesBucket());
@@ -76,10 +77,16 @@ public class PostServiceImpl implements  PostService {
                 .content(content)
                 .commentCount(0)
                 .viewCount(0)
-                .isPublic(true)
+                .isPublic(isPublic == "true")
+                .caption(caption)
                 .build();
         postRepository.save(post);
-        return postMapper.toPostResponse(post);
+        PostResponse postResponse = postMapper.toPostResponse(post);
+        ContentResponse contentResponse = postResponse.getContent();
+        contentResponse.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
+        contentResponse.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
+        postResponse.setContent(contentResponse);
+        return postResponse;
     }
 
     @Override
@@ -117,6 +124,13 @@ public class PostServiceImpl implements  PostService {
             }
             postRepository.save(post);
             PostResponse postResponse = postMapper.toPostResponse(post);
+            if(post.getType() == Type.TEXT) {
+                return postResponse;
+            }
+            ContentResponse content = postResponse.getContent();
+             content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
+             content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
+            postResponse.setContent(content);
             if(postRequest.getType() == Type.ALBUM || postRequest.getType() == Type.PLAYLIST){
                 postResponse.getContent().setSongIds(getSongs(postRequest.getContent().getSongIds()));
 
@@ -145,8 +159,11 @@ public class PostServiceImpl implements  PostService {
         post.setUpdatedAt(Instant.now());
         postRepository.save(post);
         PostResponse postResponse = postMapper.toPostResponse(post);
+
         ContentResponse content = postResponse.getContent();
         content.setSongIds(getSongs(songList));
+        content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
+        content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
         postResponse.setContent(content);
         return postResponse;
     }
@@ -158,8 +175,8 @@ public class PostServiceImpl implements  PostService {
                     .songId(songPost.getId())
                     .title(songPost.getContent().getTitle())
                     .mediaUrl(songPost.getContent().getMediaUrl())
-                    .imageUrl(songPost.getContent().getImageUrl())
-                    .coverUrl(songPost.getContent().getCoverUrl())
+                    .imageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), songPost.getContent().getImageUrl()))
+                    .coverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), songPost.getContent().getCoverUrl()))
                     .tags(songPost.getContent().getTags())
                     .build());
         }
@@ -168,18 +185,39 @@ public class PostServiceImpl implements  PostService {
     @Override
     public List<PostResponse> getPosts(String userId) {
         List<Post> posts = postRepository.findAllByUserId(userId);
-        return posts.stream().map(postMapper::toPostResponse).toList();
+        List<PostResponse> postResponses = new ArrayList<>();
+        for(Post post : posts){
+            PostResponse postResponse = postMapper.toPostResponse(post);
+            if(post.getContent() != null){
+                ContentResponse content = postResponse.getContent();
+                if(post.getContent().getImageUrl() != null) content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
+                if(post.getContent().getCoverUrl() != null)  content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
+                postResponse.setContent(content);
+                if(post.getType() == Type.ALBUM || post.getType() == Type.PLAYLIST){
+                    postResponse.getContent().setSongIds(getSongs(post.getContent().getSongIds()));
+                }
+            }
+
+            postResponses.add(postResponse);
+
+        }
+        return postResponses;
     }
 
     @Override
     public PostDetailResponse getPost(String postId) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
         PostResponse postResponse = postMapper.toPostResponse(post);
-        ContentResponse content = postResponse.getContent();
-        if(post.getType() == Type.ALBUM || post.getType() == Type.PLAYLIST){
-            content.setSongIds(getSongs(post.getContent().getSongIds()));
+        if(post.getContent() != null){
+            ContentResponse content = postResponse.getContent();
+            if (post.getContent().getImageUrl() != null) content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
+            if (post.getContent().getCoverUrl() != null) content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
+            if(post.getType() == Type.ALBUM || post.getType() == Type.PLAYLIST){
+                content.setSongIds(getSongs(post.getContent().getSongIds()));
+            }
+            postResponse.setContent(content);
         }
-        postResponse.setContent(content);
+
         List <Like> likes = likeRepository.findAllByPostId(postId);
         return PostDetailResponse.builder()
                 .post(postResponse)
@@ -187,6 +225,41 @@ public class PostServiceImpl implements  PostService {
                 .comments(getComments(postId))
                 .build();
     }
+
+    @Override
+    public List<PostResponse> getSongs(String userId) {
+        List<Post> posts = postRepository.findAllByUserIdAndType(userId, Type.SONG);
+        List<PostResponse> postResponses = new ArrayList<>();
+        for(Post post : posts){
+            PostResponse postResponse = postMapper.toPostResponse(post);
+            if(post.getContent() != null){
+                ContentResponse content = postResponse.getContent();
+                if(post.getContent().getImageUrl() != null) content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
+                if(post.getContent().getCoverUrl() != null)  content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
+                postResponse.setContent(content);
+            }
+            postResponses.add(postResponse);
+
+        }
+        return postResponses;
+    }
+
+    @Override
+    public List<PlaylistResponse> getPlaylists(String userId) {
+        List<Post> posts = postRepository.findAllByUserIdAndType(userId, Type.PLAYLIST);
+        List<PlaylistResponse> playlistResponses = new ArrayList<>();
+        for(Post post : posts){
+            playlistResponses.add(PlaylistResponse.builder()
+                    .id(post.getId())
+                    .title(post.getContent().getTitle())
+                    .imageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()))
+                    .tracks(post.getContent().getSongIds().size())
+                            .tags(post.getContent().getTags())
+                    .build());
+        }
+        return playlistResponses;
+    }
+
     private List<CommentResponse> getComments(String postId) {
         List<Comment> comments = commentRepository.findAllByPostId(postId);
         CommentManager manager = new CommentManager();

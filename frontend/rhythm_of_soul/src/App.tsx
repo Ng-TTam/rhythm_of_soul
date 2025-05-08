@@ -1,0 +1,27 @@
+import React from 'react';
+import './App.css';
+import { BrowserRouter as Router, useRoutes } from "react-router-dom";
+import { indexRouter } from './router/indexRouter';
+import { authRouter } from './router/authRouter';
+import { Provider } from 'react-redux';
+import  store  from './store/store';
+function AppRouter() {
+  const routes = useRoutes([
+    ...authRouter,
+    indexRouter
+  ]);
+  return routes;
+}
+function App() {
+  
+  return (
+    <Provider store={store}>
+    <Router>
+      <AppRouter />
+    </Router>
+    </Provider>
+    
+  );
+}
+
+export default App;
