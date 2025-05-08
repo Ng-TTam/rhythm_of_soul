@@ -171,7 +171,7 @@ const LoginForm: React.FC = () => {
                                 />
                                 <label className="form-check-label" htmlFor="customCheck1">Remember Me</label>
                               </div>
-                              <a href="recoverpw.html">Forgot Password?</a>
+                              <a href="/reset-password">Forgot Password?</a>
                             </div>
                           </div>
                           <div className="d-flex justify-content-center">

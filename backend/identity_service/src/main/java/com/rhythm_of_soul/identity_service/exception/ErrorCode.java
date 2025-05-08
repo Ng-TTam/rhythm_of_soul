@@ -22,6 +22,8 @@ public enum ErrorCode {
     ACCOUNT_VERIFIED(1005, "Account verified", HttpStatus.CONFLICT),
     BLANK_TOKEN(1006, "Blank token", HttpStatus.BAD_REQUEST),
     ACCOUNT_NOT_VERIFIED(1007, "Account not verified, you need to verify your account to upgrade artist", HttpStatus.UNAUTHORIZED),
+    ACCOUNT_ALREADY_LOCKED(1008, "Account is already locked", HttpStatus.CONFLICT),
+    ACCOUNT_NOT_LOCKED(1009, "Account is not locked", HttpStatus.BAD_REQUEST),
 
     //user - 2xxx
     INVALID_USERNAME(2001, "Username must be at least {min} characters", HttpStatus.BAD_REQUEST),

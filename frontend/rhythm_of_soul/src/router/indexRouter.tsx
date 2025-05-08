@@ -1,6 +1,7 @@
 
 import React from 'react'
 import Dashboard from '../pages/dashboard/Dashboard'
+import AdminDashboard from '../pages/admin/Dashboard'
 import PlayList from '../components/playlist/playlist'
 import MainContent from '../components/mainContent'
 import PlayListGrid from '../components/playlist/PlayListGrid'
@@ -16,6 +17,8 @@ import AlbumPage from '../components/album/AlbumPage'
 import AlbumsCollectionPage from '../components/album/AlbumCollectionPage'
 import path from 'path'
 import AlbumMain from '../components/album/AlbumMain'
+import AdminUser from '../pages/admin/AdminUser'
+import ProtectedRoute from './ProtectedRoute'
 export const indexRouter: any = {
     path: '/',
     element: (<Dashboard />),
@@ -28,7 +31,6 @@ export const indexRouter: any = {
                 { path: 'mine', element: (<PlayListOwner />) },
 
             ]
-
         },
         {
           path: 'userProfile',
@@ -52,6 +54,14 @@ export const indexRouter: any = {
         { path: "postTrack/:postId", element: (<PostTrackDetail />) },
         { path: "postPlaylist/:postId", element: (<PostPlaylistDetail />) },
         { path: 'aplaylist', element: <APlayList /> },
+        {
+          path: 'admin',
+          // element: <ProtectedRoute allowedRoles={['ADMIN']} />, // Bảo vệ tất cả route con
+          children: [
+            // { path: '', element: <AdminDashboard /> },
+            { path: 'admin-user', element: <AdminUser /> },
+          ],
+        },
         { path: '', element: (<MainContent />) },
     ]
 

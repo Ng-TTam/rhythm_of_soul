@@ -4,6 +4,7 @@ import com.rhythm_of_soul.identity_service.constant.SecurityConstants;
 import com.rhythm_of_soul.identity_service.exception.AppException;
 import com.rhythm_of_soul.identity_service.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -14,8 +15,9 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class OtpUtils {
-    StringRedisTemplate stringRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
 
     private static final String OTP_CHARACTERS = "0123456789";
     private static final int OTP_LENGTH = 6;
@@ -32,14 +34,20 @@ public class OtpUtils {
         try {
             String key = "OTP_" + type + "_" + email;
             String otp = generateOtp();
+            log.info("otp là: {}", otp);
 
             stringRedisTemplate.opsForValue().set(key, otp);
             stringRedisTemplate.expire(key, OTP_TTL_MIN, TimeUnit.MINUTES);
 
             // Publisher send email
-            stringRedisTemplate.opsForStream().add(SecurityConstants.STREAM_KEY, Map.of(email, otp));
+            stringRedisTemplate.opsForStream().add(SecurityConstants.STREAM_OTP_KEY, Map.of(
+                    "email", email,
+                    "otp", otp
+            ));
+
         }
         catch (Exception e){
+            log.error("Error sending OTP to Redis stream: ", e);
             throw new AppException(ErrorCode.ERROR_SEND_OTP);
         }
     }

@@ -10,9 +10,10 @@ public class SecurityConstants {
     public static final String ADMIN_PASSWORD = "admin_admin";
     public static final String REDIRECT_URI_KEY = "redirect_uri";
     public static final String VERIFY_OTP = "VERIFY_OTP";
-    public static final String RESET_OTP = "RESET";
+    public static final String RESET_PASSWORD_OTP = "RESET_PASSWORD_OTP";
     public static final String PRE_RESET_PASS = "TOKEN_RESET_PASS_";
     public static final int TTL_TOKEN_RESET_CACHE = 5;
-    public static final String STREAM_KEY = "otp";
+    public static final String STREAM_OTP_KEY = "otp";
+    public static final String STREAM_BAN_KEY = "ban_user";
 }
 

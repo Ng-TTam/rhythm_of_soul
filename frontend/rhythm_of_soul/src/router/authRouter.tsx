@@ -1,6 +1,8 @@
 import React from 'react';
 import LoginForm from '../pages/login/login';
 import SignUp from '../pages/login/sign-up';
+import ResetPassword from '../pages/login/ResetPassword';
+import ResetPasswordVerify from '../pages/login/ResetPasswordVerify';
 
 export const authRouter = [
   {
@@ -11,5 +13,10 @@ export const authRouter = [
     path: '/sign-up',
     element: <SignUp />
   },
+  {
+    path: '/reset-password',
+    element: <ResetPassword />
+  },
+  { path: "/reset-password/verify", element: <ResetPasswordVerify /> }
 
 ];

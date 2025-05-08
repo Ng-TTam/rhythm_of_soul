@@ -39,6 +39,26 @@ class LoginService {
     );
     return response.data;
   }
+
+  async resetPasswordRequest(email: string): Promise<APIResponse<any>> {
+    const response = await axios.post<APIResponse<any>>(
+      "http://localhost:8080/identity/reset-password/request",
+      { email }
+    );
+    return response.data;
+  }
+  async resetPasswordVerify(data: {
+    email: string;
+    otp: string;
+    newPassword: string;
+  }): Promise<APIResponse<any>> {
+    const response = await axios.post(
+      "http://localhost:8080/identity/reset-password/verify",
+      data
+    );
+    return response.data;
+  }
+  
   
 }
 export default new LoginService();

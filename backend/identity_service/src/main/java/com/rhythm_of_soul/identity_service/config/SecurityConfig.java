@@ -42,7 +42,7 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_ENDPOINTS = {
         "/users", "/auth/login", "/auth/introspect", "/auth/logout", "/auth/refresh","/api/auth/**",
-            "/auth/log", "/api/sign-up",
+            "/auth/log", "/api/sign-up", "/reset-password/request", "/reset-password/verify",
             "/lib/**",
     };
 
@@ -104,7 +104,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:3000")); // Nguồn gốc được phép
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
 

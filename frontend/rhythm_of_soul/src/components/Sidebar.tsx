@@ -21,6 +21,10 @@ export default function Sidebar() {
   const handleProfileUser = () => {
     redirectPath(`/userProfile`);
   }
+  const handleAdmin_User = () => {
+    redirectPath('/admin/admin-user');
+  }
+
   return (
     <>
       <aside
@@ -418,7 +422,7 @@ export default function Sidebar() {
                     </a>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link " href="admin/admin-category.html">
+                    <button className="nav-link " onClick={handleAdmin_User}>
                       <i className="icon svg-icon">
                         <svg
                           className="icon-10"
@@ -441,89 +445,8 @@ export default function Sidebar() {
                         {" "}
                         C
                       </i>
-                      <span className="item-name">Category</span>
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a className="nav-link " href="admin/admin-writer.html">
-                      <i className="icon">
-                        <svg
-                          className="icon-10"
-                          width={10}
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <g>
-                            <circle cx={12} cy={12} r={8} fill="currentColor" />
-                          </g>
-                        </svg>
-                      </i>
-                      <i
-                        className="sidenav-mini-icon"
-                        data-bs-toggle="tooltip"
-                        title="Writer"
-                        data-bs-placement="right"
-                      >
-                        {" "}
-                        W
-                      </i>
-                      <span className="item-name">Writer</span>
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a className="nav-link " href="admin/admin-singer.html">
-                      <i className="icon">
-                        <svg
-                          className="icon-10"
-                          width={10}
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <g>
-                            <circle cx={12} cy={12} r={8} fill="currentColor" />
-                          </g>
-                        </svg>
-                      </i>
-                      <i
-                        className="sidenav-mini-icon"
-                        data-bs-toggle="tooltip"
-                        title="Singer"
-                        data-bs-placement="right"
-                      >
-                        {" "}
-                        S
-                      </i>
-                      <span className="item-name">Singer</span>
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a className="nav-link " href="admin/admin-song.html">
-                      <i className="icon">
-                        <svg
-                          className="icon-10"
-                          width={10}
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <g>
-                            <circle cx={12} cy={12} r={8} fill="currentColor" />
-                          </g>
-                        </svg>
-                      </i>
-                      <i
-                        className="sidenav-mini-icon"
-                        data-bs-toggle="tooltip"
-                        title="Muzic"
-                        data-bs-placement="right"
-                      >
-                        {" "}
-                        M
-                      </i>
-                      <span className="item-name">Muzic</span>
-                    </a>
+                      <span className="item-name">User</span>
+                    </button>
                   </li>
                 </ul>
               </li>
