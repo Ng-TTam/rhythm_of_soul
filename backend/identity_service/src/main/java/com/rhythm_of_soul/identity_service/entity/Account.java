@@ -1,19 +1,22 @@
 package com.rhythm_of_soul.identity_service.entity;
 
-import com.rhythm_of_soul.identity_service.constant.Role;
-import com.rhythm_of_soul.identity_service.constant.Status;
+import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
+
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.Instant;
-import java.util.Collection;
-import java.util.List;
+import com.rhythm_of_soul.identity_service.constant.Role;
+import com.rhythm_of_soul.identity_service.constant.Status;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
@@ -34,13 +37,13 @@ public class Account implements UserDetails {
     @Column(nullable = false)
     String password;
 
-    boolean isVerified = false;
+    boolean isVerified;
 
     @Enumerated(EnumType.STRING)
     Role role;
 
     @Enumerated(EnumType.STRING)
-    Status status = Status.ACTIVE;
+    Status status;
 
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
     User user;

@@ -6,7 +6,7 @@ public class SecurityConstants {
     public static final String ACCESS_TOKEN = "access_token";
     public static final String ACCESS_TOKEN_SSO = "access_token_sso";
     public static final String REFRESH_TOKEN = "refresh_token";
-    public static final String ADMIN_EMAIL= "admin@gmail.com";
+    public static final String ADMIN_EMAIL = "admin@gmail.com";
     public static final String ADMIN_PASSWORD = "admin_admin";
     public static final String REDIRECT_URI_KEY = "redirect_uri";
     public static final String VERIFY_OTP = "VERIFY_OTP";
@@ -16,4 +16,3 @@ public class SecurityConstants {
     public static final String STREAM_OTP_KEY = "otp";
     public static final String STREAM_BAN_KEY = "ban_user";
 }
-

@@ -1,9 +1,10 @@
 package com.rhythm_of_soul.identity_service.dto.response;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
 
 import java.util.Collections;
 import java.util.List;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Setter
 @Getter
@@ -20,4 +21,3 @@ public class PageResponse<T> {
     @Builder.Default
     private List<T> data = Collections.emptyList();
 }
-

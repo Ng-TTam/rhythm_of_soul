@@ -1,17 +1,19 @@
 package com.rhythm_of_soul.identity_service.utils;
 
-import com.rhythm_of_soul.identity_service.constant.SecurityConstants;
-import com.rhythm_of_soul.identity_service.exception.AppException;
-import com.rhythm_of_soul.identity_service.exception.ErrorCode;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.security.SecureRandom;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import java.security.SecureRandom;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import com.rhythm_of_soul.identity_service.constant.SecurityConstants;
+import com.rhythm_of_soul.identity_service.exception.AppException;
+import com.rhythm_of_soul.identity_service.exception.ErrorCode;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
@@ -30,7 +32,7 @@ public class OtpUtils {
      * type: VERIFY_OTP, RESET
      */
     @Async("taskExecutor")
-    public void send(String type, String email){
+    public void send(String type, String email) {
         try {
             String key = "OTP_" + type + "_" + email;
             String otp = generateOtp();
@@ -40,13 +42,15 @@ public class OtpUtils {
             stringRedisTemplate.expire(key, OTP_TTL_MIN, TimeUnit.MINUTES);
 
             // Publisher send email
-            stringRedisTemplate.opsForStream().add(SecurityConstants.STREAM_OTP_KEY, Map.of(
-                    "email", email,
-                    "otp", otp
-            ));
+            stringRedisTemplate
+                    .opsForStream()
+                    .add(
+                            SecurityConstants.STREAM_OTP_KEY,
+                            Map.of(
+                                    "email", email,
+                                    "otp", otp));
 
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             log.error("Error sending OTP to Redis stream: ", e);
             throw new AppException(ErrorCode.ERROR_SEND_OTP);
         }
@@ -55,11 +59,10 @@ public class OtpUtils {
     /**
      * Verify otp in server
      */
-    public boolean verify(String type, String email, String otp){
-        String key = "OTP_" + type+ "_" + email;
+    public boolean verify(String type, String email, String otp) {
+        String key = "OTP_" + type + "_" + email;
         String otpStored = stringRedisTemplate.opsForValue().get(key);
-        if(otpStored == null)
-            throw new AppException(ErrorCode.INVALID_OTP);
+        if (otpStored == null) throw new AppException(ErrorCode.INVALID_OTP);
         if (otpStored.equals(otp)) {
             stringRedisTemplate.delete(key);
             return true;
@@ -71,7 +74,7 @@ public class OtpUtils {
      * Gen random otp
      * @return otp
      */
-    private String generateOtp(){
+    private String generateOtp() {
         StringBuilder otp = new StringBuilder(OTP_LENGTH);
         for (int i = 0; i < OTP_LENGTH; i++) {
             otp.append(OTP_CHARACTERS.charAt(random.nextInt(OTP_CHARACTERS.length())));
@@ -79,4 +82,3 @@ public class OtpUtils {
         return otp.toString();
     }
 }
-

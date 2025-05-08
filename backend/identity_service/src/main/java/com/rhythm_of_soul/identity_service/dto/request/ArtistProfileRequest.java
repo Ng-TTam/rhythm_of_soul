@@ -1,7 +1,7 @@
 package com.rhythm_of_soul.identity_service.dto.request;
 
-import com.rhythm_of_soul.identity_service.constant.ArtistProfileStatus;
 import jakarta.validation.constraints.NotBlank;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -14,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 public class ArtistProfileRequest {
     @NotBlank(message = "BLANK_STAGE_NAME")
     String stageName;
+
     String bio;
     String facebookUrl;
     String instagramUrl;

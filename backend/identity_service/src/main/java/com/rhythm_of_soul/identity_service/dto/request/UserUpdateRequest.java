@@ -1,14 +1,16 @@
 package com.rhythm_of_soul.identity_service.dto.request;
 
-import com.rhythm_of_soul.identity_service.constant.Gender;
-import com.rhythm_of_soul.identity_service.entity.ArtistProfile;
+import java.time.LocalDate;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
+
+import com.rhythm_of_soul.identity_service.constant.Gender;
+
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -20,6 +22,7 @@ public class UserUpdateRequest {
     String lastName;
 
     @NotNull(message = "BLANK_DOB")
+    @Past(message = "INVALID_DOB")
     LocalDate dateOfBirth;
 
     @NotNull(message = "BLANK_GENDER")
@@ -31,5 +34,6 @@ public class UserUpdateRequest {
 
     String avatar;
     String cover;
-    ArtistProfile artistProfile;
+
+    ArtistProfileRequest artistProfile;
 }

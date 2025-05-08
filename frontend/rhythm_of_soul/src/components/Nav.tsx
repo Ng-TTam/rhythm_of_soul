@@ -1,21 +1,19 @@
 import React, { useEffect } from "react";
 import LoginService from "../services/service";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+
 export default function Nav() {
+  const location = useLocation();
+
   const handleLogout = () => {
     const response = LoginService.logout();
     console.log(response);
-  }
+  };
   const navigate = useNavigate();
   const redirectPath = (url: string) => {
     navigate(url);
-  }
-  const handleToFeed = () => {
-    redirectPath('/feed');
-  }
-  const handleToAlbums = () => {
-    redirectPath('/albums');
-  }
+  };
+
   return (
     <>
       <div className="position-relative ">
@@ -23,88 +21,39 @@ export default function Nav() {
           <div className="container-fluid navbar-inner">
             <a href="index-2.html" className="navbar-brand">
               <div className="logo-main">
-                <img
-                  src="https://templates.iqonic.design/muzik/html/assets/images/logo.svg"
-                  className="logo-normal img-fluid"
-                  alt="logo"
-                />
-                <img
-                  src="https://templates.iqonic.design/muzik/html/assets/images/logo-dark.svg"
-                  className="logo-normal dark-normal img-fluid"
-                  alt="logo-dark"
-                />
-                <img
-                  src="https://templates.iqonic.design/muzik/html/assets/images/logo-color.svg"
-                  className="logo-normal white-normal img-fluid"
-                  alt="logo-color"
-                />
-                <img
-                  src="https://templates.iqonic.design/muzik/html/assets/images/logo-mini.svg"
-                  className="logo-mini img-fluid"
-                  alt="logo-mini"
-                />
-                <img
-                  src="https://templates.iqonic.design/muzik/html/assets/images/logo-dark-mini.svg"
-                  className="logo-mini dark-mini img-fluid"
-                  alt="logo-dark-mini"
-                />
-                <img
-                  src="https://templates.iqonic.design/muzik/html/assets/images/logo-color-mini.svg"
-                  className="logo-mini white-mini img-fluid"
-                  alt="logo-white-mini"
-                />
+                <img src="https://templates.iqonic.design/muzik/html/assets/images/logo.svg" className="logo-normal img-fluid" alt="logo" />
+                <img src="https://templates.iqonic.design/muzik/html/assets/images/logo-dark.svg" className="logo-normal dark-normal img-fluid" alt="logo-dark" />
+                <img src="https://templates.iqonic.design/muzik/html/assets/images/logo-color.svg" className="logo-normal white-normal img-fluid" alt="logo-color" />
+                <img src="https://templates.iqonic.design/muzik/html/assets/images/logo-mini.svg" className="logo-mini img-fluid" alt="logo-mini" />
+                <img src="https://templates.iqonic.design/muzik/html/assets/images/logo-dark-mini.svg" className="logo-mini dark-mini img-fluid" alt="logo-dark-mini" />
+                <img src="https://templates.iqonic.design/muzik/html/assets/images/logo-color-mini.svg" className="logo-mini white-mini img-fluid" alt="logo-white-mini" />
               </div>
             </a>
-            <div
-              className="sidebar-toggle"
-              data-toggle="sidebar"
-              data-active="true"
-            >
+            <div className="sidebar-toggle" data-toggle="sidebar" data-active="true">
               <i className="icon d-flex">
                 <svg className="icon-20" width={20} viewBox="0 0 24 24">
-                  <path
-                    fill="currentColor"
-                    d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"
-                  />
+                  <path fill="currentColor" d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" />
                 </svg>
               </i>
             </div>
             <div className="d-flex align-items-center justify-content-between product-offcanvas">
-              <div
-                className="offcanvas offcanvas-end shadow-none iq-product-menu-responsive"
-                tabIndex={-1}
-                id="offcanvasBottom"
-              >
+              <div className="offcanvas offcanvas-end shadow-none iq-product-menu-responsive" tabIndex={-1} id="offcanvasBottom">
                 <div className="offcanvas-body">
                   <ul className="iq-nav-menu list-unstyled">
                     <li className="nav-item">
-                      <a
-                        className="nav-link active"
-                        aria-current="page"
-                        href="index-2.html"
-                      >
+                      <a className={`nav-link ${location.pathname === '/' ? 'active' : ''}`} aria-current="page" onClick={(e) => {e.preventDefault(); redirectPath(`/`)}}>
                         <span className="item-name">Home</span>
                       </a>
                     </li>
                     <li className="nav-item">
-                      <button
-                        className="nav-link "
-                        aria-current="page"
-                        style={{ border: "none", background: "none" }}
-                        onClick={handleToFeed}
-                      >
+                      <a className={`nav-link ${location.pathname === '/feed' ? 'active' : ''}`} aria-current="page" onClick={(e) => {e.preventDefault(); redirectPath(`/feed`)}}>
                         <span className="item-name">Feed</span>
-                      </button>
+                      </a>
                     </li>
                     <li className="nav-item">
-                      <button
-                        className="nav-link "
-                        aria-current="page"
-                        style={{ border: "none", background: "none" }}
-                        onClick={handleToAlbums}
-                      >
+                      <a className={`nav-link ${location.pathname === '/albums' ? 'active' : ''}`} aria-current="page" onClick={(e) => {e.preventDefault(); redirectPath(`/albums`)}}>
                         <span className="item-name">Albums</span>
-                      </button>
+                      </a>
                     </li>
                   </ul>
                 </div>
@@ -128,46 +77,16 @@ export default function Nav() {
                 </span>
               </button>
             </div>
-            <div
-              className="collapse navbar-collapse"
-              id="navbarSupportedContent"
-            >
+            <div className="collapse navbar-collapse" id="navbarSupportedContent">
               <div className="search-box d-xl-block d-none">
                 <div className="dropdown">
-                  <div
-                    className="search-box-drop"
-                    id="search-box-drop"
-                    data-bs-toggle="dropdown"
-                  >
+                  <div className="search-box-drop" id="search-box-drop" data-bs-toggle="dropdown">
                     <div className="d-flex align-items-center justify-content-between gap-2">
                       <div className="search-box-inner">
-                        <button
-                          type="submit"
-                          className="search-box-drop-submit"
-                        >
-                          <svg
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width={24}
-                            height={24}
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              cx="11.7669"
-                              cy="11.7666"
-                              r="8.98856"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M18.0186 18.4851L21.5426 22"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
+                        <button type="submit" className="search-box-drop-submit">
+                          <svg fill="none" xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
+                            <circle cx="11.7669" cy="11.7666" r="8.98856" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M18.0186 18.4851L21.5426 22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </button>
                         <input type="text" placeholder="Search Here..." />
@@ -177,19 +96,12 @@ export default function Nav() {
                       </div>
                     </div>
                   </div>
-                  <ul
-                    className="p-0 sub-drop dropdown-menu dropdown-menu-end"
-                    aria-labelledby="search-drop"
-                  >
+                  <ul className="p-0 sub-drop dropdown-menu dropdown-menu-end" aria-labelledby="search-drop">
                     <li className="">
                       <div className="p-0 card-body all-notification">
                         <div className="d-flex align-items-center border-bottom search-hover py-2 px-3">
                           <div className="flex-shrink-0">
-                            <img
-                              src="../assets/images/dashboard/64.jpg"
-                              className="align-self-center img-fluid avatar-50 rounded-pill"
-                              alt="#"
-                            />
+                            <img src="../assets/images/dashboard/64.jpg" className="align-self-center img-fluid avatar-50 rounded-pill" alt="#" />
                           </div>
                           <div className="d-flex flex-column ms-3 w-100">
                             <a href="javascript:void(0);" className="h5">
@@ -200,11 +112,7 @@ export default function Nav() {
                         </div>
                         <div className="d-flex align-items-center border-bottom search-hover py-2 px-3">
                           <div className="flex-shrink-0">
-                            <img
-                              src="../assets/images/dashboard/02.png"
-                              className="align-self-center img-fluid avatar-50 rounded-pill"
-                              alt="#"
-                            />
+                            <img src="../assets/images/dashboard/02.png" className="align-self-center img-fluid avatar-50 rounded-pill" alt="#" />
                           </div>
                           <div className="d-flex flex-column ms-3 w-100">
                             <a href="javascript:void(0);" className="h5">
@@ -215,11 +123,7 @@ export default function Nav() {
                         </div>
                         <div className="d-flex align-items-center search-hover py-2 px-3 border-bottom">
                           <div className="flex-shrink-0">
-                            <img
-                              src="../assets/images/dashboard/03.png"
-                              className="align-self-center img-fluid avatar-50 rounded-pill"
-                              alt="#"
-                            />
+                            <img src="../assets/images/dashboard/03.png" className="align-self-center img-fluid avatar-50 rounded-pill" alt="#" />
                           </div>
                           <div className="d-flex flex-column ms-3 w-100">
                             <a href="javascript:void(0);" className="h5">
@@ -230,11 +134,7 @@ export default function Nav() {
                         </div>
                         <div className="d-flex align-items-center border-bottom search-hover py-2 px-3">
                           <div className="flex-shrink-0">
-                            <img
-                              src="../assets/images/dashboard/04.png"
-                              className="align-self-center img-fluid avatar-50 rounded-pill"
-                              alt="#"
-                            />
+                            <img src="../assets/images/dashboard/04.png" className="align-self-center img-fluid avatar-50 rounded-pill" alt="#" />
                           </div>
                           <div className="d-flex flex-column ms-3 w-100">
                             <a href="javascript:void(0);" className="h5">
@@ -250,56 +150,24 @@ export default function Nav() {
               </div>
               <ul className="mb-2 navbar-nav ms-auto align-items-center navbar-list mb-lg-0">
                 <li className="nav-item dropdown d-xl-none d-block">
-                  <a
-                    href="#"
-                    className="nav-link"
-                    id="search-drop"
-                    data-bs-toggle="dropdown"
-                  >
-                    <svg
-                      width={24}
-                      height={24}
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <rect
-                        opacity="0.5"
-                        x="17.0365"
-                        y="15.1223"
-                        width="8.15546"
-                        height={2}
-                        rx={1}
-                        transform="rotate(45 17.0365 15.1223)"
-                        fill="currentColor"
-                      />
+                  <a href="#" className="nav-link" id="search-drop" data-bs-toggle="dropdown">
+                    <svg width={24} height={24} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height={2} rx={1} transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
                       <path
                         d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z"
                         fill="currentColor"
                       />
                     </svg>
                   </a>
-                  <ul
-                    className="p-0 sub-drop dropdown-menu dropdown-menu-end"
-                    aria-labelledby="search-drop"
-                  >
+                  <ul className="p-0 sub-drop dropdown-menu dropdown-menu-end" aria-labelledby="search-drop">
                     <li className="">
                       <div className="p-3 card-header justify-content-between border-bottom rounded-top">
                         <div className="header-title">
                           <div className="iq-search-bar device-search  position-relative">
                             <form action="#" className="searchbox">
-                              <input
-                                type="text"
-                                className="text search-input form-control bg-soft-primary"
-                                placeholder="Search here..."
-                              />
-                              <a
-                                className="d-lg-none d-flex"
-                                href="javascript:void(0);"
-                              >
-                                <span className="material-symbols-outlined">
-                                  search
-                                </span>
+                              <input type="text" className="text search-input form-control bg-soft-primary" placeholder="Search here..." />
+                              <a className="d-lg-none d-flex" href="javascript:void(0);">
+                                <span className="material-symbols-outlined">search</span>
                               </a>
                             </form>
                           </div>
@@ -308,11 +176,7 @@ export default function Nav() {
                       <div className="p-0 card-body all-notification">
                         <div className="d-flex align-items-center border-bottom search-hover py-2 px-3">
                           <div className="flex-shrink-0">
-                            <img
-                              src="../assets/images/dashboard/64.jpg"
-                              className="align-self-center img-fluid avatar-50 rounded-pill"
-                              alt="#"
-                            />
+                            <img src="../assets/images/dashboard/64.jpg" className="align-self-center img-fluid avatar-50 rounded-pill" alt="#" />
                           </div>
                           <div className="d-flex flex-column ms-3 w-100">
                             <a href="javascript:void(0);" className="h6">
@@ -323,11 +187,7 @@ export default function Nav() {
                         </div>
                         <div className="d-flex align-items-center border-bottom search-hover py-2 px-3">
                           <div className="flex-shrink-0">
-                            <img
-                              src="../assets/images/dashboard/55.png"
-                              className="align-self-center img-fluid avatar-50 rounded-pill"
-                              alt="#"
-                            />
+                            <img src="../assets/images/dashboard/55.png" className="align-self-center img-fluid avatar-50 rounded-pill" alt="#" />
                           </div>
                           <div className="d-flex flex-column ms-3 w-100">
                             <a href="javascript:void(0);" className="h6">
@@ -338,11 +198,7 @@ export default function Nav() {
                         </div>
                         <div className="d-flex align-items-center search-hover py-2 px-3 border-bottom">
                           <div className="flex-shrink-0">
-                            <img
-                              src="../assets/images/dashboard/56.png"
-                              className="align-self-center img-fluid avatar-50 rounded-pill"
-                              alt="#"
-                            />
+                            <img src="../assets/images/dashboard/56.png" className="align-self-center img-fluid avatar-50 rounded-pill" alt="#" />
                           </div>
                           <div className="d-flex flex-column ms-3 w-100">
                             <a href="javascript:void(0);" className="h6">
@@ -353,11 +209,7 @@ export default function Nav() {
                         </div>
                         <div className="d-flex align-items-center border-bottom search-hover py-2 px-3">
                           <div className="flex-shrink-0">
-                            <img
-                              src="../assets/images/dashboard/57.png"
-                              className="align-self-center img-fluid avatar-50 rounded-pill"
-                              alt="#"
-                            />
+                            <img src="../assets/images/dashboard/57.png" className="align-self-center img-fluid avatar-50 rounded-pill" alt="#" />
                           </div>
                           <div className="d-flex flex-column ms-3 w-100">
                             <a href="javascript:void(0);" className="h6">
@@ -371,13 +223,7 @@ export default function Nav() {
                   </ul>
                 </li>
                 <li>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width={20}
-                    height={20}
-                    viewBox="0 0 20 20"
-                    fill="none"
-                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" width={20} height={20} viewBox="0 0 20 20" fill="none">
                     <g clipPath="url(#clip0_549_1300)">
                       <path
                         d="M10 13.125C11.7259 13.125 13.125 11.7259 13.125 10C13.125 8.27411 11.7259 6.875 10 6.875C8.27411 6.875 6.875 8.27411 6.875 10C6.875 11.7259 8.27411 13.125 10 13.125Z"
@@ -402,19 +248,8 @@ export default function Nav() {
                   </svg>
                 </li>
                 <li className="nav-item dropdown">
-                  <a
-                    href="#"
-                    className="nav-link p-0 ps-3"
-                    id="notification-drop"
-                    data-bs-toggle="dropdown"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width={20}
-                      height={20}
-                      viewBox="0 0 20 20"
-                      fill="none"
-                    >
+                  <a href="#" className="nav-link p-0 ps-3" id="notification-drop" data-bs-toggle="dropdown">
+                    <svg xmlns="http://www.w3.org/2000/svg" width={20} height={20} viewBox="0 0 20 20" fill="none">
                       <g clipPath="url(#clip0_549_1304)">
                         <path
                           d="M7.5 15C7.5 15.663 7.76339 16.2989 8.23223 16.7678C8.70107 17.2366 9.33696 17.5 10 17.5C10.663 17.5 11.2989 17.2366 11.7678 16.7678C12.2366 16.2989 12.5 15.663 12.5 15"
@@ -430,13 +265,7 @@ export default function Nav() {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
-                        <circle
-                          cx="14.2803"
-                          cy="2.91665"
-                          r="2.58333"
-                          fill="#EF3E36"
-                          stroke="white"
-                        />
+                        <circle cx="14.2803" cy="2.91665" r="2.58333" fill="#EF3E36" stroke="white" />
                       </g>
                       <defs>
                         <clipPath id="clip0_549_1304">
@@ -446,10 +275,7 @@ export default function Nav() {
                     </svg>
                     <span className="bg-danger dots" />
                   </a>
-                  <ul
-                    className="p-0 sub-drop dropdown-menu dropdown-menu-end"
-                    aria-labelledby="notification-drop"
-                  >
+                  <ul className="p-0 sub-drop dropdown-menu dropdown-menu-end" aria-labelledby="notification-drop">
                     <li className="">
                       <div className="p-3 card-header d-flex justify-content-between bg-primary rounded-top">
                         <div className="header-title">
@@ -459,19 +285,12 @@ export default function Nav() {
                       <div className="p-0 card-body all-notification">
                         <a href="#" className="iq-sub-card">
                           <div className="d-flex align-items-center">
-                            <img
-                              className="p-1 avatar-40 rounded-pill bg-soft-primary"
-                              src="../assets/images/dashboard/24.png"
-                              alt=""
-                              loading="lazy"
-                            />
+                            <img className="p-1 avatar-40 rounded-pill bg-soft-primary" src="../assets/images/dashboard/24.png" alt="" loading="lazy" />
                             <div className="ms-3 w-100">
                               <h6 className="mb-0 ">Emma Watson Bni</h6>
                               <div className="d-flex justify-content-between align-items-center">
                                 <p className="mb-0">95 MB</p>
-                                <small className="float-end font-size-12">
-                                  Just Now
-                                </small>
+                                <small className="float-end font-size-12">Just Now</small>
                               </div>
                             </div>
                           </div>
@@ -479,58 +298,37 @@ export default function Nav() {
                         <a href="#" className="iq-sub-card">
                           <div className="d-flex align-items-center">
                             <div>
-                              <img
-                                className="p-1 avatar-40 rounded-pill bg-soft-primary"
-                                src="../assets/images/dashboard/25.png"
-                                alt=""
-                                loading="lazy"
-                              />
+                              <img className="p-1 avatar-40 rounded-pill bg-soft-primary" src="../assets/images/dashboard/25.png" alt="" loading="lazy" />
                             </div>
                             <div className="ms-3 w-100">
                               <h6 className="mb-0 ">New customer is join</h6>
                               <div className="d-flex justify-content-between align-items-center">
                                 <p className="mb-0">Cyst Bni</p>
-                                <small className="float-end font-size-12">
-                                  5 days ago
-                                </small>
+                                <small className="float-end font-size-12">5 days ago</small>
                               </div>
                             </div>
                           </div>
                         </a>
                         <a href="#" className="iq-sub-card">
                           <div className="d-flex align-items-center">
-                            <img
-                              className="p-1 avatar-40 rounded-pill bg-soft-primary"
-                              src="../assets/images/dashboard/26.png"
-                              alt=""
-                              loading="lazy"
-                            />
+                            <img className="p-1 avatar-40 rounded-pill bg-soft-primary" src="../assets/images/dashboard/26.png" alt="" loading="lazy" />
                             <div className="ms-3 w-100">
                               <h6 className="mb-0 ">Two customer is left</h6>
                               <div className="d-flex justify-content-between align-items-center">
                                 <p className="mb-0">Cyst Bni</p>
-                                <small className="float-end font-size-12">
-                                  2 days ago
-                                </small>
+                                <small className="float-end font-size-12">2 days ago</small>
                               </div>
                             </div>
                           </div>
                         </a>
                         <a href="#" className="iq-sub-card">
                           <div className="d-flex align-items-center">
-                            <img
-                              className="p-1 avatar-40 rounded-pill bg-soft-primary"
-                              src="../assets/images/dashboard/27.png"
-                              alt=""
-                              loading="lazy"
-                            />
+                            <img className="p-1 avatar-40 rounded-pill bg-soft-primary" src="../assets/images/dashboard/27.png" alt="" loading="lazy" />
                             <div className="w-100 ms-3">
                               <h6 className="mb-0 ">New Mail from Fenny</h6>
                               <div className="d-flex justify-content-between align-items-center">
                                 <p className="mb-0">Cyst Bni</p>
-                                <small className="float-end font-size-12">
-                                  3 days ago
-                                </small>
+                                <small className="float-end font-size-12">3 days ago</small>
                               </div>
                             </div>
                           </div>
@@ -540,39 +338,18 @@ export default function Nav() {
                   </ul>
                 </li>
                 <li className="nav-item dropdown">
-                  <a
-                    className="p-0 ps-3 nav-link d-flex align-items-center position-relative"
-                    href="#"
-                    id="profile-setting"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <img
-                      src="../assets/images/dashboard/64.jpg"
-                      alt="User-Profile"
-                      className="theme-color-default-img img-fluid avatar avatar-40 avatar-rounded"
-                      loading="lazy"
-                    />
+                  <a className="p-0 ps-3 nav-link d-flex align-items-center position-relative" href="#" id="profile-setting" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="../assets/images/dashboard/64.jpg" alt="User-Profile" className="theme-color-default-img img-fluid avatar avatar-40 avatar-rounded" loading="lazy" />
                     <div className="iq-profile-badge bg-success" />
                   </a>
-                  <ul
-                    className="dropdown-menu dropdown-menu-end"
-                    aria-labelledby="profile-setting"
-                  >
+                  <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="profile-setting">
                     <li>
-                      <a
-                        className="dropdown-item"
-                        href="app/user-profile.html"
-                      >
+                      <a className="dropdown-item" onClick={(e) => {e.preventDefault(); redirectPath(`/userProfile`)}}>
                         Profile
                       </a>
                     </li>
                     <li>
-                      <a
-                        className="dropdown-item"
-                        href="app/user-privacy-setting.html"
-                      >
+                      <a className="dropdown-item" href="app/user-privacy-setting.html">
                         Privacy Setting
                       </a>
                     </li>

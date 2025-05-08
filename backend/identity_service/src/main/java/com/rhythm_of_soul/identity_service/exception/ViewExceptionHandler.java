@@ -1,13 +1,15 @@
 package com.rhythm_of_soul.identity_service.exception;
 
-import com.rhythm_of_soul.identity_service.dto.request.AuthenticationRequest;
-import lombok.extern.slf4j.Slf4j;
+import java.nio.file.AccessDeniedException;
+
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.nio.file.AccessDeniedException;
+import com.rhythm_of_soul.identity_service.dto.request.AuthenticationRequest;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ControllerAdvice(basePackages = "com.rhythm_of_soul.identity_service.controller")
@@ -28,7 +30,8 @@ public class ViewExceptionHandler {
     }
 
     @ExceptionHandler(value = AccessDeniedException.class)
-    public String handlingAccessDeniedException(AccessDeniedException exception, RedirectAttributes redirectAttributes) {
+    public String handlingAccessDeniedException(
+            AccessDeniedException exception, RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("error", ErrorCode.UNAUTHORIZED.getMessage());
         return "redirect:/sign-in";
     }
@@ -37,7 +40,8 @@ public class ViewExceptionHandler {
     public String handlingValidation(MethodArgumentNotValidException exception, RedirectAttributes redirectAttributes) {
         String errorMessage = exception.getFieldError().getDefaultMessage();
         redirectAttributes.addFlashAttribute("error", errorMessage);
-        String redirectUrl = exception.getBindingResult().getTarget() instanceof AuthenticationRequest ? "/sign-in" : "/sign-up";
+        String redirectUrl =
+                exception.getBindingResult().getTarget() instanceof AuthenticationRequest ? "/sign-in" : "/sign-up";
         return "redirect:" + redirectUrl;
     }
 }

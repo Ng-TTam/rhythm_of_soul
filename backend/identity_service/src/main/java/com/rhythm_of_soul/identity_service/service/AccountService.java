@@ -1,16 +1,16 @@
 package com.rhythm_of_soul.identity_service.service;
 
-import com.rhythm_of_soul.identity_service.constant.Role;
-import com.rhythm_of_soul.identity_service.constant.Status;
-import com.rhythm_of_soul.identity_service.dto.request.ArtistProfileRequest;
-import com.rhythm_of_soul.identity_service.dto.request.UserCreationRequest;
-import com.rhythm_of_soul.identity_service.dto.response.AccountResponse;
-import com.rhythm_of_soul.identity_service.dto.response.AuthenticationResponse;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 
-import java.util.List;
+import com.rhythm_of_soul.identity_service.constant.Role;
+import com.rhythm_of_soul.identity_service.constant.Status;
+import com.rhythm_of_soul.identity_service.dto.request.UserCreationRequest;
+import com.rhythm_of_soul.identity_service.dto.response.AccountResponse;
+import com.rhythm_of_soul.identity_service.dto.response.AuthenticationResponse;
 
 public interface AccountService {
     /**
@@ -102,5 +102,4 @@ public interface AccountService {
     boolean isAccountLocked(String accountId);
 
     Page<AccountResponse> getFilteredAccounts(List<Role> roles, Status status, String keySearch, Pageable pageable);
-
 }

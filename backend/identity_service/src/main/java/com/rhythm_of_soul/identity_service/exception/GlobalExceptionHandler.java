@@ -1,7 +1,6 @@
 package com.rhythm_of_soul.identity_service.exception;
 
 import java.util.Map;
-import java.util.Objects;
 
 import jakarta.validation.ConstraintViolation;
 
@@ -66,10 +65,8 @@ public class GlobalExceptionHandler {
         try {
             errorCode = ErrorCode.valueOf(enumKey);
 
-            var constraintViolation = exception.getBindingResult()
-                    .getAllErrors()
-                    .get(0)
-                    .unwrap(ConstraintViolation.class);
+            var constraintViolation =
+                    exception.getBindingResult().getAllErrors().get(0).unwrap(ConstraintViolation.class);
 
             attributes = constraintViolation.getConstraintDescriptor().getAttributes();
             log.info("Validation attributes: {}", attributes);
@@ -79,19 +76,14 @@ public class GlobalExceptionHandler {
         String message;
         int code;
 
-            code = errorCode.getCode();
-            message = (attributes != null)
-                    ? mapAttribute(errorCode.getMessage(), attributes)
-                    : errorCode.getMessage();
+        code = errorCode.getCode();
+        message = (attributes != null) ? mapAttribute(errorCode.getMessage(), attributes) : errorCode.getMessage();
 
-        ApiResponse apiResponse = ApiResponse.builder()
-                .code(code)
-                .message(message)
-                .build();
+        ApiResponse apiResponse =
+                ApiResponse.builder().code(code).message(message).build();
 
         return ResponseEntity.badRequest().body(apiResponse);
     }
-
 
     private String mapAttribute(String message, Map<String, Object> attributes) {
         if (attributes == null || attributes.isEmpty()) return message;

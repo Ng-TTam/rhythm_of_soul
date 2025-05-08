@@ -1,15 +1,18 @@
 package com.rhythm_of_soul.identity_service.entity;
 
-import com.rhythm_of_soul.identity_service.constant.Gender;
+import java.time.Instant;
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.Instant;
-import java.time.LocalDate;
+import com.rhythm_of_soul.identity_service.constant.Gender;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
@@ -19,7 +22,7 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class User{
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -42,10 +45,12 @@ public class User{
 
     String phoneNumber;
 
-    boolean isArtist = false;
+    boolean isArtist;
 
+    @Column(length = 500)
     String avatar;
 
+    @Column(length = 500)
     String cover;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)

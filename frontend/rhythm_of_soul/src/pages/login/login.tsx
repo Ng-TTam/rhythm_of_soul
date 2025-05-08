@@ -4,8 +4,8 @@ import { Account } from "../../model/account";
 import LoginService from "../../services/service";
 import { Tooltip } from 'bootstrap';
 import { useAppDispatch, useAppSelector } from '../../store/hook';
-import { setToken } from "../../reducers/tokenReducer";
 import Swal from 'sweetalert2'; 
+import { login } from "../../services/api/authService";
 
 const LoginForm: React.FC = () => {
   const [form, setForm] = useState<Account>({
@@ -16,21 +16,21 @@ const LoginForm: React.FC = () => {
   const dispatch = useAppDispatch();
   
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await LoginService.verifyToken();
-        if (res.result.valid) {
-          dispatch(setToken({ accessToken: res.result.token }));
-          navigate("/");// đã đăng nhập, chuyển hướng sang trang chính
-        }
-      } catch (err) {
-        // Token không hợp lệ hoặc không tồn tại
-        console.log("Token không hợp lệ hoặc không tồn tại");
-      }
-    };
-    checkAuth();
-  }, []);
+  // useEffect(() => {
+  //   const checkAuth = async () => {
+  //     try {
+  //       const res = await LoginService.verifyToken();
+  //       if (res.result.valid) {
+  //         dispatch(setToken({ accessToken: res.result.token }));
+  //         navigate("/");// đã đăng nhập, chuyển hướng sang trang chính
+  //       }
+  //     } catch (err) {
+  //       // Token không hợp lệ hoặc không tồn tại
+  //       console.log("Token không hợp lệ hoặc không tồn tại");
+  //     }
+  //   };
+  //   checkAuth();
+  // }, []);
 
   const [errors, setErrors] = useState({
     email: "",
@@ -46,8 +46,8 @@ const LoginForm: React.FC = () => {
       valid = false;
     }
 
-    if (form.password.length < 6) {
-      newErrors.password = "Mật khẩu phải có ít nhất 6 ký tự";
+    if (form.password.length < 8) {
+      newErrors.password = "Mật khẩu phải có ít nhất 8 ký tự";
       valid = false;
     }
 
@@ -79,19 +79,21 @@ const LoginForm: React.FC = () => {
     if (!validate()) return;
 
     try {
-      const response = await LoginService.login(form);
-      if (response.code === 1000) {
-        dispatch(setToken({ accessToken: response.result.token})); 
+      const response = await login(form);
+      if (response.code === 200) {
         console.log("Token: " + response.result.token); 
+        
         Swal.fire({
           icon: 'success',
           title: 'Đăng nhập thành công',
-          showConfirmButton: true,
-          confirmButtonText: 'OK',
-          confirmButtonColor: '#6f42c1', // Purple button color
-        }).then(() => {
-          navigate("/"); // Chuyển hướng đến trang chính
-        });
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        }).then((result) => {
+          if (result.dismiss === Swal.DismissReason.timer) {
+            navigate("/");
+          }
+        })
       }
     } catch (err: any) {
       Swal.fire({
@@ -99,7 +101,7 @@ const LoginForm: React.FC = () => {
         title: 'Tài khoản hoặc mật khẩu không đúng',
         showConfirmButton: true,
         confirmButtonText: 'OK',
-        confirmButtonColor: '#6f42c1', // Purple button color
+        confirmButtonColor: '#ff4545',
       });
     }
   };
@@ -141,6 +143,7 @@ const LoginForm: React.FC = () => {
                                   title={errors.email} // Tooltip
                                   data-bs-toggle="tooltip"
                                 />
+                                {errors.email && <small style={{color: 'red'}}>{errors.email}</small>} 
                               </div>
                             </div>
                             <div className="col-lg-12">
@@ -157,6 +160,7 @@ const LoginForm: React.FC = () => {
                                   title={errors.password} // Tooltip
                                   data-bs-toggle="tooltip"
                                 />
+                                {errors.password && <small style={{color: 'red'}}>{errors.password}</small>} 
                               </div>
                             </div>
                             <div className="col-lg-12 d-flex justify-content-between">
@@ -168,7 +172,7 @@ const LoginForm: React.FC = () => {
                                   checked={form.remember}
                                   onChange={handleChange}
                                   id="customCheck1"
-                                />
+                                />  
                                 <label className="form-check-label" htmlFor="customCheck1">Remember Me</label>
                               </div>
                               <a href="/reset-password">Forgot Password?</a>
@@ -186,7 +190,7 @@ const LoginForm: React.FC = () => {
                             </ul>
                           </div>
                           <p className="mt-3 text-center">
-                            Don’t have an account? <a href="sign-up" className="text-underline">Click here to sign up.</a>
+                            Don’t have an account? <a href="/sign-up" className="text-underline">Click here to sign up.</a>
                           </p>
                         </form>
                       </div>

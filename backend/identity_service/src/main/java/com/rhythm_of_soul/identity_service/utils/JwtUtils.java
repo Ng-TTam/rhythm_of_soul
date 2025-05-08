@@ -1,5 +1,14 @@
 package com.rhythm_of_soul.identity_service.utils;
 
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -10,15 +19,8 @@ import com.rhythm_of_soul.identity_service.entity.RefreshToken;
 import com.rhythm_of_soul.identity_service.exception.AppException;
 import com.rhythm_of_soul.identity_service.exception.ErrorCode;
 import com.rhythm_of_soul.identity_service.repository.RefreshTokenRepository;
-import lombok.experimental.NonFinal;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
+import lombok.experimental.NonFinal;
 
 @Service
 public class JwtUtils {
@@ -42,23 +44,21 @@ public class JwtUtils {
     public void saveRefreshToken(Account account, String token) {
         Instant expiry = Instant.now().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS);
 
-        RefreshToken refreshToken = refreshTokenRepository.findByAccount(account)
+        RefreshToken refreshToken = refreshTokenRepository
+                .findByAccount(account)
                 .map(existingToken -> {
                     existingToken.setToken(token);
                     existingToken.setExpiryTime(expiry);
                     return existingToken;
                 })
-                .orElse(
-                        RefreshToken.builder()
-                                .account(account)
-                                .token(token)
-                                .expiryTime(expiry)
-                                .build()
-                );
+                .orElse(RefreshToken.builder()
+                        .account(account)
+                        .token(token)
+                        .expiryTime(expiry)
+                        .build());
 
         refreshTokenRepository.save(refreshToken);
     }
-
 
     public String generateToken(Account account, boolean isRefresh) {
         long duration = isRefresh ? REFRESHABLE_DURATION : VALID_DURATION;
@@ -67,12 +67,14 @@ public class JwtUtils {
                 .subject(account.getId())
                 .issuer("rhythm_of_soul.com")
                 .issueTime(new Date())
-                .expirationTime(new Date(Instant.now().plus(duration, ChronoUnit.SECONDS).toEpochMilli()))
-//                .jwtID(UUID.randomUUID().toString())
+                .expirationTime(new Date(
+                        Instant.now().plus(duration, ChronoUnit.SECONDS).toEpochMilli()))
+                //                .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(account))
                 .build();
 
-        JWSObject jwsObject = new JWSObject(new JWSHeader(JWSAlgorithm.HS512), new Payload(jwtClaimsSet.toJSONObject()));
+        JWSObject jwsObject =
+                new JWSObject(new JWSHeader(JWSAlgorithm.HS512), new Payload(jwtClaimsSet.toJSONObject()));
 
         try {
             jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
@@ -82,7 +84,6 @@ public class JwtUtils {
         }
     }
 
-
     public SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
 
@@ -90,11 +91,11 @@ public class JwtUtils {
 
         Date expiryTime = (isRefresh)
                 ? new Date(signedJWT
-                .getJWTClaimsSet()
-                .getIssueTime()
-                .toInstant()
-                .plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS)
-                .toEpochMilli())
+                        .getJWTClaimsSet()
+                        .getIssueTime()
+                        .toInstant()
+                        .plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS)
+                        .toEpochMilli())
                 : signedJWT.getJWTClaimsSet().getExpirationTime();
 
         var verified = signedJWT.verify(verifier);

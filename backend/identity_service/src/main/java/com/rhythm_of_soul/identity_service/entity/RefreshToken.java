@@ -1,10 +1,11 @@
 package com.rhythm_of_soul.identity_service.entity;
 
+import java.time.Instant;
+
 import jakarta.persistence.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.Instant;
 
 @Getter
 @Setter

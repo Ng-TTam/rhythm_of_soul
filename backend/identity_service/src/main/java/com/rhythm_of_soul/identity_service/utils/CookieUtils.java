@@ -1,11 +1,13 @@
 package com.rhythm_of_soul.identity_service.utils;
 
-import org.springframework.util.SerializationUtils;
+import java.util.Base64;
+import java.util.Optional;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Base64;
-import java.util.Optional;
+
+import org.springframework.util.SerializationUtils;
 
 public class CookieUtils {
     private static final int MAX_AGE = 8 * 3600;
@@ -94,13 +96,10 @@ public class CookieUtils {
     }
 
     public static String serialize(Object object) {
-        return Base64.getUrlEncoder()
-                .encodeToString(SerializationUtils.serialize(object));
+        return Base64.getUrlEncoder().encodeToString(SerializationUtils.serialize(object));
     }
 
     public static <T> T deserialize(Cookie cookie, Class<T> cls) {
-        return cls.cast(SerializationUtils.deserialize(
-                Base64.getUrlDecoder().decode(cookie.getValue())));
+        return cls.cast(SerializationUtils.deserialize(Base64.getUrlDecoder().decode(cookie.getValue())));
     }
 }
-

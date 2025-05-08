@@ -1,5 +1,10 @@
 package com.rhythm_of_soul.identity_service.service.impl;
 
+import java.text.ParseException;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 import com.rhythm_of_soul.identity_service.dto.request.AuthenticationRequest;
@@ -15,14 +20,11 @@ import com.rhythm_of_soul.identity_service.repository.AccountRepository;
 import com.rhythm_of_soul.identity_service.repository.RefreshTokenRepository;
 import com.rhythm_of_soul.identity_service.service.AuthenticationService;
 import com.rhythm_of_soul.identity_service.utils.JwtUtils;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.text.ParseException;
 
 @Service
 @Slf4j
@@ -59,12 +61,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         if (!authenticated) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
-
         var accessToken = jwtUtil.generateToken(account, false);
-        if(Boolean.FALSE.equals(request.getRemember())) {
-            return AuthenticationResponse.builder()
-                    .token(accessToken)
-                    .build();
+        if (Boolean.FALSE.equals(request.getRemember())) {
+            return AuthenticationResponse.builder().token(accessToken).build();
         }
         var refreshToken = jwtUtil.generateToken(account, true);
 
@@ -82,8 +81,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var signedJWT = SignedJWT.parse(token);
         var email = signedJWT.getJWTClaimsSet().getSubject();
 
-        var account = accountRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        var account =
+                accountRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         refreshTokenRepository.deleteByAccount(account);
     }
@@ -94,10 +93,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var signedJWT = jwtUtil.verifyToken(token, true);
 
         var accountId = signedJWT.getJWTClaimsSet().getSubject();
-        var account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        var account =
+                accountRepository.findById(accountId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        var storedToken = refreshTokenRepository.findByAccount(account)
+        var storedToken = refreshTokenRepository
+                .findByAccount(account)
                 .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
 
         if (!storedToken.getToken().equals(token)) {
@@ -114,5 +114,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .refreshToken(newRefreshToken)
                 .build();
     }
-
 }

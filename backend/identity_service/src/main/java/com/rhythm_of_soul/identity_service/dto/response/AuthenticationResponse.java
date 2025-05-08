@@ -1,6 +1,7 @@
 package com.rhythm_of_soul.identity_service.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

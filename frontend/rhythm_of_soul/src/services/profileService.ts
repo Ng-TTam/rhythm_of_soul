@@ -1,6 +1,5 @@
 import axios from "axios";
 import { User } from "../model/profile/UserProfile";
-import { Artist } from "../model/profile/ArtistProfile";
 
 const BASE_URL = "http://localhost:8080/identity";
 

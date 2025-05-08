@@ -3,6 +3,7 @@ package com.rhythm_of_soul.identity_service.dto.request;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -19,5 +20,6 @@ public class AuthenticationRequest {
     @NotBlank(message = "BLANK_PASSWORD")
     @Size(min = 8, max = 64, message = "INVALID_PASSWORD")
     String password;
+
     Boolean remember;
 }

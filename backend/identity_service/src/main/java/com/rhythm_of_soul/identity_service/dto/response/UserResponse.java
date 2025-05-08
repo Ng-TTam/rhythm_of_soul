@@ -1,12 +1,12 @@
 package com.rhythm_of_soul.identity_service.dto.response;
 
-import com.rhythm_of_soul.identity_service.constant.Gender;
-import com.rhythm_of_soul.identity_service.entity.ArtistProfile;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-
 import java.time.Instant;
 import java.time.LocalDate;
+
+import com.rhythm_of_soul.identity_service.constant.Gender;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Data
 @NoArgsConstructor
@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserResponse {
     String id;
-//    Account account;
+    //    Account account;
     String firstName;
     String lastName;
     LocalDate dateOfBirth;

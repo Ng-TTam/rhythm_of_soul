@@ -2,15 +2,14 @@ import React, { useEffect, useState } from "react";
 import { FaUpload } from "@react-icons/all-files/fa/FaUpload";
 import { FaUser } from "@react-icons/all-files/fa/FaUser";
 import { User } from "../../model/profile/UserProfile";
-import { Artist } from "../../model/profile/ArtistProfile";
-import ProfileService from "../../services/profileService";
+import { updateUser } from "../../services/api/userService";
+import { getAccessToken } from "../../utils/tokenManager";
 
 interface EditProfileProps {
   visible: boolean;
   onClose: () => void;
   onSave: (data: User) => void;
-  initialData: User;
-  token : string;
+  initialData: User | null;
 }
 
 export default function EditProfileDialog({
@@ -18,101 +17,121 @@ export default function EditProfileDialog({
   onClose,
   onSave,
   initialData,
-  token
 }: EditProfileProps) {
   const [formData, setFormData] = useState<User>({
-    user_id: "",
-     full_name: "",
-     avatar_url: "",
-     created_at: "",
-     updated_at: "",
-     gender: "OTHER",
-     cover_url: "",
-     role: "USER",
-     artist: null
-   });
+    id: '',
+    firstName: '',
+    lastName: '',
+    dateOfBirth: '',
+    gender: '',
+    phoneNumber: '',
+    avatar: '',
+    cover: '',
+    artistProfile: {
+      id: '',
+      stageName: '',
+      bio: '',
+      facebookUrl: '',
+      instagramUrl: '',
+      youtubeUrl: '',
+      status: 'PENDING',
+      createdAt: '',
+      updatedAt: ''
+    },
+    createdAt: null,
+    updatedAt: null,
+    artist: false,
+  });
+
   useEffect(() => {
-    setFormData(initialData);
-  }, [ initialData ]);
-  const isArtist = formData.role === "ARTIST";
-  const handleUserChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    if(initialData)
+      setFormData(initialData);
+  }, [initialData]);
+
+  const isArtist = formData.artist;
+
+  // Xử lý thay đổi thông tin user
+  const handleUserChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
+  // Xử lý thay đổi thông tin artist
   const handleArtistChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    if (formData.artist) {
-      setFormData(prev => ({
+    if (isArtist) {
+      setFormData((prev) => ({
         ...prev,
-        artist: {
-          ...prev.artist!,
-          [name]: value
-        }
+        artistProfile: {
+          ...prev.artistProfile!,
+          [name]: value,
+        },
       }));
     }
   };
 
+  // Xử lý thay đổi giới tính
   const handleGenderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value as "MALE" | "FEMALE" | "OTHER";
-    setFormData(prev => ({
+    const value = e.target.value as 'MALE' | 'FEMALE' | 'OTHER';
+    setFormData((prev) => ({
       ...prev,
-      gender: value
+      gender: value,
     }));
   };
 
-
+  // Xử lý upload avatar
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
-            ...prev,
-            avatar_url: reader.result as string
+          avatar: reader.result as string,
         }));
       };
       reader.readAsDataURL(file);
     }
   };
 
+  // Xử lý upload cover
   const handleCoverUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
-            ...prev,
-            cover_url: reader.result as string
-
+          cover: reader.result as string,
         }));
       };
       reader.readAsDataURL(file);
     }
   };
+
+  // Xử lý lưu profile
   const handleSave = async () => {
-    try{
-      const response = await ProfileService.updateUserProfile(formData.user_id, formData, token);
-      console.log("Profile updated successfully", response);
-      onSave(formData);  
+    try {
+      console.log('Sending update data:', formData);
+      const response = await updateUser(formData.id, formData);
+      console.log('Profile updated successfully', response);
+      onSave(formData);
       onClose();
     } catch (error) {
-      console.error("Failed to update profile", error);
+      console.error('Failed to update profile', error);
     }
+  };
 
-  }
   if (!visible) return null;
 
   return (
     <div className="modal-backdrop" style={backdropStyle}>
       <div className="modal-content" style={modalStyle}>
         <h4 className="mb-4">Edit Profile</h4>
-        
+
         <div className="row">
           {/* Left Column - Images */}
           <div className="col-md-4">
@@ -120,10 +139,10 @@ export default function EditProfileDialog({
             <div className="mb-4 text-center">
               <div className="position-relative d-inline-block">
                 <img
-                  src={formData.avatar_url || "/assets/images/default/avatar.jpg"}
+                  src={formData.avatar || '/assets/images/default/avatar.jpg'}
                   alt="Profile Avatar"
                   className="rounded-circle img-thumbnail shadow"
-                  style={{ width: 150, height: 150, objectFit: "cover" }}
+                  style={{ width: 150, height: 150, objectFit: 'cover' }}
                 />
               </div>
               <div className="mt-3">
@@ -131,7 +150,7 @@ export default function EditProfileDialog({
                   type="file"
                   accept="image/*"
                   onChange={handleAvatarUpload}
-                  style={{ display: "none" }}
+                  style={{ display: 'none' }}
                   id="avatarUpload"
                 />
                 <label htmlFor="avatarUpload" className="btn btn-outline-light btn-sm">
@@ -139,17 +158,17 @@ export default function EditProfileDialog({
                 </label>
               </div>
             </div>
-            
+
             {/* Cover Image */}
             <div className="mb-4">
               <h6 className="mb-2">Cover Image</h6>
-              <div 
-                className="rounded mb-2 position-relative" 
+              <div
+                className="rounded mb-2 position-relative"
                 style={{
-                  height: "100px",
-                  backgroundImage: `url(${formData.cover_url || "/assets/images/default/cover.png"})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center"
+                  height: '100px',
+                  backgroundImage: `url(${formData.cover || '/assets/images/default/cover.png'})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
                 }}
               />
               <div>
@@ -157,7 +176,7 @@ export default function EditProfileDialog({
                   type="file"
                   accept="image/*"
                   onChange={handleCoverUpload}
-                  style={{ display: "none" }}
+                  style={{ display: 'none' }}
                   id="coverUpload"
                 />
                 <label htmlFor="coverUpload" className="btn btn-outline-light btn-sm">
@@ -166,99 +185,130 @@ export default function EditProfileDialog({
               </div>
             </div>
           </div>
-          
+
           {/* Right Column - Form Fields */}
           <div className="col-md-8">
             <div className="row">
               {/* Basic Information */}
               <div className="col-12 mb-4">
                 <h5 className="border-bottom pb-2 mb-3">Basic Information</h5>
-                
+
                 <div className="mb-3">
                   <label className="form-label">
-                    <FaUser className="me-2" /> Full Name *
+                    <FaUser className="me-2" /> First Name *
                   </label>
                   <input
                     className="form-control"
-                    name="full_name"
-                    value={formData.full_name}
+                    name="firstName"
+                    value={formData.firstName}
                     onChange={handleUserChange}
                     required
                   />
                 </div>
-                
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label className="form-label">Gender</label>
-                    <select
-                      className="form-select"
-                      value={formData.gender}
-                      onChange={handleGenderChange}
-                    >
-                      <option value="MALE">Male</option>
-                      <option value="FEMALE">Female</option>
-                      <option value="OTHER">Other</option>
-                    </select>
-                  </div>
+
+                <div className="mb-3">
+                  <label className="form-label">
+                    <FaUser className="me-2" /> Last Name *
+                  </label>
+                  <input
+                    className="form-control"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleUserChange}
+                    required
+                  />
                 </div>
-                
+
+                <div className="mb-3">
+                  <label className="form-label">Phone Number</label>
+                  <input
+                    className="form-control"
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={handleUserChange}
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Date of Birth</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    name="dateOfBirth"
+                    value={formData.dateOfBirth || ''}
+                    onChange={handleUserChange}
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Gender</label>
+                  <select
+                    className="form-select"
+                    value={formData.gender || 'OTHER'}
+                    onChange={handleGenderChange}
+                  >
+                    <option value="MALE">Male</option>
+                    <option value="FEMALE">Female</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
               </div>
-              
+
               {/* Artist Information - Only show if user is an artist */}
-              {isArtist && formData.artist && (
+              {isArtist && formData.artistProfile && (
                 <div className="col-12 mb-4">
                   <h5 className="border-bottom pb-2 mb-3">Artist Information</h5>
-                  
+
                   <div className="mb-3">
                     <label className="form-label">Stage Name *</label>
                     <input
                       className="form-control"
-                      name="stage_name"
-                      value={formData.artist.stage_name}
+                      name="stageName"
+                      value={formData.artistProfile.stageName}
                       onChange={handleArtistChange}
                       required
                     />
                   </div>
-                  
+
                   <div className="mb-3">
                     <label className="form-label">Bio</label>
                     <textarea
                       className="form-control"
                       name="bio"
-                      value={formData.artist.bio}
+                      value={formData.artistProfile.bio}
                       onChange={handleArtistChange}
                       rows={3}
                     />
                   </div>
-                  
+
                   <div className="mb-3">
                     <label className="form-label">Facebook URL</label>
                     <input
                       className="form-control"
-                      name="facebook_url"
-                      value={formData.artist.facebook_url}
+                      name="facebookUrl"
+                      value={formData.artistProfile.facebookUrl}
                       onChange={handleArtistChange}
                       placeholder="https://facebook.com/..."
                     />
                   </div>
-                  
+
                   <div className="mb-3">
                     <label className="form-label">Instagram URL</label>
                     <input
                       className="form-control"
-                      name="instagram_url"
-                      value={formData.artist.instagram_url}
+                      name="instagramUrl"
+                      value={formData.artistProfile.instagramUrl}
                       onChange={handleArtistChange}
                       placeholder="https://instagram.com/..."
                     />
                   </div>
-                  
+
                   <div className="mb-3">
                     <label className="form-label">YouTube URL</label>
                     <input
                       className="form-control"
-                      name="youtube_url"
-                      value={formData.artist.youtube_url}
+                      name="youtubeUrl"
+                      value={formData.artistProfile.youtubeUrl}
                       onChange={handleArtistChange}
                       placeholder="https://youtube.com/..."
                     />
@@ -266,16 +316,13 @@ export default function EditProfileDialog({
                 </div>
               )}
             </div>
-            
+
             {/* Action Buttons */}
             <div className="d-flex justify-content-end gap-2 mt-4">
               <button className="btn btn-outline-light" onClick={onClose}>
                 Cancel
               </button>
-              <button 
-                className="btn btn-primary" 
-                onClick={() => handleSave()}
-              >
+              <button className="btn btn-primary" onClick={handleSave}>
                 Save Changes
               </button>
             </div>

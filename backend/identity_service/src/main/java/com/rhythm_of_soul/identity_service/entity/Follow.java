@@ -1,12 +1,14 @@
 package com.rhythm_of_soul.identity_service.entity;
 
+import java.time.Instant;
+
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.Instant;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter

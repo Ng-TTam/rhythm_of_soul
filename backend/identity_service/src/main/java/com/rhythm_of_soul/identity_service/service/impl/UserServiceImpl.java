@@ -1,5 +1,12 @@
 package com.rhythm_of_soul.identity_service.service.impl;
 
+import jakarta.transaction.Transactional;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+
 import com.rhythm_of_soul.identity_service.constant.ArtistProfileStatus;
 import com.rhythm_of_soul.identity_service.constant.Role;
 import com.rhythm_of_soul.identity_service.dto.request.ArtistProfileRequest;
@@ -17,15 +24,11 @@ import com.rhythm_of_soul.identity_service.repository.AccountRepository;
 import com.rhythm_of_soul.identity_service.repository.UserRepository;
 import com.rhythm_of_soul.identity_service.service.UserService;
 import com.rhythm_of_soul.identity_service.utils.JwtUtils;
-import jakarta.transaction.Transactional;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -39,27 +42,34 @@ public class UserServiceImpl implements UserService {
     ArtistProfileMapper artistProfileMapper;
 
     @Override
-    @PreAuthorize("hasRole('ADMIN') or accountSecurity.isProfileOwner(#userId)")
+    @PreAuthorize("@userSecurity.isProfileOwner(#userId) or hasRole('ADMIN')")
     public UserResponse updateUser(String userId, UserUpdateRequest userUpdateRequest) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new AppException(ErrorCode.USER_NOT_EXISTED)
-        );
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        //user cannot update artist field if not artist role
-        if(user.isArtist())
+        // user cannot update artist field if not artist role
+        if (user.isArtist()) {
+            if (userUpdateRequest.getArtistProfile() == null) throw new AppException(ErrorCode.BLANK_ARTIST_PROFILE);
+            if (userUpdateRequest.getArtistProfile().getStageName() == null)
+                throw new AppException(ErrorCode.BLANK_STAGE_NAME);
+
             userMapper.updateArtist(user, userUpdateRequest);
-        else
-            userMapper.updateUser(user, userUpdateRequest);
+        } else userMapper.updateUser(user, userUpdateRequest);
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
     @Override
     public UserResponse getUser(String userId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new AppException(ErrorCode.USER_NOT_EXISTED)
-        );
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+    @Override
+    public UserResponse getUserByEmail(String email) {
+        User user = userRepository
+                .findByAccountEmail(email + "@gmail.com")
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
@@ -73,7 +83,9 @@ public class UserServiceImpl implements UserService {
                 .pageSize(pageData.getSize())
                 .totalPages(pageData.getTotalPages())
                 .totalElements(pageData.getTotalElements())
-                .data(pageData.getContent().stream().map(userMapper::toUserResponse).toList())
+                .data(pageData.getContent().stream()
+                        .map(userMapper::toUserResponse)
+                        .toList())
                 .build();
     }
 
@@ -81,41 +93,39 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @PreAuthorize("hasRole('USER')") // Role Artist can not assign role artist
     public void assignRoleArtist(ArtistProfileRequest artistProfileRequest) {
-        Account account = accountRepository.findById(jwtUtil.getAccountInContext())
+        Account account = accountRepository
+                .findById(jwtUtil.getAccountInContext())
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         // User verified can upgrade artist
         if (!account.isVerified()) throw new AppException(ErrorCode.ACCOUNT_NOT_VERIFIED);
 
-        //set is_artist = true in user
+        // set is_artist = true in user
         User user = userRepository.findByAccountId(account.getId()).orElseThrow();
 
-        //create artist profile, if account have artist profile is null else update
+        // create artist profile, if account have artist profile is null else update
         ArtistProfile artistProfile = null;
-        if(user.getArtistProfile() == null) {
+        if (user.getArtistProfile() == null) {
             artistProfile = artistProfileMapper.toArtistProfile(artistProfileRequest);
             artistProfile.setUser(user);
             artistProfile.setStatus(ArtistProfileStatus.PENDING);
             user.setArtistProfile(artistProfile);
-        }
-        else {
+        } else {
             artistProfile = user.getArtistProfile();
             artistProfileMapper.updateArtistProfile(artistProfile, artistProfileRequest);
             user.setArtistProfile(artistProfile);
         }
         userRepository.save(user);
-
     }
 
     @Override
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void upgradeRoleArtist(String userId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        Account account = accountRepository.findByUser(user).orElseThrow(
-                () -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+        Account account =
+                accountRepository.findByUser(user).orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         // save change of artist profile status and user is_artist
         ArtistProfile artistProfile = user.getArtistProfile();
@@ -124,7 +134,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
-        //save change account
+        // save change account
         account.setRole(Role.ARTIST);
         accountRepository.save(account);
     }
@@ -132,8 +142,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     public void revokeRoleArtist(String userId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         // save change of artist profile status is rejected
         ArtistProfile artistProfile = user.getArtistProfile();

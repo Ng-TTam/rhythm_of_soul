@@ -1,14 +1,17 @@
 package com.rhythm_of_soul.identity_service.entity;
 
-import com.rhythm_of_soul.identity_service.constant.ArtistProfileStatus;
+import java.time.Instant;
+
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.Instant;
+import com.rhythm_of_soul.identity_service.constant.ArtistProfileStatus;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
@@ -37,7 +40,7 @@ public class ArtistProfile {
     String youtubeUrl;
 
     @Enumerated(EnumType.STRING)
-    ArtistProfileStatus status = ArtistProfileStatus.PENDING;
+    ArtistProfileStatus status;
 
     @OneToOne
     @JoinColumn(name = "user_id")

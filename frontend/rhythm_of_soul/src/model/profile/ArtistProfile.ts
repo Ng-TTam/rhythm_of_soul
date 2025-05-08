@@ -1,11 +1,11 @@
-export interface Artist {
-    artist_id: string;
-    stage_name: string;
+export interface ArtistProfile {
+    id: string;
+    stageName: string;
     bio: string;
-    facebook_url: string;
-    instagram_url: string;
-    youtube_url: string;
-    is_verified: boolean;
-    created_at: Date;
-    updated_at: Date;
-  }
+    facebookUrl?: string;
+    instagramUrl?: string;
+    youtubeUrl?: string;
+    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    createdAt: string | null;
+    updatedAt: string | null;
+}

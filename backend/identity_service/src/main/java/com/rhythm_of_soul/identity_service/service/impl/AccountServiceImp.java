@@ -1,5 +1,18 @@
 package com.rhythm_of_soul.identity_service.service.impl;
 
+import java.util.List;
+import java.util.Map;
+
+import jakarta.transaction.Transactional;
+
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.rhythm_of_soul.identity_service.constant.Role;
 import com.rhythm_of_soul.identity_service.constant.SecurityConstants;
 import com.rhythm_of_soul.identity_service.constant.Status;
@@ -11,30 +24,15 @@ import com.rhythm_of_soul.identity_service.entity.User;
 import com.rhythm_of_soul.identity_service.exception.AppException;
 import com.rhythm_of_soul.identity_service.exception.ErrorCode;
 import com.rhythm_of_soul.identity_service.mapper.AccountMapper;
-import com.rhythm_of_soul.identity_service.mapper.ArtistProfileMapper;
 import com.rhythm_of_soul.identity_service.repository.AccountRepository;
-
-//import com.rhythm_of_soul.identity_service.repository.ArtistProfileRepository;
-
 import com.rhythm_of_soul.identity_service.repository.UserRepository;
 import com.rhythm_of_soul.identity_service.service.AccountService;
 import com.rhythm_of_soul.identity_service.utils.JwtUtils;
 import com.rhythm_of_soul.identity_service.utils.OtpUtils;
-import jakarta.transaction.Transactional;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -48,18 +46,17 @@ public class AccountServiceImp implements AccountService {
     OtpUtils otpUtils;
     AccountMapper accountMapper;
 
-    ArtistProfileMapper artistProfileMapper;
-
     @Override
     @Transactional
     public AuthenticationResponse register(UserCreationRequest userCreatedRequest) {
-        if(accountRepository.existsByEmail(userCreatedRequest.getEmail()))
+        if (accountRepository.existsByEmail(userCreatedRequest.getEmail()))
             throw new AppException(ErrorCode.EMAIL_EXISTED);
 
         Account account = Account.builder()
                 .email(userCreatedRequest.getEmail())
                 .password(passwordEncoder.encode(userCreatedRequest.getPassword()))
                 .role(Role.USER)
+                .isVerified(false)
                 .status(Status.ACTIVE)
                 .build();
 
@@ -70,6 +67,7 @@ public class AccountServiceImp implements AccountService {
                     .firstName(userCreatedRequest.getFirstName())
                     .lastName(userCreatedRequest.getLastName())
                     .phoneNumber(userCreatedRequest.getPhoneNumber())
+                    .isArtist(false)
                     .build();
 
             userRepository.save(user);
@@ -85,7 +83,8 @@ public class AccountServiceImp implements AccountService {
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     public void sendVerificationRequest() {
-        Account account = accountRepository.findById(jwtUtil.getAccountInContext())
+        Account account = accountRepository
+                .findById(jwtUtil.getAccountInContext())
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         if (account.isVerified()) throw new AppException(ErrorCode.ACCOUNT_VERIFIED);
@@ -96,7 +95,8 @@ public class AccountServiceImp implements AccountService {
     @Override
     @PreAuthorize("hasRole('USER')")
     public String verifyAccount(String otp) {
-        Account account = accountRepository.findById(jwtUtil.getAccountInContext())
+        Account account = accountRepository
+                .findById(jwtUtil.getAccountInContext())
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         if (account.isVerified()) throw new AppException(ErrorCode.ACCOUNT_VERIFIED);
@@ -117,23 +117,23 @@ public class AccountServiceImp implements AccountService {
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     public boolean isAccountVerified(String accountId) {
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+        Account account =
+                accountRepository.findById(accountId).orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
         return account.isVerified();
     }
 
     @Override
     public void sendPasswordResetRequest(String email) {
-        Account account = accountRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+        Account account =
+                accountRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         otpUtils.send(SecurityConstants.RESET_PASSWORD_OTP, email);
     }
 
     @Override
     public boolean resetPassword(String email, String otpResetPass, String newPassword) {
-        Account account = accountRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+        Account account =
+                accountRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         if (!otpUtils.verify(SecurityConstants.RESET_PASSWORD_OTP, email, otpResetPass)) {
             throw new AppException(ErrorCode.INVALID_OTP);
@@ -147,8 +147,8 @@ public class AccountServiceImp implements AccountService {
     @Override
     @PreAuthorize("hasAnyRole('USER', 'ARTIST')")
     public void changePassword(String accountId, String oldPassword, String newPassword) {
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+        Account account =
+                accountRepository.findById(accountId).orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         if (!passwordEncoder.matches(oldPassword, account.getPassword())) {
             throw new AppException(ErrorCode.INVALID_PASSWORD);
@@ -161,48 +161,51 @@ public class AccountServiceImp implements AccountService {
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     public void lockAccount(String accountId, String reason) {
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+        Account account =
+                accountRepository.findById(accountId).orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
-        if (account.getStatus() == Status.BANNED)
-            throw new AppException(ErrorCode.ACCOUNT_ALREADY_LOCKED);
+        if (account.getStatus() == Status.BANNED) throw new AppException(ErrorCode.ACCOUNT_ALREADY_LOCKED);
 
         account.setStatus(Status.BANNED);
         accountRepository.save(account);
 
-        stringRedisTemplate.opsForStream().add(SecurityConstants.STREAM_BAN_KEY, Map.of(
-                "userId", account.getId(),
-                "email", account.getEmail(),
-                "reason", reason,
-                "event", "BAN_USER"
-        ));
-
+        stringRedisTemplate
+                .opsForStream()
+                .add(
+                        SecurityConstants.STREAM_BAN_KEY,
+                        Map.of(
+                                "userId",
+                                account.getId(),
+                                "email",
+                                account.getEmail(),
+                                "reason",
+                                reason,
+                                "event",
+                                "BAN_USER"));
     }
-
 
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     public void unlockAccount(String accountId) {
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+        Account account =
+                accountRepository.findById(accountId).orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
-        if (account.getStatus() != Status.BANNED)
-            throw new AppException(ErrorCode.ACCOUNT_NOT_LOCKED);
+        if (account.getStatus() != Status.BANNED) throw new AppException(ErrorCode.ACCOUNT_NOT_LOCKED);
 
         account.setStatus(Status.ACTIVE);
         accountRepository.save(account);
     }
 
-
     @Override
     public boolean isAccountLocked(String accountId) {
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+        Account account =
+                accountRepository.findById(accountId).orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         return account.getStatus() == Status.BANNED;
     }
 
-    public Page<AccountResponse> getFilteredAccounts(List<Role> roles, Status status, String keySearch, Pageable pageable) {
+    public Page<AccountResponse> getFilteredAccounts(
+            List<Role> roles, Status status, String keySearch, Pageable pageable) {
         if (roles == null || roles.isEmpty()) {
             roles = List.of(Role.USER, Role.ARTIST);
         }
@@ -210,6 +213,4 @@ public class AccountServiceImp implements AccountService {
         Page<Account> accounts = accountRepository.findByRoleInAndOptionalStatus(roles, status, keySearch, pageable);
         return accounts.map(accountMapper::toAccountResponse);
     }
-
-
 }

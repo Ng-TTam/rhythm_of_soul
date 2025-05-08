@@ -1,22 +1,24 @@
 package com.rhythm_of_soul.identity_service.config;
 
-import com.rhythm_of_soul.identity_service.constant.Role;
-import com.rhythm_of_soul.identity_service.constant.SecurityConstants;
-import com.rhythm_of_soul.identity_service.entity.Account;
-import com.rhythm_of_soul.identity_service.repository.AccountRepository;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.rhythm_of_soul.identity_service.constant.Role;
+import com.rhythm_of_soul.identity_service.constant.SecurityConstants;
+import com.rhythm_of_soul.identity_service.entity.Account;
+import com.rhythm_of_soul.identity_service.repository.AccountRepository;
+
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @Configuration
 public class ApplicationInitConfig {
 
     private final PasswordEncoder passwordEncoder;
-    
+
     ApplicationInitConfig(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
     }
@@ -30,7 +32,6 @@ public class ApplicationInitConfig {
         log.info("Initializing application...");
         return args -> {
             if (accountRepository.findByEmail(SecurityConstants.ADMIN_EMAIL).isEmpty()) {
-
 
                 Account accountAdmin = Account.builder()
                         .email(SecurityConstants.ADMIN_EMAIL)
