@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
-import LoginService from "../../services/service";
 import { useNavigate } from "react-router-dom";
+import { resetPasswordRequest } from "../../services/api/authService";
 
 
 const ResetPassword: React.FC = () => {
@@ -18,7 +18,7 @@ const ResetPassword: React.FC = () => {
     }
 
     try {
-      const res = await LoginService.resetPasswordRequest(email);
+      const res = await resetPasswordRequest(email);
       if (res.code === 200) {
         Swal.fire({
           icon: "success",

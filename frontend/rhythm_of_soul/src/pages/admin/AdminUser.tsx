@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { getUsers, lockUser, unlockUser } from '../../services/adminService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faUnlock } from '@fortawesome/free-solid-svg-icons';
 import Pagination from '../../components/Pagination';
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
 import '../../styles/toast.css';
+import { getUsers, lockUser, unlockUser } from '../../services/api/accountService';
 
 interface User {
   id: string;

@@ -28,8 +28,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import com.rhythm_of_soul.identity_service.config.jwt.JwtAuthenticationEntryPoint;
 import com.rhythm_of_soul.identity_service.repository.AccountRepository;
@@ -76,18 +74,19 @@ public class SecurityConfig {
                         .permitAll()
                         .anyRequest()
                         .authenticated())
-                .formLogin(form -> form.loginPage("/sign-in")
-                        .loginProcessingUrl("/sign-in")
-                        .successHandler((request, response, authentication) -> {
-                            // Chuyển hướng sau khi đăng nhập thành công
-                            response.sendRedirect("/home");
-                        })
-                        .failureHandler((request, response, exception) -> {
-                            RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
-                            redirectAttributes.addFlashAttribute("error", "Email hoặc mật khẩu không đúng");
-                            response.sendRedirect(request.getContextPath() + "/sign-in");
-                        })
-                        .permitAll())
+                //                .formLogin(form -> form.loginPage("/sign-in")
+                //                        .loginProcessingUrl("/sign-in")
+                //                        .successHandler((request, response, authentication) -> {
+                //                            // Chuyển hướng sau khi đăng nhập thành công
+                //                            response.sendRedirect("/home");
+                //                        })
+                //                        .failureHandler((request, response, exception) -> {
+                //                            RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+                //                            redirectAttributes.addFlashAttribute("error", "Email hoặc mật khẩu không
+                // đúng");
+                //                            response.sendRedirect(request.getContextPath() + "/sign-in");
+                //                        })
+                //                        .permitAll())
                 .rememberMe(remember -> remember.rememberMeParameter("remember")
                         .tokenValiditySeconds(30 * 24 * 60 * 60) // 30 days
                         .rememberMeServices(tokenBasedRememberMeServices()))

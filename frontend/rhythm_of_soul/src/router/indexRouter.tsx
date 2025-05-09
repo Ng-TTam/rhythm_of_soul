@@ -17,7 +17,6 @@ import AlbumPage from '../components/album/AlbumPage'
 import AlbumsCollectionPage from '../components/album/AlbumCollectionPage'
 import AlbumMain from '../components/album/AlbumMain'
 import AdminUser from '../pages/admin/AdminUser'
-import ProtectedRoute from './ProtectedRoute'
 export const indexRouter: any = {
     path: '/',
     element: (<Dashboard />),

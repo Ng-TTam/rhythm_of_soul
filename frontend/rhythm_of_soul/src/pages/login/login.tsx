@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Account } from "../../model/account";
-import LoginService from "../../services/service";
 import { Tooltip } from 'bootstrap';
-import { useAppDispatch, useAppSelector } from '../../store/hook';
+import { useAppDispatch } from '../../store/hook';
 import Swal from 'sweetalert2'; 
 import { login } from "../../services/api/authService";
 

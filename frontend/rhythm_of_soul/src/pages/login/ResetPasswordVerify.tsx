@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
-import LoginService from "../../services/service";
 import { useLocation } from "react-router-dom";
+import { resetPasswordVerify } from "../../services/api/authService";
 
 const ResetPasswordVerify: React.FC = () => {
   const [otp, setOtp] = useState("");
@@ -27,7 +27,7 @@ const ResetPasswordVerify: React.FC = () => {
     setError("");
 
     try {
-      const res = await LoginService.resetPasswordVerify({
+      const res = await resetPasswordVerify({
         email,
         otp,
         newPassword

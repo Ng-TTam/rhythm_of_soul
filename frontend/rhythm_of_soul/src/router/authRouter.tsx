@@ -1,8 +1,7 @@
-import React from 'react';
-import LoginForm from '../pages/login/login';
-import SignUp from '../pages/login/sign-up';
 import ResetPassword from '../pages/login/ResetPassword';
 import ResetPasswordVerify from '../pages/login/ResetPasswordVerify';
+import LoginForm from '../pages/login/Login';
+import SignUp from '../pages/login/Sign-up';
 
 export const authRouter = [
   {
