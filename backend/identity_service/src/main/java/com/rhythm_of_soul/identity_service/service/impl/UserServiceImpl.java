@@ -2,6 +2,7 @@ package com.rhythm_of_soul.identity_service.service.impl;
 
 import jakarta.transaction.Transactional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,6 +30,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -150,4 +153,30 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
     }
+
+    @Override
+    public PageResponse<UserResponse> getAllUsers(int page, int size, String searchKey) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<User> userPage;
+
+        if (searchKey == null || searchKey.trim().isEmpty()) {
+            userPage = userRepository.findAll(pageRequest);
+        } else {
+            userPage = userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
+                    searchKey, searchKey, pageRequest
+            );
+        }
+
+        return PageResponse.<UserResponse>builder()
+                .currentPage(userPage.getNumber())
+                .totalPages(userPage.getTotalPages())
+                .pageSize(userPage.getSize())
+                .totalElements(userPage.getTotalElements())
+                .data(userPage.getContent()
+                        .stream()
+                        .map(userMapper::toUserResponse)
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
 }

@@ -5,6 +5,7 @@ import java.time.LocalDate;
 
 import com.rhythm_of_soul.identity_service.constant.Gender;
 
+import com.rhythm_of_soul.identity_service.entity.User;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -27,4 +28,11 @@ public class UserResponse {
     ArtistProfileResponse artistProfile;
     Instant createdAt;
     Instant updatedAt;
+    int followCount;
+
+    public static UserResponse fromEntity(User user) {
+        return UserResponse.builder()
+                .id(user.getId())
+                .build();
+    }
 }

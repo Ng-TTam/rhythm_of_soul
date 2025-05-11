@@ -2,6 +2,8 @@ package com.rhythm_of_soul.identity_service.api;
 
 import jakarta.validation.Valid;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.rhythm_of_soul.identity_service.dto.request.ArtistProfileRequest;
@@ -84,5 +86,22 @@ public class UserController {
         return ApiResponse.<Void>builder()
                 .message("Revoke artist successful!!!")
                 .build();
+    }
+
+    @GetMapping("/searchUser")
+    @PreAuthorize("hasAnyRole('USER', 'ARTIST')")
+    public ResponseEntity<ApiResponse<PageResponse<UserResponse>>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String searchKey
+    ) {
+        PageResponse<UserResponse> result = userService.getAllUsers(page, size, searchKey);
+        return ResponseEntity.ok(
+                ApiResponse.<PageResponse<UserResponse>>builder()
+                        .code(200)
+                        .message("Search users successfully")
+                        .result(result)
+                        .build()
+        );
     }
 }

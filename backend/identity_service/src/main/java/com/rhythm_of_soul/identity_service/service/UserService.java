@@ -42,4 +42,8 @@ public interface UserService {
      * @throws IllegalArgumentException if userId or roleName invalid
      */
     void revokeRoleArtist(String userId);
+
+//    Tìm kiếm người dùng để follow
+    PageResponse<UserResponse> getAllUsers(int page, int size, String searchKey);
+
 }

@@ -61,4 +61,8 @@ public class User {
 
     @LastModifiedDate
     Instant updatedAt;
+
+    @Column(nullable = false)
+    @Builder.Default
+    int followerCount = 0;
 }
