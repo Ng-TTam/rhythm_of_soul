@@ -1,5 +1,7 @@
 package com.rhythm_of_soul.identity_service.service.impl;
 
+import java.util.stream.Collectors;
+
 import jakarta.transaction.Transactional;
 
 import org.springframework.data.domain.Page;
@@ -30,8 +32,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -65,6 +65,15 @@ public class UserServiceImpl implements UserService {
     public UserResponse getUser(String userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+    @Override
+    @PreAuthorize("permitAll()")
+    public UserResponse getMe() {
+        User user = userRepository
+                .findByAccountId(jwtUtil.getAccountInContext())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
@@ -163,8 +172,7 @@ public class UserServiceImpl implements UserService {
             userPage = userRepository.findAll(pageRequest);
         } else {
             userPage = userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
-                    searchKey, searchKey, pageRequest
-            );
+                    searchKey, searchKey, pageRequest);
         }
 
         return PageResponse.<UserResponse>builder()
@@ -172,11 +180,9 @@ public class UserServiceImpl implements UserService {
                 .totalPages(userPage.getTotalPages())
                 .pageSize(userPage.getSize())
                 .totalElements(userPage.getTotalElements())
-                .data(userPage.getContent()
-                        .stream()
+                .data(userPage.getContent().stream()
                         .map(userMapper::toUserResponse)
                         .collect(Collectors.toList()))
                 .build();
     }
-
 }

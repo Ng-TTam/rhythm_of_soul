@@ -1,11 +1,11 @@
 package com.rhythm_of_soul.identity_service.security;
 
-import com.rhythm_of_soul.identity_service.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import com.rhythm_of_soul.identity_service.entity.User;
 import com.rhythm_of_soul.identity_service.exception.AppException;
 import com.rhythm_of_soul.identity_service.exception.ErrorCode;
 import com.rhythm_of_soul.identity_service.repository.UserRepository;
@@ -31,9 +31,11 @@ public class UserSecurity {
     }
 
     public User getCurrentUser() {
-        String accountId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String accountId =
+                SecurityContextHolder.getContext().getAuthentication().getName();
         log.info("id: {}", accountId);
-        return userRepository.findByAccountId(accountId)
+        return userRepository
+                .findByAccountId(accountId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
     }
 }

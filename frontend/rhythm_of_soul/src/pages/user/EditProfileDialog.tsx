@@ -3,7 +3,6 @@ import { FaUpload } from "@react-icons/all-files/fa/FaUpload";
 import { FaUser } from "@react-icons/all-files/fa/FaUser";
 import { User } from "../../model/profile/UserProfile";
 import { updateUser } from "../../services/api/userService";
-import { getAccessToken } from "../../utils/tokenManager";
 
 interface EditProfileProps {
   visible: boolean;
@@ -115,7 +114,7 @@ export default function EditProfileDialog({
   // Xử lý lưu profile
   const handleSave = async () => {
     try {
-      console.log('Sending update data:', formData);
+      // console.log('Sending update data:', formData);
       const response = await updateUser(formData.id, formData);
       console.log('Profile updated successfully', response);
       onSave(formData);

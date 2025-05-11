@@ -68,8 +68,8 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
                         .permitAll()
-                        .requestMatchers(HttpMethod.GET, "/users/**")
-                        .permitAll()
+                        //                        .requestMatchers(HttpMethod.GET, "/users/**")
+                        //                        .permitAll()
                         .requestMatchers("/sign-in", "/sign-up", "/css/**", "/images/**", "/auth/introspect")
                         .permitAll()
                         .anyRequest()
@@ -90,7 +90,8 @@ public class SecurityConfig {
                 .rememberMe(remember -> remember.rememberMeParameter("remember")
                         .tokenValiditySeconds(30 * 24 * 60 * 60) // 30 days
                         .rememberMeServices(tokenBasedRememberMeServices()))
-                .logout(logout -> logout.permitAll().logoutSuccessUrl("/login?logout=true"));
+        //                .logout(logout -> logout.permitAll().logoutSuccessUrl("/login?logout=true"))
+        ;
 
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer ->
                         jwtConfigurer.decoder(jwtDecode()).jwtAuthenticationConverter(jwtAuthenticationConverter()))

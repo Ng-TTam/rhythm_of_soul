@@ -8,36 +8,29 @@ interface DecodedToken {
   sub: string;
 }
 
-interface TokenData {
-  accessToken: string | null;
-}
+const ACCESS_TOKEN_KEY = 'accessToken';
 
-const tokenStore: TokenData = {
-  accessToken: null,
-};
-
-// Lưu access token
+// Lưu access token vào sessionStorage
 export const setAccessToken = (token: string) => {
-  tokenStore.accessToken = token;
+  sessionStorage.setItem(ACCESS_TOKEN_KEY, token);
 };
 
-// Lấy access token
+// Lấy access token từ sessionStorage và kiểm tra hạn
 export const getAccessToken = (): string | null => {
-  if (!tokenStore.accessToken) {
-    return null;
-  }
+  const token = sessionStorage.getItem(ACCESS_TOKEN_KEY);
+  if (!token) return null;
 
   try {
-    const decoded  = jwtDecode<DecodedToken>(tokenStore.accessToken);
+    const decoded = jwtDecode<DecodedToken>(token);
     const exp = decoded.exp;
 
-    // Kiểm tra token còn hợp lệ
+    // Nếu token hết hạn, xoá và trả null
     if (exp && Date.now() >= exp * 1000) {
       clearAccessToken();
       return null;
     }
 
-    return tokenStore.accessToken;
+    return token;
   } catch (error) {
     console.error('Invalid JWT:', error);
     clearAccessToken();
@@ -45,6 +38,7 @@ export const getAccessToken = (): string | null => {
   }
 };
 
+// Xoá token khỏi sessionStorage
 export const clearAccessToken = () => {
-  tokenStore.accessToken = null;
+  sessionStorage.removeItem(ACCESS_TOKEN_KEY);
 };
