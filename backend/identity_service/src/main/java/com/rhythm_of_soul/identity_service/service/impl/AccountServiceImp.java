@@ -3,11 +3,18 @@ package com.rhythm_of_soul.identity_service.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rhythm_of_soul.identity_service.dto.request.BanUserRequest;
+import com.rhythm_of_soul.identity_service.utils.AESUtil;
 import jakarta.transaction.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.connection.stream.StreamRecords;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,9 +41,12 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import javax.crypto.SecretKey;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class AccountServiceImp implements AccountService {
     private final StringRedisTemplate stringRedisTemplate;
     AccountRepository accountRepository;
@@ -45,6 +55,13 @@ public class AccountServiceImp implements AccountService {
     JwtUtils jwtUtil;
     OtpUtils otpUtils;
     AccountMapper accountMapper;
+
+    private final ObjectMapper objectMapper;
+
+    private final SecretKey secretKey;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final ApplicationContext applicationContext;
+
 
     @Override
     @Transactional
@@ -127,7 +144,7 @@ public class AccountServiceImp implements AccountService {
         Account account =
                 accountRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
-        otpUtils.send(SecurityConstants.RESET_PASSWORD_OTP, email);
+        applicationContext.getBean(OtpUtils.class).send(SecurityConstants.RESET_PASSWORD_OTP, email);
     }
 
     @Override
@@ -168,20 +185,23 @@ public class AccountServiceImp implements AccountService {
 
         account.setStatus(Status.BANNED);
         accountRepository.save(account);
+        try {
+            BanUserRequest request = new BanUserRequest(account.getId(), account.getEmail(), reason, "BAN_USER");
+            Map<String, Object> data = objectMapper.convertValue(request, Map.class);
+            String json = objectMapper.writeValueAsString(data);
+            String encryptedJson = AESUtil.encrypt(json, secretKey);
 
-        stringRedisTemplate
-                .opsForStream()
-                .add(
-                        SecurityConstants.STREAM_BAN_KEY,
-                        Map.of(
-                                "userId",
-                                account.getId(),
-                                "email",
-                                account.getEmail(),
-                                "reason",
-                                reason,
-                                "event",
-                                "BAN_USER"));
+            Map<String, Object> redisData = Map.of("message", encryptedJson);
+            redisTemplate.opsForStream().add(
+                    StreamRecords.mapBacked(redisData).withStreamKey(SecurityConstants.STREAM_BAN_KEY)
+            );
+
+            log.info("Pushed ban user to Redis stream");
+        }
+        catch (Exception e) {
+            log.error("Failed to serialize ban user data", e);
+            throw new AppException(ErrorCode.INTERNAL_ERROR);
+        }
     }
 
     @Override

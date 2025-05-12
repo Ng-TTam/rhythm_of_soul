@@ -28,7 +28,8 @@ public class UserResponse {
     ArtistProfileResponse artistProfile;
     Instant createdAt;
     Instant updatedAt;
-    int followCount;
+    int followerCount;
+    int followedCount;
 
     public static UserResponse fromEntity(User user) {
         return UserResponse.builder()

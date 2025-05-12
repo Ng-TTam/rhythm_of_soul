@@ -4,6 +4,11 @@ import java.security.SecureRandom;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rhythm_of_soul.identity_service.dto.request.OtpRequest;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.connection.stream.StreamRecords;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -14,6 +19,8 @@ import com.rhythm_of_soul.identity_service.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.crypto.SecretKey;
 
 @Component
 @RequiredArgsConstructor
@@ -26,6 +33,11 @@ public class OtpUtils {
     private final SecureRandom random = new SecureRandom();
 
     private static final int OTP_TTL_MIN = 5;
+
+    private final ObjectMapper objectMapper;
+
+    private final SecretKey secretKey;
+    private final RedisTemplate<String, String> redisTemplate;
 
     /**
      * Send otp when sign up or reset pass
@@ -41,14 +53,19 @@ public class OtpUtils {
             stringRedisTemplate.opsForValue().set(key, otp);
             stringRedisTemplate.expire(key, OTP_TTL_MIN, TimeUnit.MINUTES);
 
-            // Publisher send email
-            stringRedisTemplate
-                    .opsForStream()
-                    .add(
-                            SecurityConstants.STREAM_OTP_KEY,
-                            Map.of(
-                                    "email", email,
-                                    "otp", otp));
+            // Chuẩn bị dữ liệu OTP
+            OtpRequest otpRequest = new OtpRequest(email, otp);
+            Map<String, Object> data = objectMapper.convertValue(otpRequest, Map.class);
+            String json = objectMapper.writeValueAsString(data);
+            String encryptedJson = AESUtil.encrypt(json, secretKey);
+
+            // Push vào Redis Stream dạng message
+            Map<String, Object> redisData = Map.of("message", encryptedJson);
+            redisTemplate.opsForStream().add(
+                    StreamRecords.mapBacked(redisData).withStreamKey(SecurityConstants.STREAM_OTP_KEY)
+            );
+
+            log.info("Pushed OTP event for email {} to Redis stream", email);
 
         } catch (Exception e) {
             log.error("Error sending OTP to Redis stream: ", e);
