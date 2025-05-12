@@ -5,305 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e2d90fc8-97dc-4ce7-9f67-c2e934e6f05b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/AudioStreamController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/response/PlaylistResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/AudioStreamService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/AudioStreamServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/.vscode/settings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/package-lock.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/css/core/libs.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/css/custom.minf700.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/css/customizer.minf700.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/css/dark.minf700.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/css/muzik.minf700.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/css/rtl.minf700.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/auth/01.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/avatars/01.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/brands/08.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/brands/09.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/brands/10.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/brands/11.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/brands/12.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/brands/13.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/covers/cover1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/01.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/02.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/03.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/04.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/05.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/06.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/07.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/08.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/09.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/10.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/11.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/12.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/13.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/14.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/15.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/16.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/17.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/18.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/19.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/20.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/21.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/22.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/23.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/24.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/25.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/26.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/27.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/28.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/29.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/30.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/31.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/32.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/33.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/34.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/35.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/36.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/37.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/38.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/39.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/40.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/41.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/42.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/43.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/44.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/45.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/46.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/47.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/48.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/49.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/50.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/51.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/52.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/53.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/54.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/55.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/56.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/57.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/58.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/59.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/60.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/61.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/62.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/64.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/top-header.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/top-header1.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/top-header2.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/top-header3.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/top-header4.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/top-header5.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/writer-1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/writer-2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/writer-3.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/writer-4.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/writer-5.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/dashboard/writer-6.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/default/avatar.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/default/cover.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/error/06.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/error/07.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/error/08.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/glass-card.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/hover-effects/01.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/hover-effects/02.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/hover-effects/03.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/hover-effects/04.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/hover-effects/05.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/hover-effects/06.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/hover-effects/07.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/hover-effects/08.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/hover-effects/09.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/hover-effects/10.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/hover-effects/11.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/hover-effects/12.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/loader.gif" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/07.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/08.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/09.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/10.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/11.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/12.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/13.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/15.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/16.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/17.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/18.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/19.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/20.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/21.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/22.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/23.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/24.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/26.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/page-img/img-1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/pages/03-page.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/pages/img-success.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/plugins/01.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/plugins/img1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/plugins/img10.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/plugins/img11.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/plugins/img12.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/plugins/img2.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/plugins/img3.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/plugins/img4.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/plugins/img5.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/plugins/img6.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/plugins/img7.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/plugins/img8.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/plugins/img9.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/shapes/18.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/shapes/20.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/images/shapes/21.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/charts/dashboardf700.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/charts/vectore-chart.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/charts/widgetchartsf700.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/core/external.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/core/libs.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/dual-tone-icon-search-filter.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/iqonic-script/setting.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/iqonic-script/utility.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/music-playerf700.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/muzikf700.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/outline-icon-search-filter.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/plugins/apexcharts.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/plugins/calender.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/plugins/choice.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/plugins/circle-progress.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/plugins/custom-circle-progress.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/plugins/flatpickr.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/plugins/form-wizard.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/plugins/fslightbox.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/plugins/image-croper.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/plugins/kanban.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/plugins/quill.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/plugins/rating.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/plugins/select2.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/plugins/slider-tabs.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/plugins/sweet-alert.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/plugins/swiper-slider.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/plugins/tour.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/plugins/uppy.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/setting-init.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/sidebarf700.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/js/solid-icon-search-filter.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/choiceJS/script/choices.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/choiceJS/style/choices.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/cropper/dist/cropper.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/cropper/dist/cropper.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/flatpickr/dist/flatpickr.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/flatpickr/dist/flatpickr.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/fullcalendar/core/main.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/fullcalendar/core/main.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/fullcalendar/daygrid/main.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/fullcalendar/daygrid/main.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/fullcalendar/interaction/main.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/fullcalendar/list/main.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/fullcalendar/list/main.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/fullcalendar/timegrid/main.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/fullcalendar/timegrid/main.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/jquery-bar-rating/dist/jquery-barrating.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/leaflet/images/layers-2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/leaflet/images/layers.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/leaflet/images/marker-icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/leaflet/leaflet.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/leaflet/leaflet.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/lodash/lodash.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/masonry/masonry.pkgd.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/moment.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/quill/quill.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/quill/quill.snow.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/sheperd/dist/css/sheperd.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/sheperd/dist/js/sheperd.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/sortable/Sortable.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/sweetalert2/dist/sweetalert2.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/sweetalert2/dist/sweetalert2.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/swiperSlider/swiper-bundle.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/swiperSlider/swiper-bundle.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/uppy/uppy.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/assets/vendor/uppy/uppy.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/favicon.ico" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/public/robots.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/App.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/App.test.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/App.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/Nav.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/Sidebar.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/album/AddAlbumForm.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/album/AlbumCollectionPage.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/album/AlbumMain.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/album/AlbumPage.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/artists/ArtistTop.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/floatMenu/FloatMenu.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/mainContent.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/playlist/CreatePlaylistDialog.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/playlist/PlayListDetail.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/playlist/PlayListGrid.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/playlist/PlayListOwner.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/playlist/playlist.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/AddSong.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/GenresTop.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/ListSongs.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/PlaybackBar.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/SongRecentlyPlayback.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/SongTop.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/SongTrending.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/fakeAPI/user.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/index.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/index.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/logo.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/model/APIResponse.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/model/Auth.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/model/Introspect.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/model/User.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/model/account.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/model/profile/ArtistProfile.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/model/profile/UserProfile.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/admin/AdminSong.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/admin/AdminUser.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/admin/Dashboard.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/artist/CreateAlbum.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/dashboard/Dashboard.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/errors/Error404.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/errors/Error500.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/errors/Maintenance.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/Feed.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/PostModal.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/login/login.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/login/sign-up.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/user/EditProfileDialog.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/user/Feeds.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/user/Follows.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/user/UserProfile.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/react-app-env.d.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/reducers/tokenReducer.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/reportWebVitals.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/router/authRouter.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/router/indexRouter.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/services/profileService.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/services/service.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/setupTests.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/store/hook.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/store/store.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/tsconfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/response/AlbumResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/common/Tag.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/common/Tag.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/config/CORSConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/config/CORSConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/config/MinioConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/config/MinioConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/AudioStreamController.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/AudioStreamController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/PostController.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/PostController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/mapper/PostMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/mapper/PostMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/repository/PostRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/repository/PostRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/ApiResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/ApiResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/PostServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/PostServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/PostService.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/PostService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/utils/SaveFileMinio.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/utils/SaveFileMinio.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/test/java/com/rhythm_of_soul/content_service/ContentServiceApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/album/AlbumCollectionPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/album/AlbumCollectionPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/album/AlbumPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/album/AlbumPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/playlist/PlayListGrid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/playlist/PlayListGrid.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/PlaybackBar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/PlaybackBar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/model/APIResponse.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/model/APIResponse.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/Feed.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/Feed.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/PostModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/PostModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/PostPlaylistDetail.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/PostTrackDetail.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/router/indexRouter.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/router/indexRouter.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -543,6 +263,12 @@
       <workItem from="1746655873493" duration="7726000" />
       <workItem from="1746679607323" duration="4872000" />
       <workItem from="1746684595321" duration="6739000" />
+      <workItem from="1746694007708" duration="1541000" />
+      <workItem from="1746723196111" duration="5535000" />
+      <workItem from="1746756136276" duration="530000" />
+      <workItem from="1746756711296" duration="2201000" />
+      <workItem from="1746982713829" duration="8207000" />
+      <workItem from="1747005484890" duration="4007000" />
     </task>
     <servers />
   </component>

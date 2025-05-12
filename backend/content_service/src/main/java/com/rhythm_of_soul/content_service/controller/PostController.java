@@ -3,6 +3,7 @@ package com.rhythm_of_soul.content_service.controller;
 import com.rhythm_of_soul.content_service.common.Tag;
 import com.rhythm_of_soul.content_service.dto.ApiResponse;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
+import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
 import com.rhythm_of_soul.content_service.dto.response.PlaylistResponse;
 import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
 import com.rhythm_of_soul.content_service.dto.resquest.PostRequest;
@@ -33,46 +34,53 @@ public class PostController {
                                         @RequestParam ("user_id") String user_id) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         return ApiResponse.<PostResponse>builder()
                 .message("File uploaded successfully")
-                .data(postService.storeFile(song,cover,image, user_id, tags, title, caption, isPublic))
+                .result(postService.storeFile(song,cover,image, user_id, tags, title, caption, isPublic))
                 .build();
     }
     @PostMapping
     ApiResponse<PostResponse> createPost(@RequestBody PostRequest postRequest) {
         return ApiResponse.<PostResponse>builder()
                 .message("Post created successfully")
-                .data(postService.createPost(postRequest))
+                .result(postService.createPost(postRequest))
                 .build();
 
+    }
+    @GetMapping("/{userId}/album")
+    ApiResponse<List<AlbumResponse>> getAlbum(@PathVariable String userId) {
+        return ApiResponse.<List<AlbumResponse>>builder()
+                .message("Album created successfully")
+                .result(postService.getAlbum(userId))
+                .build();
     }
     @PutMapping("/{postId}")
     ApiResponse<PostResponse> addSongs(@PathVariable String postId, @RequestParam List<String> songIds) {
         return ApiResponse.<PostResponse>builder()
-                .data(postService.addSong(postId, songIds))
+                .result(postService.addSong(postId, songIds))
                 .build();
     }
     @GetMapping("/{userId}")
     ApiResponse<List<PostResponse>> getPosts(@PathVariable String userId) {
         return ApiResponse.<List<PostResponse>>builder()
-                .data(postService.getPosts(userId))
+                .result(postService.getPosts(userId))
                 .build();
     }
     @GetMapping("/{userId}/songs")
     ApiResponse<List<PostResponse>> getSongs(@PathVariable String userId) {
         return ApiResponse.<List<PostResponse>>builder()
-                .data(postService.getSongs(userId))
+                .result(postService.getSongs(userId))
                 .build();
     }
     @GetMapping("/{userId}/playlists")
-    ApiResponse<List<PlaylistResponse>> getPlaylists(@PathVariable String userId) {
-        return ApiResponse.<List<PlaylistResponse>>builder()
-                .data(postService.getPlaylists(userId))
+    ApiResponse<List<PostResponse>> getPlaylists(@PathVariable String userId) {
+        return ApiResponse.<List<PostResponse>>builder()
+                .result(postService.getPlaylists(userId))
                 .build();
     }
 
     @GetMapping("/detailPost/{postId}")
     ApiResponse<PostDetailResponse> getPost(@PathVariable String postId) {
         return ApiResponse.<PostDetailResponse>builder()
-                .data(postService.getPost(postId))
+                .result(postService.getPost(postId))
                 .build();
     }
 }

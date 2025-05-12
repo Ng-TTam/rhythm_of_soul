@@ -19,20 +19,6 @@ export default function Playlist() {
                 paddingRight: "10px",
                 borderRight: "1px solid #ccc",
             }}>Playlist</h2>
-            <div className="d-flex align-items-center  pb-1" >
-                <div
-                className={`tab-item me-4 ${activeTab === 'all' ? 'active' : ''}`}
-                onClick={() => handleClick('/playlist', 'all')}
-                >
-                TẤT CẢ
-                </div>
-                <div
-                className={`tab-item ${activeTab === 'mine' ? 'active' : ''}`}
-                onClick={() => handleClick('/playlist/mine', 'mine')}
-                >
-                CỦA TÔI
-                </div>
-            </div>
             </div>
             <Outlet />
         </div>

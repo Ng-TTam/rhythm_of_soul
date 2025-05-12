@@ -1,227 +1,278 @@
-import React, { useState } from 'react';
-import { FaEye } from '@react-icons/all-files/fa/FaEye';
-import { FaEllipsisH } from '@react-icons/all-files/fa/FaEllipsisH'; 
-import { FaTrash } from '@react-icons/all-files/fa/FaTrash'; 
-import {  FaDownload } from '@react-icons/all-files/fa/FaDownload';
-import {  FaPlay } from '@react-icons/all-files/fa/FaPlay';  // React Icons// React Icons
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import '../../style/PlaylistDetail.css';
 
-interface Song {
-    id: string;
-    title: string;
-    artist: string;
-    album: string;
-    time: string;
-    img: string;
-}
-export default function PlayListDetail() {
-  // Quản lý danh sách bài hát bằng useState
-  const [songs, setSongs] = useState<Song[]>([
-    {
-      id: '01',
-      title: 'The Girl',
-      artist: 'Snoods Smith Jonas',
-      album: 'Heart Is Beating',
-      time: '4:21',
-      img: '../assets/images/dashboard/05.png',
-    },
-    {
-      id: '02',
-      title: 'Infinity',
-      artist: 'Edyta Gorniak',
-      album: 'My Crying Eyes',
-      time: '3:21',
-      img: '../assets/images/dashboard/06.png',
-    },
-    {
-      id: '03',
-      title: 'Everything I Want',
-      artist: 'Edyta Gorniak',
-      album: 'My Lovely Dad',
-      time: '2:21',
-      img: '../assets/images/dashboard/07.png',
-    },
-    {
-      id: '04',
-      title: 'The Silent One',
-      artist: 'Edyta Gorniak',
-      album: 'Travel Mix',
-      time: '3:21',
-      img: '../assets/images/dashboard/08.png',
-    },
-    {
-      id: '05',
-      title: 'Just Perfect',
-      artist: 'Nil Ana Meet Nagak',
-      album: 'Way Of Right',
-      time: '4:21',
-      img: '../assets/images/dashboard/10.png',
-    },
-  ]);
+const PlaylistDetail = () => {
+  const { playlistId } = useParams<{ playlistId: string }>();
+  console.log('Playlist ID:', playlistId);
+  const navigate = useNavigate();
+  interface PlaylistData {
+    post: {
+      content: {
+        coverUrl: string;
+        title: string;
+        songIds: { mediaUrl: string; imageUrl: string; title: string; tags?: string[] }[];
+        imageUrl: string;
+        tags?: string[];
+      };
+      type: string;
+      created_at: string;
+      view_count: number;
+      like_count: number;
+      comment_count: number;
+      caption?: string;
+    };
+    comments?: {
+      user?: { avatar?: string; username?: string };
+      created_at: string;
+      content: string;
+    }[];
+  }
+  
+  const [playlistData, setPlaylistData] = useState<PlaylistData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState<number | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioRef, setAudioRef] = useState<HTMLAudioElement | null>(null);
 
-  // Hàm xóa bài hát
-  const handleDelete = (id :string) => {
-    setSongs(songs.filter((song) => song.id !== id));
+  useEffect(() => {
+    const fetchPlaylistData = async () => {
+      try {
+        const response = await fetch(`http://localhost:8484/posts/detailPost/${playlistId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch playlist data');
+        }
+        const data = await response.json();
+        setPlaylistData(data.result);
+        setLoading(false);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unknown error occurred');
+        }
+        setLoading(false);
+      }
+    };
+
+    fetchPlaylistData();
+  }, [playlistId]);
+
+  const handleBackClick = () => {
+    navigate(-1);
   };
 
-  // Hàm xử lý phát nhạc (giả lập)
-  const handlePlay = (song : Song) => {
-    console.log(`Playing: ${song.title} by ${song.artist}`);
-    // Thêm logic phát nhạc thực tế ở đây, ví dụ: sử dụng HTML5 Audio
-    // const audio = new Audio(song.audioUrl);
-    // audio.play();
+  const handlePlayTrack = (index: number) => {
+    if (currentTrackIndex === index && isPlaying) {
+      // Pause current track
+      audioRef?.pause();
+      setIsPlaying(false);
+    } else if (currentTrackIndex === index && !isPlaying) {
+      // Resume current track
+      audioRef?.play();
+      setIsPlaying(true);
+    } else {
+      // Play new track
+      if (audioRef) {
+        audioRef.pause();
+      }
+      
+      if (!playlistData || !playlistData.post) {
+        console.error('Playlist data is null or undefined');
+        return;
+      }
+      const newAudio = new Audio(getMediaUrl(playlistData.post.content.songIds[index].mediaUrl));
+      newAudio.onended = () => {
+        if (index < playlistData.post.content.songIds.length - 1) {
+          handlePlayTrack(index + 1);
+        } else {
+          setCurrentTrackIndex(null);
+          setIsPlaying(false);
+        }
+      };
+      
+      setAudioRef(newAudio);
+      newAudio.play();
+      setCurrentTrackIndex(index);
+      setIsPlaying(true);
+    }
   };
+
+  const getMediaUrl = (mediaUrl:string) => {
+    // Adjust this based on your actual media URL structure
+    return `http://localhost:9000/media/${mediaUrl}`;
+  };
+
+  const formatDate = (dateString : string)  => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  if (loading) return <div className="loading-container"><div className="loader"></div></div>;
+  if (error) return <div className="error-message">Error: {error}</div>;
+  if (!playlistData || !playlistData.post) return <div className="error-message">No playlist data available</div>;
+
+  const { post } = playlistData;
 
   return (
-    <div className="container-fluid py-4 bg-light min-vh-100">
-      <div className="row g-4">
-        {/* Playlist Info */}
-        <div className="col-lg-4">
-          <div className="card shadow-sm border-0">
-            <img
-              src="../assets/images/dashboard/01.png"
-              alt="Playlist Cover"
-              className="card-img-top img-fluid"
-              style={{ height: '250px', objectFit: 'cover' }}
-            />
-            <div className="card-body">
-              <h3 className="card-title mb-3 fw-bold">OK Playlist</h3>
-              <div className="d-flex align-items-center mb-4">
-                <span className="fw-semibold me-3">Phong Do</span>
-                <span className="fw-semibold ps-3 border-start">Công khai</span>
-              </div>
-              <button className="btn btn-primary w-100">Play Music</button>
-            </div>
-          </div>
-        </div>
-
-        {/* Playlist Songs */}
-        <div className="col-lg-8">
-          <div className="card shadow-sm border-0">
-            <div className="card-body p-0">
-              <h4 className="card-title p-4 mb-0 fw-semibold">Songs</h4>
-              <div className="table-responsive">
-                <table className="table table-hover mb-0">
-                  <thead className="table-light">
-                    <tr>
-                      <th scope="col" className="ps-4">No.</th>
-                      <th scope="col">Title</th>
-                      <th scope="col">Album</th>
-                      <th scope="col">Time</th>
-                      <th scope="col">Play</th>
-                      <th scope="col">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {songs.map((song, index) => (
-                      <tr key={index}>
-                        <td className="ps-4">{song.id}</td>
-                        <td>
-                          <div className="d-flex align-items-center">
-                            <img
-                              src={song.img}
-                              alt={song.title}
-                              className="rounded-circle me-3"
-                              style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                            />
-                            <div>
-                              <p className="mb-0 fw-medium">{song.title}</p>
-                              <small className="text-muted">{song.artist}</small>
-                            </div>
-                          </div>
-                        </td>
-                        <td>{song.album}</td>
-                        <td>{song.time}</td>
-                        <td>
-                          <button
-                            className="btn-outline-success"
-                            onClick={() => handlePlay(song)}
-                            title="Play"
-                            
-                          >
-                            <FaPlay size={14} />
-                          </button>
-                        </td>
-                        <td>
-                          <div className="dropdown">
-                            <button
-                              className="btn btn-link text-muted p-0"
-                              type="button"
-                              id={`dropdownMenuButton${index}`}
-                              data-bs-toggle="dropdown"
-                              aria-expanded="false"
-                            >
-                              <FaEllipsisH size={20} />
-                            </button>
-                            <ul
-                              className="dropdown-menu dropdown-menu-end shadow-sm"
-                              aria-labelledby={`dropdownMenuButton${index}`}
-                            >
-                              <li>
-                                <a className="dropdown-item d-flex align-items-center" href="#">
-                                  <FaEye className="me-2" /> View
-                                </a>
-                              </li>
-                              <li>
-                                <button
-                                  className="dropdown-item d-flex align-items-center"
-                                  onClick={() => handleDelete(song.id)}
-                                >
-                                  <FaTrash className="me-2" /> Delete
-                                </button>
-                              </li>
-                              <li>
-                                <a className="dropdown-item d-flex align-items-center" href="#">
-                                  <FaDownload className="me-2" /> Download
-                                </a>
-                              </li>
-                            </ul>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+    <div className="playlist-detail-container">
+      {/* Header with background image */}
+      <div 
+        className="playlist-header" 
+        style={{ backgroundImage: `url(${post.content.coverUrl})` }}
+      >
+        <div className="header-overlay">
+          <div className="playlist-header-content">
+            <div className="playlist-type-badge">{post.type}</div>
+            <h1 className="playlist-title">{post.content.title}</h1>
+            <div className="playlist-info">
+              <span>{post.content.songIds.length} tracks</span>
+              <span>Created on {formatDate(post.created_at)}</span>
+              <div className="playlist-stats">
+                <span><i className="icon-view"></i> {post.view_count} views</span>
+                <span><i className="icon-like"></i> {post.like_count} likes</span>
+                <span><i className="icon-comment"></i> {post.comment_count} comments</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Custom CSS để tinh chỉnh giao diện */}
-      <style >{`
-        .card {
-          transition: transform 0.2s;
-        }
-        .card:hover {
-          transform: translateY(-5px);
-        }
-        .btn-primary {
-          background-color: #007bff;
-          border-color: #007bff;
-        }
-        .btn-primary:hover {
-          background-color: #0056b3;
-          border-color: #0056b3;
-        }
-        .btn-outline-success {
-          border:none;
-          color: black;
-            background-color: transparent;
-        }
-        .table-hover tbody tr:hover {
-          background-color: #f8f9fa;
-        }
-        .dropdown-menu {
-          min-width: 150px;
-        }
-        .dropdown-item {
-          font-size: 0.9rem;
-          padding: 0.5rem 1rem;
-        }
-        .dropdown-item:hover {
-          background-color: #e9ecef;
-        }
-      `}</style>
+      {/* Main content */}
+      <div className="playlist-content">
+        <div className="playlist-main">
+          <div className="playlist-cover-section">
+            <div className="playlist-cover-wrapper">
+              <img 
+                src={post.content.imageUrl} 
+                alt={post.content.title} 
+                className="playlist-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/assets/images/default/cover.jpg';
+                }}
+              />
+              <button 
+                className={`play-all-button ${isPlaying && currentTrackIndex === 0 ? 'playing' : ''}`}
+                onClick={() => handlePlayTrack(0)}
+              >
+                {isPlaying && currentTrackIndex === 0 ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="4" width="4" height="16" rx="1" />
+                    <rect x="14" y="4" width="4" height="16" rx="1" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                )}
+                {isPlaying && currentTrackIndex === 0 ? 'Pause' : 'Play All'}
+              </button>
+            </div>
+            
+            {post.content.tags && post.content.tags.length > 0 && (
+              <div className="playlist-tags">
+                <h3>Tags</h3>
+                <div className="tags-list">
+                  {post.content.tags.map((tag, index) => (
+                    <span key={index} className="tag">#{tag}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="tracks-section">
+            <h2>Tracks</h2>
+            <div className="tracks-list">
+              {post.content.songIds.map((song, index) => (
+                <div 
+                  key={index} 
+                  className={`track-item ${currentTrackIndex === index ? 'playing' : ''}`}
+                >
+                  <div className="track-number">{index + 1}</div>
+                  <img 
+                    src={song.imageUrl} 
+                    alt={song.title}
+                    className="track-thumbnail"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/assets/images/default/track-thumbnail.jpg';
+                    }}
+                  />
+                  <div className="track-info">
+                    <div className="track-title">{song.title}</div>
+                    {song.tags && (
+                      <div className="track-tags">
+                        {song.tags.map((tag, tagIndex) => (
+                          <span key={tagIndex} className="track-tag">#{tag}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <button 
+                    className="track-play-button"
+                    onClick={() => handlePlayTrack(index)}
+                  >
+                    {currentTrackIndex === index && isPlaying ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="6" y="4" width="4" height="16" rx="1" />
+                        <rect x="14" y="4" width="4" height="16" rx="1" />
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Comments section */}
+        <div className="comments-section">
+          <h2>Comments ({post.comment_count})</h2>
+          {playlistData.comments && playlistData.comments.length > 0 ? (
+            <div className="comments-list">
+              {playlistData.comments.map((comment, index) => (
+                <div key={index} className="comment-item">
+                  <img 
+                    src={comment.user?.avatar || '/assets/images/default/avatar.jpg'} 
+                    alt={comment.user?.username} 
+                    className="comment-avatar"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/assets/images/default/avatar.jpg';
+                    }}
+                  />
+                  <div className="comment-content">
+                    <div className="comment-header">
+                      <span className="comment-username">{comment.user?.username || 'Anonymous'}</span>
+                      <span className="comment-date">{formatDate(comment.created_at)}</span>
+                    </div>
+                    <div className="comment-text">{comment.content}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="no-comments">No comments yet. Be the first to comment!</div>
+          )}
+          
+          <div className="add-comment">
+            <textarea 
+              placeholder="Add your comment..." 
+              className="comment-input"
+            ></textarea>
+            <button className="comment-submit">Comment</button>
+          </div>
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default PlaylistDetail;

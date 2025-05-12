@@ -4,18 +4,18 @@ import Dashboard from '../pages/dashboard/Dashboard'
 import PlayList from '../components/playlist/playlist'
 import MainContent from '../components/mainContent'
 import PlayListGrid from '../components/playlist/PlayListGrid'
-import PlayListOwner from '../components/playlist/PlayListOwner'
-import APlayList from '../components/playlist/PlayListDetail'
+import PlayListDetail from '../components/playlist/PlayListDetail'
 import Feed from '../pages/feed/Feed'
-import PostTrackDetail from '../pages/feed/PostTrackDetail'
-import PostPlaylistDetail from '../pages/feed/PostPlaylistDetail'
+import PostDetail from '../pages/feed/PostDetail'
 import UserProfile from '../pages/user/UserProfile'
 import Feeds from '../pages/user/Feeds'
 import Follows from '../pages/user/Follows'
 import AlbumPage from '../components/album/AlbumPage'
 import AlbumsCollectionPage from '../components/album/AlbumCollectionPage'
-import path from 'path'
 import AlbumMain from '../components/album/AlbumMain'
+import  PostSong  from '../components/songs/PostSong'
+import PostSongDetail from '../components/songs/PostSongDetail'
+import Songs from '../components/songs/Songs'
 export const indexRouter: any = {
     path: '/',
     element: (<Dashboard />),
@@ -25,11 +25,19 @@ export const indexRouter: any = {
             element: (<PlayList />),
             children: [
                 { path: '', element: (<PlayListGrid />) },
-                { path: 'mine', element: (<PlayListOwner />) },
+                {path: ':playlistId', element: (<PlayListDetail />) },
 
             ]
 
         },
+        {
+          path: 'songs',
+              element: (<Songs />),
+          children : [
+            {path: '', element: (<PostSong />) },
+            {path: ':songId', element: (<PostSongDetail />)}
+          ]
+         },
         {
           path: 'userProfile',
           element: <UserProfile />,
@@ -45,13 +53,11 @@ export const indexRouter: any = {
         { path: 'albums', element: (<AlbumMain />),
           children: [
             {path: '', element: (<AlbumsCollectionPage />) },
-            {path: 'album/:ablumId', element: (<AlbumPage />) },
+            {path: ':albumId', element: (<AlbumPage />) },
           ]
          },
         { path: 'feed', element: (<Feed />) },
-        { path: "postTrack/:postId", element: (<PostTrackDetail />) },
-        { path: "postPlaylist/:postId", element: (<PostPlaylistDetail />) },
-        { path: 'aplaylist', element: <APlayList /> },
+        { path: "post/:postId", element: (<PostDetail />) },
         { path: '', element: (<MainContent />) },
     ]
 

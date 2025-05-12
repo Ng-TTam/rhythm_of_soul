@@ -5,11 +5,8 @@ import com.rhythm_of_soul.content_service.common.Type;
 import com.rhythm_of_soul.content_service.config.MinioConfig;
 import com.rhythm_of_soul.content_service.dto.ContentResponse;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
-import com.rhythm_of_soul.content_service.dto.response.CommentResponse;
-import com.rhythm_of_soul.content_service.dto.response.PlaylistResponse;
-import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
+import com.rhythm_of_soul.content_service.dto.response.*;
 import com.rhythm_of_soul.content_service.dto.resquest.PostRequest;
-import com.rhythm_of_soul.content_service.dto.response.SongResponse;
 import com.rhythm_of_soul.content_service.entity.Comment;
 import com.rhythm_of_soul.content_service.entity.Like;
 import com.rhythm_of_soul.content_service.entity.Post;
@@ -236,6 +233,7 @@ public class PostServiceImpl implements  PostService {
                 ContentResponse content = postResponse.getContent();
                 if(post.getContent().getImageUrl() != null) content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
                 if(post.getContent().getCoverUrl() != null)  content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
+
                 postResponse.setContent(content);
             }
             postResponses.add(postResponse);
@@ -245,19 +243,49 @@ public class PostServiceImpl implements  PostService {
     }
 
     @Override
-    public List<PlaylistResponse> getPlaylists(String userId) {
+    public List<PostResponse> getPlaylists(String userId) {
         List<Post> posts = postRepository.findAllByUserIdAndType(userId, Type.PLAYLIST);
-        List<PlaylistResponse> playlistResponses = new ArrayList<>();
+        List<PostResponse> postResponses = new ArrayList<>();
         for(Post post : posts){
-            playlistResponses.add(PlaylistResponse.builder()
+            PostResponse postResponse = postMapper.toPostResponse(post);
+            if(post.getContent() != null){
+                ContentResponse content = postResponse.getContent();
+                if(post.getContent().getImageUrl() != null) content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
+                if(post.getContent().getCoverUrl() != null)  content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
+                postResponse.getContent().setSongIds(getSongs(post.getContent().getSongIds()));
+                postResponse.setContent(content);
+            }
+            postResponses.add(postResponse);
+
+        }
+
+        return postResponses;
+    }
+
+    @Override
+    public List<AlbumResponse> getAlbum(String userId) {
+        List<Post> posts = postRepository.findAllByUserIdAndType(userId, Type.ALBUM);
+        List<AlbumResponse> albumResponses = new ArrayList<>();
+        for(Post post : posts){
+            AlbumResponse albumResponse = AlbumResponse.builder()
                     .id(post.getId())
                     .title(post.getContent().getTitle())
                     .imageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()))
+                    .coverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()))
                     .tracks(post.getContent().getSongIds().size())
-                            .tags(post.getContent().getTags())
-                    .build());
+                    .crateAt(Date.from(post.getCreatedAt()))
+                    .updatedAt(post.getUpdatedAt() != null ? Date.from(post.getUpdatedAt()) : null)
+                    .tags(post.getContent().getTags())
+                    .isPublic(post.isPublic())
+                    .userId(post.getUserId())
+                    .viewCount(post.getViewCount())
+                    .likeCount(post.getLikeCount())
+                    .commentCount(post.getCommentCount())
+                    .scheduledAt(post.getScheduledAt() != null ? Date.from(post.getScheduledAt()) : null)
+                    .build();
+            albumResponses.add(albumResponse);
         }
-        return playlistResponses;
+        return albumResponses;
     }
 
     private List<CommentResponse> getComments(String postId) {

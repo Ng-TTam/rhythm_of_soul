@@ -1,152 +1,105 @@
-import React, { useState } from 'react';
-import { IoMdAddCircle } from '@react-icons/all-files/io/IoMdAddCircle';
-import { BsFillPlayFill } from '@react-icons/all-files/bs/BsFillPlayFill';
-import CreatePlaylistDialog from './CreatePlaylistDialog';
-
-interface Playlist {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  tracks: number;
-  color: string;
-}
-
+import React, { useRef, useEffect } from 'react';
+import { Container, Card, Button, Row, Col } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import { FaPlus } from '@react-icons/all-files/fa/FaPlus';
+import playlistPosts from './hooks/playlistPosts';
+import ErrorBoundary from '../../pages/feed/ErrorBoundary';
+import SkeletonPost from '../../pages/feed/SkeletonPost';
+import { CurrentUser} from '../../model/post';
+import PlayListPost from './PlayListPost';
+const currentUser: CurrentUser = {
+  id: "1234",
+  username: "Current User",
+  avatar: "https://i1.sndcdn.com/avatars-6zJmWE24BNXpCEdL-qVvuHg-t120x120.jpg"
+};
 const PlaylistGrid: React.FC = () => {
-  const [playlists, setPlaylists] = useState<Playlist[]>([
-    {
-      id: '01',
-      title: "Eliana d'cruz playlist",
-      description: 'top 12 songs from Eliana and all type of songs.',
-      image: '../assets/images/dashboard/01.png',
-      tracks: 12,
-      color: 'danger'
-    },
-    {
-      id: '02',
-      title: 'omen smith playlist',
-      description: 'top 18 songs from omen and mainly party song.',
-      image: '../assets/images/dashboard/02.png',
-      tracks: 18,
-      color: 'warning'
-    },
-    {
-      id: '03',
-      title: 'samantha playlist',
-      description: 'most popular love songs from Samantha.',
-      image: '../assets/images/dashboard/03.png',
-      tracks: 9,
-      color: 'info'
-    },
-    // Add more if needed
-  ]);
-
-  const [showCreateDialog, setShowCreateDialog] = useState<boolean>(false);
-
-  const handleOpenCreateDialog = (): void => {
-    setShowCreateDialog(true);
-  };
-
-  const handleCloseCreateDialog = (): void => {
-    setShowCreateDialog(false);
-  };
-
-  const handleCreatePlaylist = (formData: { title: string; description: string }): void => {
-    const newPlaylistItem: Playlist = {
-      id: `0${playlists.length + 1}`,
-      title: formData.title,
-      description: formData.description || 'New custom playlist.',
-      image: '../assets/images/dashboard/04.png', // Default image
-      tracks: 0,
-      color: 'primary'
-    };
-    
-    setPlaylists([...playlists, newPlaylistItem]);
-    handleCloseCreateDialog();
-  };
+  const {
+    posts,
+    loading,
+    error,
+    likedPosts,
+    playingTrackId,
+    fetchPosts,
+    handleLike,
+    toggleComment,
+    handlePlayTrack,
+  } = playlistPosts(currentUser);
+  console.log('posts', posts);
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
 
   return (
-    <>
-      {/* Create Playlist Card */}
-      <div className="col-xl-3 col-md-6 mb-3">
-        <div 
-          className="empty-playlist rounded-lg shadow-sm" 
-          style={{
-            background: "linear-gradient(180deg, #f8f9fa 0%, #f8f9fa 100%)",
-            border: "1px dashed #e7eaec",
-            borderRadius: "10px",
-            height: "100%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            cursor: "pointer",
-            padding: "20px",
-            minHeight: "200px",
-            transition: "all 0.3s ease"
-          }} 
-          onClick={handleOpenCreateDialog}
-          onMouseOver={(e: React.MouseEvent<HTMLDivElement>) => 
-            e.currentTarget.style.backgroundColor = "#f0f0f0"
-          }
-          onMouseOut={(e: React.MouseEvent<HTMLDivElement>) => 
-            e.currentTarget.style.backgroundColor = "#f8f9fa"
-          }
-        >
-          <div className="content"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              textAlign: "center",
+    <ErrorBoundary fallback={<div>Something went wrong</div>}>
+    <Container className="my-4">
+      {/* Create post card */}
+      <Card className="mb-4 shadow-sm">
+        <Card.Body className="d-flex align-items-center">
+          <img 
+            src={currentUser.avatar} 
+            alt={currentUser.username} 
+            className="me-3" 
+            style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/default-avatar.jpg';
             }}
-          >                                
-            <IoMdAddCircle 
-              style={{
-                fontSize: "48px",
-                color: "#007bff",
-                marginBottom: "15px"
-              }}
-            />
-            <span
-              style={{
-                fontSize: "20px",
-                color: "#333",
-                fontWeight: "500"
-              }}
-            >Tạo playlist mới</span>
-          </div>
+          />
+          <Button 
+            variant="light" 
+            className="flex-grow-1 text-start text-muted border"
+            
+          >
+            What's on your mind?
+          </Button>
+        </Card.Body>
+      </Card>
+      
+      {/* Loading state */}
+      {loading && (
+        <div className="text-center py-5">
+          {[...Array(3)].map((_, i) => (
+            <SkeletonPost key={i} />
+          ))}
         </div>
-      </div>
-
-      {/* Existing Playlists */}
-      {playlists.map((playlist) => (
-        <div key={playlist.id} className="col-xl-3 col-md-6 mb-3">
-          <div className={`bg-soft-${playlist.color} position-relative rounded-3 card-box mb-3`}>
-            <img
-              src={playlist.image}
-              id={playlist.id}
-              className="img-fluid mx-auto d-block"
-              alt="play-img"
-            />
-            <div className="d-flex align-items-center play-list-icon">
-              <BsFillPlayFill className={`text-${playlist.color}`} size={24} />
-              <span className="ms-2 fw-semibold text-capitalize">{playlist.tracks} tracks</span>
-            </div>
-          </div>
-          <a href="music-player.html" className="text-capitalize h5">{playlist.title}</a>
-          <small className="fw-normal line-count-1 text-capitalize">{playlist.description}</small>
+      )}
+      
+      {/* Error state */}
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          Error loading posts: {error}
+          <Button 
+            variant="link" 
+            onClick={fetchPosts}
+            className="ms-2"
+          >
+            Retry
+          </Button>
         </div>
-      ))}
-
-      {/* Create Playlist Dialog Component */}
-      <CreatePlaylistDialog 
-        isOpen={showCreateDialog}
-        onClose={handleCloseCreateDialog}
-        onCreatePlaylist={handleCreatePlaylist}
-      />
-    </>
-  );
+      )}
+      
+      {/* Feed content */}
+      <Row>
+        { 
+          posts.map((post) => (
+            <Col xs={12} key={post.id} className="mb-4">
+              {
+                <PlayListPost 
+                  post={post}
+                  playingTrackId={playingTrackId}
+                  likedTracks={likedPosts}
+                  onPlayTrack={handlePlayTrack}
+                  onLike={() => handleLike(post.id)}
+                  onComment={() => toggleComment(post.id)}
+                />
+              }
+            </Col>
+          ))
+        }
+      </Row>
+    </Container>
+  </ErrorBoundary>
+);
+     
 };
 
 export default PlaylistGrid;

@@ -29,7 +29,7 @@ public class AudioStreamController {
     public ApiResponse<SongResponse> getContent(@PathVariable String songId) {
         return ApiResponse.<SongResponse>builder()
                 .message("Content fetched successfully")
-                .data(audioStreamService.getContent(songId))
+                .result(audioStreamService.getContent(songId))
                 .build();
     }
 }

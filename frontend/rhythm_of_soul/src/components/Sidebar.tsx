@@ -18,6 +18,9 @@ export default function Sidebar() {
   const handlePlaylist = () => {
     redirectPath('/playlist');
   }
+  const handleSongs = () => {
+    redirectPath('/songs');
+  }
   const handleProfileUser = () => {
     redirectPath(`/userProfile`);
   }
@@ -625,7 +628,7 @@ export default function Sidebar() {
                     </button>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link " href="app/user-add.html">
+                    <button className="nav-link " onClick={handleSongs} >
                       <i className="icon">
                         <svg
                           className="icon-10"
@@ -649,7 +652,7 @@ export default function Sidebar() {
                         A
                       </i>
                       <span className="item-name">Songs</span>
-                    </a>
+                    </button>
                   </li>
                   <li className="nav-item">
                     <button className="nav-link btn-sidebar" onClick={handlePlaylist}>

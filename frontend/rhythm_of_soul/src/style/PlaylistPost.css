@@ -1,0 +1,274 @@
+/* PlaylistPostCard.css */
+
+/* Card Container */
+.playlist-card {
+  margin: 0 auto;
+  background-color: white;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Header with Background Section */
+.card-header-banner {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+}
+
+.banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8));
+}
+
+/* Header Content */
+.header-content {
+  position: relative;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  object-fit: cover;
+  margin-right: 0.75rem;
+}
+
+.user-details {
+  color: white;
+}
+
+.username {
+  font-weight: 500;
+}
+
+.post-date {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.playlist-type {
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  background-color: #7c3aed; /* Purple */
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Banner Content */
+.banner-content {
+  position: relative;
+  padding: 5rem 1rem 1rem 1rem;
+  z-index: 10;
+}
+
+.banner-title-area {
+  margin-left: 6rem;
+}
+
+.banner-title {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.banner-meta {
+  color: white;
+  font-size: 0.875rem;
+  opacity: 0.8;
+}
+
+/* Card Body */
+.card-body {
+  padding: 1rem;
+}
+
+/* Album Cover */
+.album-cover-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .album-cover-container {
+    width: 33.333333%;
+    margin-bottom: 0;
+  }
+}
+
+.album-cover-wrapper {
+  position: relative;
+  width: 16rem;
+  height: 16rem;
+  cursor: pointer;
+}
+
+.album-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0.25rem;
+}
+
+.play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.play-overlay:hover {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.play-icon {
+  height: 3rem;
+  width: 3rem;
+  color: white;
+}
+
+/* Playlist Details */
+.playlist-details {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .playlist-details {
+    width: 66.666667%;
+  }
+}
+
+/* Tags */
+.tags-container {
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tag {
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  background-color: #f3f4f6;
+  border-radius: 9999px;
+}
+
+/* Track List */
+.tracks-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.track-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.track-item:hover {
+  background-color: #f9fafb;
+}
+
+.track-number {
+  width: 1.5rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+.track-thumbnail {
+  width: 2.5rem;
+  height: 2.5rem;
+  object-fit: cover;
+  border-radius: 0.25rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
+}
+
+.track-info {
+  margin-left: 0.75rem;
+  flex-grow: 1;
+}
+
+.track-title {
+  font-weight: 500;
+}
+
+.track-tags {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.track-tag {
+  margin-right: 0.25rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.track-play-button {
+  padding: 0.5rem;
+  border : none;
+  background: none;
+}
+
+.track-play-button:hover {
+  background-color: #e5e7eb;
+}
+
+/* Actions */
+.actions-container {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  margin-right: 1.5rem;
+  color: #6b7280;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.action-button.liked {
+  color: #ef4444; /* Red */
+}
+
+.action-icon {
+  height: 1.25rem;
+  width: 1.25rem;
+  margin-right: 0.25rem;
+}
+
+.action-count {
+  display: inline;
+}
+
+.view-display {
+  display: flex;
+  align-items: center;
+  color: #6b7280;
+}

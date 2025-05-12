@@ -2,6 +2,7 @@ package com.rhythm_of_soul.content_service.service;
 
 import com.rhythm_of_soul.content_service.common.Tag;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
+import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
 import com.rhythm_of_soul.content_service.dto.response.PlaylistResponse;
 import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
 import com.rhythm_of_soul.content_service.dto.resquest.PostRequest;
@@ -23,5 +24,6 @@ public interface PostService {
     List<PostResponse> getPosts(String userId);
     PostDetailResponse getPost(String postId);
     List<PostResponse> getSongs(String userId);
-    List<PlaylistResponse> getPlaylists(String userId);
+    List<PostResponse> getPlaylists(String userId);
+    List<AlbumResponse> getAlbum(String userId);
 }
