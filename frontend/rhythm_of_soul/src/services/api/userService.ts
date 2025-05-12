@@ -48,7 +48,7 @@ export const updateUser = async (userId: string, data: UpdateUserRequest): Promi
 
 export const getProfile = async (): Promise<User> => {
   const response = await apiClient.get(apiConfig.endpoints.user.profile);
-  return response.data;
+  return response.data.result;
 };
 
 export const assignArtist = async (data: AssignArtistRequest): Promise<AssignArtistResponse> => {

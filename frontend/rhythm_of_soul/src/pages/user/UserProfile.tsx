@@ -8,28 +8,43 @@ import { FaMusic } from "@react-icons/all-files/fa/FaMusic";
 import { User } from "../../model/profile/UserProfile";
 import EditProfileDialog from "./EditProfileDialog";
 import { ArtistStatus } from "../../config/constants";
-import { getUserByPreEmail } from "../../services/api/userService";
 import { CalendarIcon, JoystickIcon, LucidePhone } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
+import { useDispatch } from "react-redux";
+import { setUserSlice, updateUser } from "../../reducers/userReducer";
+import { getProfile } from "../../services/api/userService";
 
 export default function UserProfile() {
   const [isEditVisible, setEditVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useDispatch();
 
+  const userRedux = useSelector((state: RootState) => state.user.currentUser);
   const [user, setUser] = useState<User | null>(null);
 
   const handleSave = (data: User) => {
     setUser(data); // Cập nhật state
-    setEditVisible(false); // Đóng dialog
+    setEditVisible(false);
   };
+
+  useEffect(() => {
+    try {
+      if (user) {
+        dispatch(updateUser(user));
+      }
+    } catch (error) {
+      console.error("Failed to load user profile", error);
+    }
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
 
     (async () => {
       try {
-        const userData = await getUserByPreEmail("Young");
         if (isMounted) {
-          setUser(userData);
+          setUser(userRedux);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -43,7 +58,7 @@ export default function UserProfile() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [userRedux]);
 
   const handleEditOpen = () => {
     setEditVisible(true);
@@ -156,7 +171,7 @@ export default function UserProfile() {
                   </div>
                   <div>
                     <small className="text-muted d-block">Date of birth</small>
-                    {user?.dateOfBirth && <span>{formatDate(user?.dateOfBirth + '')}</span>}
+                    {user?.dateOfBirth && <span>{formatDate(user?.dateOfBirth + "")}</span>}
                   </div>
                 </div>
                 <div className="d-flex align-items-center mb-3">

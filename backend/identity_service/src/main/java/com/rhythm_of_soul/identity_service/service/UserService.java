@@ -12,6 +12,8 @@ public interface UserService {
 
     UserResponse getUser(String userId);
 
+    UserResponse getMe();
+
     UserResponse getUserByEmail(String email);
 
     PageResponse<UserResponse> getAllUsers(int page, int size);
@@ -43,7 +45,6 @@ public interface UserService {
      */
     void revokeRoleArtist(String userId);
 
-//    Tìm kiếm người dùng để follow
+    //    Tìm kiếm người dùng để follow
     PageResponse<UserResponse> getAllUsers(int page, int size, String searchKey);
-
 }

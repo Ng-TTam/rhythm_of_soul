@@ -54,6 +54,14 @@ public class UserController {
                 .build();
     }
 
+    @GetMapping("/me")
+    ApiResponse<UserResponse> getMe() {
+        return ApiResponse.<UserResponse>builder()
+                .message(SUCCESS)
+                .result(userService.getMe())
+                .build();
+    }
+
     @GetMapping
     ApiResponse<PageResponse<UserResponse>> getAllUsers(
             @RequestParam(value = "size", required = false, defaultValue = "10") int size,
@@ -93,15 +101,12 @@ public class UserController {
     public ResponseEntity<ApiResponse<PageResponse<UserResponse>>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String searchKey
-    ) {
+            @RequestParam(required = false) String searchKey) {
         PageResponse<UserResponse> result = userService.getAllUsers(page, size, searchKey);
-        return ResponseEntity.ok(
-                ApiResponse.<PageResponse<UserResponse>>builder()
-                        .code(200)
-                        .message("Search users successfully")
-                        .result(result)
-                        .build()
-        );
+        return ResponseEntity.ok(ApiResponse.<PageResponse<UserResponse>>builder()
+                .code(200)
+                .message("Search users successfully")
+                .result(result)
+                .build());
     }
 }

@@ -86,7 +86,7 @@ const LoginForm: React.FC = () => {
           icon: 'success',
           title: 'Đăng nhập thành công',
           showConfirmButton: false,
-          timer: 2000,
+          timer: 1000,
           timerProgressBar: true,
         }).then((result) => {
           if (result.dismiss === Swal.DismissReason.timer) {

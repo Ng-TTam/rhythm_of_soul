@@ -48,11 +48,9 @@ public enum ErrorCode {
     BLANK_STAGE_NAME(2016, "Stage name is blank", HttpStatus.BAD_REQUEST),
     BLANK_ARTIST_PROFILE(2017, "You are Artist, your profile is blank", HttpStatus.BAD_REQUEST),
 
-
     // follow - 3xxx
     ALREADY_FOLLOWING(3000, "Follow already exists", HttpStatus.CONFLICT),
     FOLLOW_NOT_FOUND(3001, "Follow not found", HttpStatus.BAD_REQUEST),
-
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

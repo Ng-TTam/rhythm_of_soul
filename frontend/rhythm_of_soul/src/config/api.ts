@@ -48,7 +48,7 @@ export const apiConfig = {
     user: {
       get_by_pre_email: (preEmail: string) => `${config.apiBaseUrl}/identity/users/${preEmail}`,
       update: (userId: string) => `${config.apiBaseUrl}/identity/users/${userId}`,
-      profile: `${config.apiBaseUrl}/identity/users`,
+      profile: `${config.apiBaseUrl}/identity/users/me`,
       assign_artist: `${config.apiBaseUrl}/identity/users/assign-artist`,
       get_users: `${config.apiBaseUrl}/identity/accounts`,
     },

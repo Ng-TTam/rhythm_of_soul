@@ -4,8 +4,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 import com.rhythm_of_soul.identity_service.constant.Gender;
-
 import com.rhythm_of_soul.identity_service.entity.User;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -32,8 +32,6 @@ public class UserResponse {
     int followedCount;
 
     public static UserResponse fromEntity(User user) {
-        return UserResponse.builder()
-                .id(user.getId())
-                .build();
+        return UserResponse.builder().id(user.getId()).build();
     }
 }
