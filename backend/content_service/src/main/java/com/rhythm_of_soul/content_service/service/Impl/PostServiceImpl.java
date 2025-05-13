@@ -4,13 +4,19 @@ import com.rhythm_of_soul.content_service.common.Tag;
 import com.rhythm_of_soul.content_service.common.Type;
 import com.rhythm_of_soul.content_service.config.MinioConfig;
 import com.rhythm_of_soul.content_service.dto.ContentResponse;
+import com.rhythm_of_soul.content_service.dto.PostIdProjection;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
-import com.rhythm_of_soul.content_service.dto.response.*;
 import com.rhythm_of_soul.content_service.dto.request.PostRequest;
+import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
+import com.rhythm_of_soul.content_service.dto.response.CommentResponse;
+import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
+import com.rhythm_of_soul.content_service.dto.response.SongResponse;
 import com.rhythm_of_soul.content_service.entity.Comment;
 import com.rhythm_of_soul.content_service.entity.Like;
 import com.rhythm_of_soul.content_service.entity.Post;
 import com.rhythm_of_soul.content_service.entity.Post.Content;
+import com.rhythm_of_soul.content_service.exception.AppException;
+import com.rhythm_of_soul.content_service.exception.ErrorCode;
 import com.rhythm_of_soul.content_service.mapper.LikeMapper;
 import com.rhythm_of_soul.content_service.mapper.PostMapper;
 import com.rhythm_of_soul.content_service.repository.CommentRepository;
@@ -23,6 +29,7 @@ import io.minio.errors.*;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,10 +39,8 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -119,6 +124,10 @@ public class PostServiceImpl implements  PostService {
                     break;
 
             }
+            // set accountId using accountId in token
+//            post.setAccountId(SecurityContextHolder.getContext().getAuthentication().getName());
+            post.setAccountId("326e6645-aa0f-4f89-b885-019c05b1a970");
+
             postRepository.save(post);
             PostResponse postResponse = postMapper.toPostResponse(post);
             if(post.getType() == Type.TEXT) {
@@ -164,6 +173,7 @@ public class PostServiceImpl implements  PostService {
         postResponse.setContent(content);
         return postResponse;
     }
+
     private List<SongResponse> getSongs(List<String> songIds) {
         List<SongResponse> songsResponse = new ArrayList<>();
         for(String songId : songIds){
@@ -182,9 +192,28 @@ public class PostServiceImpl implements  PostService {
     @Override
     public List<PostResponse> getPosts(String accountId) {
         List<Post> posts = postRepository.findAllByAccountId(accountId);
+        if (posts.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Lấy danh sách postId để kiểm tra trạng thái like
+        List<String> postIds = posts.stream()
+                .map(Post::getId)
+                .collect(Collectors.toList());
+
+        // Truy vấn danh sách postId đã được like bởi accountId
+        List<PostIdProjection> likedPostIdProjections = likeRepository.findLikedPostIdsByAccountIdAndPostIds(accountId, postIds);
+        Set<String> likedPostIdSet = likedPostIdProjections.stream()
+                .map(PostIdProjection::getPostId)
+                .collect(Collectors.toSet());
+
         List<PostResponse> postResponses = new ArrayList<>();
         for(Post post : posts){
             PostResponse postResponse = postMapper.toPostResponse(post);
+
+            boolean liked = likedPostIdSet.contains(post.getId());
+            postResponse.set_liked(liked);
+
             if(post.getContent() != null){
                 ContentResponse content = postResponse.getContent();
                 if(post.getContent().getImageUrl() != null) content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
@@ -203,8 +232,14 @@ public class PostServiceImpl implements  PostService {
 
     @Override
     public PostDetailResponse getPost(String postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new AppException(ErrorCode.POST_NOT_FOUND));
         PostResponse postResponse = postMapper.toPostResponse(post);
+
+        // set liked of accountId decode from token
+        postResponse.set_liked(likeRepository.existsByAccountIdAndPostId("326e6645-aa0f-4f89-b885-019c05b1a970", postId));
+//                SecurityContextHolder.getContext().getAuthentication().getName(), postId));
+
         if(post.getContent() != null){
             ContentResponse content = postResponse.getContent();
             if (post.getContent().getImageUrl() != null) content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
@@ -273,15 +308,15 @@ public class PostServiceImpl implements  PostService {
                     .imageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()))
                     .coverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()))
                     .tracks(post.getContent().getSongIds().size())
-                    .crateAt(Date.from(post.getCreatedAt()))
-                    .updatedAt(post.getUpdatedAt() != null ? Date.from(post.getUpdatedAt()) : null)
+                    .createdAt(post.getCreatedAt())
+                    .updatedAt(post.getUpdatedAt() != null ? post.getUpdatedAt() : null)
                     .tags(post.getContent().getTags())
                     .isPublic(post.isPublic())
                     .accountId(post.getAccountId())
                     .viewCount(post.getViewCount())
                     .likeCount(post.getLikeCount())
                     .commentCount(post.getCommentCount())
-                    .scheduledAt(post.getScheduledAt() != null ? Date.from(post.getScheduledAt()) : null)
+                    .scheduledAt(post.getScheduledAt() != null ? post.getScheduledAt() : null)
                     .build();
             albumResponses.add(albumResponse);
         }

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -15,7 +15,7 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostResponse {
     String id;
-    String user_id;
+    String account_id;
     String type;
     String caption;
     ContentResponse content;
@@ -23,8 +23,8 @@ public class PostResponse {
     int like_count;
     int comment_count;
     boolean is_public;
-    Date created_at;
-    Date updated_at;
-    Date scheduled_at;
+    Instant created_at;
+    Instant updated_at;
+    Instant scheduled_at;
     boolean is_liked;
 }

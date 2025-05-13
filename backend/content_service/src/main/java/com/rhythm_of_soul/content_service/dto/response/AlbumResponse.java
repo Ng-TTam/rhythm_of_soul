@@ -1,11 +1,10 @@
 package com.rhythm_of_soul.content_service.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.rhythm_of_soul.content_service.common.Tag;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 @Getter
@@ -14,7 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
 public class AlbumResponse {
     String id; // album_id
     String title; // Tên album
@@ -23,10 +21,10 @@ public class AlbumResponse {
     String accountId; // ID người tạo album
     int tracks; // Số lượng bài hát trong album
     List<Tag> tags; // Danh sách tag của album
-    Date crateAt;
+    Instant createdAt;
     Boolean isPublic; // Thời gian phát hành album
-    Date updatedAt; // Thời gian cập nhật album
-    Date scheduledAt; // Thời gian phát hành album
+    Instant updatedAt; // Thời gian cập nhật album
+    Instant scheduledAt; // Thời gian phát hành album
     int viewCount; // Số lượt xem album
     int likeCount; // Số lượt thích album
     int commentCount; // Số lượng bình luận album
