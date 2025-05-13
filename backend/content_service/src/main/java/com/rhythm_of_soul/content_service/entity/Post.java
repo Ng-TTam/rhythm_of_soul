@@ -21,7 +21,7 @@ public class Post {
 
     @Id
      String id;
-     String userId;
+     String accountId;
      Type type;
      String caption;
      Content content;

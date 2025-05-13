@@ -1,8 +1,6 @@
-package com.rhythm_of_soul.content_service.dto.resquest;
+package com.rhythm_of_soul.content_service.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.rhythm_of_soul.content_service.common.Tag;
-import com.rhythm_of_soul.content_service.common.Type;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

@@ -13,5 +13,5 @@ import lombok.experimental.FieldDefaults;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LikeResponse {
     String id;
-    String userId;
+    String accountId;
 }

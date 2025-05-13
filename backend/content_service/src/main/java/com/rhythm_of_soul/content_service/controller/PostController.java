@@ -4,9 +4,8 @@ import com.rhythm_of_soul.content_service.common.Tag;
 import com.rhythm_of_soul.content_service.dto.ApiResponse;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
 import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
-import com.rhythm_of_soul.content_service.dto.response.PlaylistResponse;
 import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
-import com.rhythm_of_soul.content_service.dto.resquest.PostRequest;
+import com.rhythm_of_soul.content_service.dto.request.PostRequest;
 import com.rhythm_of_soul.content_service.service.PostService;
 import io.minio.errors.*;
 import lombok.RequiredArgsConstructor;
@@ -45,11 +44,11 @@ public class PostController {
                 .build();
 
     }
-    @GetMapping("/{userId}/album")
-    ApiResponse<List<AlbumResponse>> getAlbum(@PathVariable String userId) {
+    @GetMapping("/{accountId}/album")
+    ApiResponse<List<AlbumResponse>> getAlbum(@PathVariable String accountId) {
         return ApiResponse.<List<AlbumResponse>>builder()
                 .message("Album created successfully")
-                .result(postService.getAlbum(userId))
+                .result(postService.getAlbum(accountId))
                 .build();
     }
     @PutMapping("/{postId}")
@@ -58,22 +57,22 @@ public class PostController {
                 .result(postService.addSong(postId, songIds))
                 .build();
     }
-    @GetMapping("/{userId}")
-    ApiResponse<List<PostResponse>> getPosts(@PathVariable String userId) {
+    @GetMapping("/{accountId}")
+    ApiResponse<List<PostResponse>> getPosts(@PathVariable String accountId) {
         return ApiResponse.<List<PostResponse>>builder()
-                .result(postService.getPosts(userId))
+                .result(postService.getPosts(accountId))
                 .build();
     }
-    @GetMapping("/{userId}/songs")
-    ApiResponse<List<PostResponse>> getSongs(@PathVariable String userId) {
+    @GetMapping("/{accountId}/songs")
+    ApiResponse<List<PostResponse>> getSongs(@PathVariable String accountId) {
         return ApiResponse.<List<PostResponse>>builder()
-                .result(postService.getSongs(userId))
+                .result(postService.getSongs(accountId))
                 .build();
     }
-    @GetMapping("/{userId}/playlists")
-    ApiResponse<List<PostResponse>> getPlaylists(@PathVariable String userId) {
+    @GetMapping("/{accountId}/playlists")
+    ApiResponse<List<PostResponse>> getPlaylists(@PathVariable String accountId) {
         return ApiResponse.<List<PostResponse>>builder()
-                .result(postService.getPlaylists(userId))
+                .result(postService.getPlaylists(accountId))
                 .build();
     }
 

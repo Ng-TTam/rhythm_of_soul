@@ -5,7 +5,7 @@ import com.rhythm_of_soul.content_service.dto.PostResponse;
 import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
 import com.rhythm_of_soul.content_service.dto.response.PlaylistResponse;
 import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
-import com.rhythm_of_soul.content_service.dto.resquest.PostRequest;
+import com.rhythm_of_soul.content_service.dto.request.PostRequest;
 import io.minio.errors.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,9 +21,9 @@ public interface PostService {
             InvalidResponseException, XmlParserException, InternalException;
     PostResponse createPost(PostRequest postRequest);
     PostResponse addSong(String postId, List<String> songIds);
-    List<PostResponse> getPosts(String userId);
+    List<PostResponse> getPosts(String accountId);
     PostDetailResponse getPost(String postId);
-    List<PostResponse> getSongs(String userId);
-    List<PostResponse> getPlaylists(String userId);
-    List<AlbumResponse> getAlbum(String userId);
+    List<PostResponse> getSongs(String accountId);
+    List<PostResponse> getPlaylists(String accountId);
+    List<AlbumResponse> getAlbum(String accountId);
 }

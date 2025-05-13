@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -17,17 +17,19 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CommentResponse {
     String id;          // comment_id
-    String userId;      // Người comment
+    String accountId;      // Người comment
     String content;     // Nội dung comment
     String parentId; // ID comment cha (nếu là reply)
-    Date createdAt; // Thời gian tạo comment
+    Instant createdAt; // Thời gian tạo comment
+    Instant updatedAt;
     List<CommentResponse> child_comments;// Danh sách comment con (nếu có)
     // Constructor
-    public CommentResponse(String id, String userId, String parentId,Date createdAt, String content) {
+    public CommentResponse(String id, String accountId, String parentId, Instant createdAt, Instant updatedAt, String content) {
         this.id = id;
-        this.userId = userId;
+        this.accountId = accountId;
         this.parentId = parentId;
         this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.content = content;
     }
 

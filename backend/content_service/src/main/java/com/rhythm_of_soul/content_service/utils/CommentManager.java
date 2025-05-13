@@ -2,13 +2,17 @@ package com.rhythm_of_soul.content_service.utils;
 
 import com.rhythm_of_soul.content_service.dto.response.CommentResponse;
 
-import java.util.*;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CommentManager {
     private final Map<String, CommentResponse> commentMap = new HashMap<>();
     private final Map<String,CommentResponse> resultMap = new HashMap<>();
     // Method to add a department to the map
-    public void addDepartment(String id, String userId, String parentId, String content, Date createdAt) {
+    public void addDepartment(String id, String accountId, String parentId, String content, Instant createdAt, Instant updatedAt) {
 
         if (commentMap.containsKey(id)) {
             return;
@@ -23,7 +27,7 @@ public class CommentManager {
             }
         }
 
-        CommentResponse newComment = new CommentResponse(id, userId, parentId, createdAt, content);
+        CommentResponse newComment = new CommentResponse(id, accountId, parentId, createdAt, updatedAt, content);
         commentMap.put(id, newComment);
 
         if (parentComment != null) {

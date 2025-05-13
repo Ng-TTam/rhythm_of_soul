@@ -2,9 +2,8 @@ package com.rhythm_of_soul.content_service.mapper;
 
 import com.rhythm_of_soul.content_service.dto.ContentResponse;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
-import com.rhythm_of_soul.content_service.dto.resquest.PostRequest;
+import com.rhythm_of_soul.content_service.dto.request.PostRequest;
 import com.rhythm_of_soul.content_service.entity.Post;
-import com.rhythm_of_soul.content_service.utils.SaveFileMinio;
 import org.mapstruct.Mapper;
 
 import java.time.Instant;
@@ -37,13 +36,13 @@ public interface PostMapper {
                 .created_at(post.getCreatedAt() != null ? Date.from(post.getCreatedAt()) : null)
                 .updated_at((post.getUpdatedAt() != null) ? Date.from(post.getUpdatedAt()) : null)
                 .scheduled_at(post.getScheduledAt() != null ? Date.from(post.getScheduledAt()) : null)
-                .user_id(post.getUserId())
+                .user_id(post.getAccountId())
                 .build();
     }
     default Post toPost(PostRequest postRequest){
         return Post.builder()
                 .id(UUID.randomUUID().toString())
-                .userId(postRequest.getUser_id())
+                .accountId(postRequest.getUser_id())
                 .type(postRequest.getType())
                 .caption(postRequest.getCaption())
                 .isPublic(postRequest.getIsPublic())

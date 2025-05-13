@@ -1,5 +1,6 @@
 package com.rhythm_of_soul.content_service.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,8 +10,11 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse <T> {
-    int code = 1000;
+    @Builder.Default
+    int code = 200;
+
     String message;
     T result;
 }

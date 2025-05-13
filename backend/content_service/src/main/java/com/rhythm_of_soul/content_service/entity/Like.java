@@ -19,6 +19,6 @@ public class Like {
     @Id
     private String id;
     private String postId;
-    private String userId;
+    private String accountId;
     private Instant createdAt;
 }

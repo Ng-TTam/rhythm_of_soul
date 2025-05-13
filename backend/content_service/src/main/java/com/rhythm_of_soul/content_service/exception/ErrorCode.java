@@ -8,6 +8,14 @@ import lombok.Getter;
 @Getter
 public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
+    UNAUTHENTICATED(9990, "Unauthenticated", HttpStatus.UNAUTHORIZED),
+    UNAUTHORIZED(1003, "You do not have permission", HttpStatus.FORBIDDEN),
+
+    // 5xxx - post error code
+    POST_NOT_FOUND(5000, "Post not found", HttpStatus.NOT_FOUND),
+
+    // 6xxx - comment error code
+    COMMENT_NOT_FOUND(6001, "Comment not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

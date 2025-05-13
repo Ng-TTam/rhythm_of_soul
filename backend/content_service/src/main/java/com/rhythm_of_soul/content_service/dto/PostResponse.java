@@ -26,4 +26,5 @@ public class PostResponse {
     Date created_at;
     Date updated_at;
     Date scheduled_at;
+    boolean is_liked;
 }

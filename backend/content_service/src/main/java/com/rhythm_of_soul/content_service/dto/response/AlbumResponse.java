@@ -20,7 +20,7 @@ public class AlbumResponse {
     String title; // Tên album
     String imageUrl; // Đường dẫn đến ảnh bìa album
     String coverUrl; // Đường dẫn đến ảnh bìa album
-    String userId; // ID người tạo album
+    String accountId; // ID người tạo album
     int tracks; // Số lượng bài hát trong album
     List<Tag> tags; // Danh sách tag của album
     Date crateAt;

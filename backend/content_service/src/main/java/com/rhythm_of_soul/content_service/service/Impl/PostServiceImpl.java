@@ -6,7 +6,7 @@ import com.rhythm_of_soul.content_service.config.MinioConfig;
 import com.rhythm_of_soul.content_service.dto.ContentResponse;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
 import com.rhythm_of_soul.content_service.dto.response.*;
-import com.rhythm_of_soul.content_service.dto.resquest.PostRequest;
+import com.rhythm_of_soul.content_service.dto.request.PostRequest;
 import com.rhythm_of_soul.content_service.entity.Comment;
 import com.rhythm_of_soul.content_service.entity.Like;
 import com.rhythm_of_soul.content_service.entity.Post;
@@ -66,7 +66,7 @@ public class PostServiceImpl implements  PostService {
                 .build();
         Post post = Post.builder()
                 .id(UUID.randomUUID().toString())
-                .userId(user_id)
+                .accountId(user_id)
                 .createdAt(Instant.now())
                 .updatedAt(Instant.now())
                 .likeCount(0)
@@ -180,8 +180,8 @@ public class PostServiceImpl implements  PostService {
         return songsResponse;
     }
     @Override
-    public List<PostResponse> getPosts(String userId) {
-        List<Post> posts = postRepository.findAllByUserId(userId);
+    public List<PostResponse> getPosts(String accountId) {
+        List<Post> posts = postRepository.findAllByAccountId(accountId);
         List<PostResponse> postResponses = new ArrayList<>();
         for(Post post : posts){
             PostResponse postResponse = postMapper.toPostResponse(post);
@@ -224,8 +224,8 @@ public class PostServiceImpl implements  PostService {
     }
 
     @Override
-    public List<PostResponse> getSongs(String userId) {
-        List<Post> posts = postRepository.findAllByUserIdAndType(userId, Type.SONG);
+    public List<PostResponse> getSongs(String accountId) {
+        List<Post> posts = postRepository.findAllByAccountIdAndType(accountId, Type.SONG);
         List<PostResponse> postResponses = new ArrayList<>();
         for(Post post : posts){
             PostResponse postResponse = postMapper.toPostResponse(post);
@@ -243,8 +243,8 @@ public class PostServiceImpl implements  PostService {
     }
 
     @Override
-    public List<PostResponse> getPlaylists(String userId) {
-        List<Post> posts = postRepository.findAllByUserIdAndType(userId, Type.PLAYLIST);
+    public List<PostResponse> getPlaylists(String accountId) {
+        List<Post> posts = postRepository.findAllByAccountIdAndType(accountId, Type.PLAYLIST);
         List<PostResponse> postResponses = new ArrayList<>();
         for(Post post : posts){
             PostResponse postResponse = postMapper.toPostResponse(post);
@@ -263,8 +263,8 @@ public class PostServiceImpl implements  PostService {
     }
 
     @Override
-    public List<AlbumResponse> getAlbum(String userId) {
-        List<Post> posts = postRepository.findAllByUserIdAndType(userId, Type.ALBUM);
+    public List<AlbumResponse> getAlbum(String accountId) {
+        List<Post> posts = postRepository.findAllByAccountIdAndType(accountId, Type.ALBUM);
         List<AlbumResponse> albumResponses = new ArrayList<>();
         for(Post post : posts){
             AlbumResponse albumResponse = AlbumResponse.builder()
@@ -277,7 +277,7 @@ public class PostServiceImpl implements  PostService {
                     .updatedAt(post.getUpdatedAt() != null ? Date.from(post.getUpdatedAt()) : null)
                     .tags(post.getContent().getTags())
                     .isPublic(post.isPublic())
-                    .userId(post.getUserId())
+                    .accountId(post.getAccountId())
                     .viewCount(post.getViewCount())
                     .likeCount(post.getLikeCount())
                     .commentCount(post.getCommentCount())
@@ -293,7 +293,7 @@ public class PostServiceImpl implements  PostService {
         CommentManager manager = new CommentManager();
         for(Comment comment : comments){
             String parentId = comment.getParentId();
-            manager.addDepartment(comment.getId(), comment.getUserId(), parentId, comment.getContent(), Date.from(comment.getCreatedAt()));
+            manager.addDepartment(comment.getId(), comment.getAccountId(), parentId, comment.getContent(), comment.getCreatedAt(), comment.getUpdatedAt());
         }
 
         return manager.getAllDepartments();

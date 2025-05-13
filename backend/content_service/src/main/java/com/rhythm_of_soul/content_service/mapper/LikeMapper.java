@@ -9,7 +9,7 @@ public interface LikeMapper {
     default LikeResponse toLikeResponse(Like like) {
         return LikeResponse.builder()
                 .id(like.getId())
-                .userId(like.getUserId())
+                .accountId(like.getAccountId())
                 .build();
     }
 }

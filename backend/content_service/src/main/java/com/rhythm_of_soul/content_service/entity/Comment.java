@@ -19,9 +19,10 @@ public class Comment {
     @Id
     private String id;          // comment_id
     private String postId;      // ID bài gốc
-    private String userId;      // Người comment
+    private String accountId;      // Người comment
     private String content;     // Nội dung comment
     private String parentId;    // ID comment cha (nếu là reply)
     private Instant createdAt;
+    private Instant updatedAt;
 }
 
