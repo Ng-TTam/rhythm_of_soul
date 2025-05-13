@@ -15,4 +15,5 @@ public class SecurityConstants {
     public static final int TTL_TOKEN_RESET_CACHE = 5;
     public static final String STREAM_OTP_KEY = "otp";
     public static final String STREAM_BAN_KEY = "ban_user";
+    public static final String STREAM_FOLLOW_KEY = "follow";
 }

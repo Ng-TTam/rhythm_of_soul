@@ -91,6 +91,7 @@ public class OtpRedisStreamConsumer {
 
           otpService.sendResetPasswordOtp(otp.getEmail(), otp.getOtp());
           redisTemplate.opsForStream().acknowledge(streamKey, consumerGroup, message.getId());
+          redisTemplate.opsForStream().delete(streamKey, message.getId());
 
           log.info("✅ OTP message processed for {}", otp.getEmail());
         } else {

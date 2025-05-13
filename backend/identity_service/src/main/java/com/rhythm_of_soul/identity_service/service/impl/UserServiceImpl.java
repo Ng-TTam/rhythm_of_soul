@@ -171,8 +171,7 @@ public class UserServiceImpl implements UserService {
         if (searchKey == null || searchKey.trim().isEmpty()) {
             userPage = userRepository.findAll(pageRequest);
         } else {
-            userPage = userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
-                    searchKey, searchKey, pageRequest);
+            userPage = userRepository.searchByEmail(searchKey, pageRequest);
         }
 
         return PageResponse.<UserResponse>builder()

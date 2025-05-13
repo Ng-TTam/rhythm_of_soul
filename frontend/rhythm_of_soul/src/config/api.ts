@@ -22,9 +22,14 @@ interface ArtistEndpoints {
   //add endpoint
 }
 
-interface AdminEndpoints{
+interface AdminEndpoints {
   lock_user: (userId: string) => string;
   unlock_user: (userId: string) => string;
+}
+
+interface NotificationEndpoints {
+  getListNoti: (userId: string) => string;
+  markAllRead: (userId: string) => string;
 }
 
 interface ApiEndpoints {
@@ -32,6 +37,7 @@ interface ApiEndpoints {
   user: UserEndpoints;
   artist: ArtistEndpoints;
   admin: AdminEndpoints;
+  notification: NotificationEndpoints;
 }
 
 export const apiConfig = {
@@ -57,7 +63,12 @@ export const apiConfig = {
     admin: {
       lock_user: (userId: string) => `/identity/account/lock/${userId}`,
       unlock_user: (userId: string) => `/identity/account/unlock/${userId}`,
+    },
+    notification: {
+      getListNoti: (userId: string) => `http://localhost:8081/notification/listNoti?userId=${userId}`,
+      markAllRead: (userId: string) => `http://localhost:8081/notification/mark-all-read/${userId}`,
     }
+
   } as ApiEndpoints,
   timeout: config.timeout,
   headers: {

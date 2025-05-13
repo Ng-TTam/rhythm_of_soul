@@ -4,6 +4,7 @@ package com.rhythm_of_soul.notification_service.service.Impl;
 
 import com.rhythm_of_soul.notification_service.constant.NotiType;
 import com.rhythm_of_soul.notification_service.dto.request.BanUserRequest;
+import com.rhythm_of_soul.notification_service.dto.request.FollowRequest;
 import com.rhythm_of_soul.notification_service.dto.request.NewContentEvent;
 import com.rhythm_of_soul.notification_service.dto.response.NotificationResponse;
 import com.rhythm_of_soul.notification_service.entity.Notification;
@@ -174,6 +175,39 @@ public class NotificationServiceImpl implements NotificationService {
 
     NotificationResponse response = new NotificationResponse(total, notificationDataList);
     return new ResponseEntity<>(response, HttpStatus.OK);
+  }
+
+  @Override
+  public void handleFollowEvent(FollowRequest event) {
+
+    try {
+      String message = "%s vừa theo dõi bạn.".formatted(event.getFollowerName());
+
+      Notification notification = Notification.builder()
+              .recipientId(event.getFollowedId())
+              .senderId(event.getFollowerId())
+              .type(NotiType.FOLLOW)
+              .referenceId("")
+              .referenceType("FOLLOW")
+              .message(message)
+              .isRead(false)
+              .createdAt(LocalDateTime.now())
+              .build();
+
+      notificationRepository.save(notification);
+      NotificationPayload payload = new NotificationPayload(
+              message,
+              "",
+              notification.getId()
+      );
+
+      websocketService.sendNotification(event.getFollowedId(), payload);
+
+      log.info("Saved notification {}", event.getFollowerId());
+
+    } catch (Exception e) {
+      log.error("Failed: {}", e.getMessage());
+    }
   }
 
 

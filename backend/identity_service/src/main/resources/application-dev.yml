@@ -38,3 +38,5 @@ jwt:
   valid-duration: 3600 # in seconds
   refreshable-duration: 36000 # in seconds
 
+aes:
+  secret-key: Unl0aE1vRnNPdUwxMkAqNw==

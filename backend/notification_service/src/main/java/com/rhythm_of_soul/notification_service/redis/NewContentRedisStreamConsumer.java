@@ -87,6 +87,7 @@ public class NewContentRedisStreamConsumer {
 
           notificationService.handleNewContentEvent(event);
           redisTemplate.opsForStream().acknowledge(streamKey, consumerGroup, message.getId());
+          redisTemplate.opsForStream().delete(streamKey, message.getId());
 
           log.info("✅ Processed NewContentEvent");
         }

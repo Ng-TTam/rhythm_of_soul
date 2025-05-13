@@ -2,7 +2,7 @@ package com.rhythm_of_soul.notification_service.redis;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rhythm_of_soul.notification_service.dto.request.BanUserRequest;
+import com.rhythm_of_soul.notification_service.dto.request.FollowRequest;
 import com.rhythm_of_soul.notification_service.service.NotificationService;
 import com.rhythm_of_soul.notification_service.util.AESUtil;
 import jakarta.annotation.PostConstruct;
@@ -22,23 +22,23 @@ import java.util.Map;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class BanRedisStreamConsumer {
-
+public class FollowStreamConsumer {
   private final RedisTemplate<String, String> redisTemplate;
   private final NotificationService notificationService;
   private final ObjectMapper objectMapper;
 
-  @Value("${redis.stream.ban.key}")
+  @Value("${redis.stream.follow.key}")
   private String streamKey;
 
-  @Value("${redis.stream.ban.group}")
+  @Value("${redis.stream.follow.group}")
   private String consumerGroup;
+
+  private final String consumerName = "follow-consumer";
+
+  private SecretKey secretKey;
 
   @Value("${aes.secret-key}")
   private String base64SecretKey;
-
-  private SecretKey secretKey;
-  private final String consumerName = "ban-user-consumer";
 
   @PostConstruct
   public void init() {
@@ -51,7 +51,7 @@ public class BanRedisStreamConsumer {
       redisTemplate.opsForStream().createGroup(streamKey, consumerGroup);
       log.info("✅ Consumer group '{}' created for stream '{}'", consumerGroup, streamKey);
     } catch (Exception e) {
-      log.warn("⚠️ Consumer group '{}' already exists", consumerGroup);
+      log.warn("⚠️ Consumer group '{}' already exists for stream '{}'", consumerGroup, streamKey);
     }
   }
 
@@ -76,31 +76,34 @@ public class BanRedisStreamConsumer {
       try {
         Object encryptedObject = message.getValue().get("message");
 
-        if (encryptedObject instanceof String encrypted){
+        // 🔥 Kiểm tra kiểu dữ liệu trước khi giải mã
+        if (encryptedObject instanceof String encrypted) {
           log.info("🔑 Received encrypted message: {}", encrypted);
 
+          // ✅ Giải mã trước khi xử lý
           String decrypted = AESUtil.decrypt(encrypted, secretKey);
           log.info("✅ Decrypted message: {}", decrypted);
 
+          // ✅ Bây giờ dữ liệu là JSON, có thể parse được
           Map<String, Object> data = objectMapper.readValue(decrypted, new TypeReference<>() {});
-          String contentType = (String) data.get("contentType");
+          FollowRequest request = objectMapper.convertValue(data, FollowRequest.class);
 
-          if ("BAN_USER".equalsIgnoreCase(contentType)) {
-            BanUserRequest request = objectMapper.convertValue(data, BanUserRequest.class);
-            notificationService.sendBanNotification(request);
-            redisTemplate.opsForStream().acknowledge(streamKey, consumerGroup, message.getId());
-            redisTemplate.opsForStream().delete(streamKey, message.getId());
-
-            log.info("✅ Processed BanUserRequest for {}", request.getUserId());
-          }
+          notificationService.handleFollowEvent(request);
+          redisTemplate.opsForStream().acknowledge(streamKey, consumerGroup, message.getId());
+          redisTemplate.opsForStream().delete(streamKey, message.getId());
+          log.info("✅ Handle follow event successfully");
+        } else {
+          log.warn("⚠️ Unexpected data format: {}", encryptedObject);
         }
       } catch (Exception e) {
-        log.warn("🔥 Failed to process BAN_USER message: {}", message, e);
+        log.error("🔥 Failed to process Follow message: {}", message, e);
       }
     }
   }
 
+
   private void handleProcessingError(Exception e) {
-    log.error("❌ Error while processing BanUser Redis Stream messages: ", e);
+    log.error("❌ Error while processing Redis Stream OTP messages: ", e);
   }
+
 }
