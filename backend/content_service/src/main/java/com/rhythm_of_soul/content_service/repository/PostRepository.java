@@ -11,5 +11,10 @@ public interface PostRepository extends MongoRepository<Post, String> {
     List<Post> findAllByAccountId(String accountId);
     List<Post> findAllByAccountIdAndType(String accountId, Type type);
 
+//    @Query("{ $or: [ " +
+//            "{ type: 'TEXT', 'caption': { $regex: ?0, $options: 'i' }, type: { $in: ?1 } }, " +
+//            "{ type: { $in: ['SONG', 'ALBUM', 'PLAYLIST'] }, 'content.title': { $regex: ?0, $options: 'i' }, type: { $in: ?1 } } " +
+//            "] }")
+//    Page<Post> findAllByKeyword(String keyword, List<String> types, Pageable pageable);
 }
 

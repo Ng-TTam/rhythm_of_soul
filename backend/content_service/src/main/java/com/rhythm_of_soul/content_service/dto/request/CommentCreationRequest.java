@@ -1,5 +1,6 @@
 package com.rhythm_of_soul.content_service.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Getter
@@ -8,7 +9,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommentCreationRequest {
+    @NotBlank
     private String postId;
+
+    @NotBlank
     private String content;
     private String parentId;
 }

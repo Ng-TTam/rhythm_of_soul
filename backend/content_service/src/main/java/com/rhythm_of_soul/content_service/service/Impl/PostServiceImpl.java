@@ -4,7 +4,6 @@ import com.rhythm_of_soul.content_service.common.Tag;
 import com.rhythm_of_soul.content_service.common.Type;
 import com.rhythm_of_soul.content_service.config.MinioConfig;
 import com.rhythm_of_soul.content_service.dto.ContentResponse;
-import com.rhythm_of_soul.content_service.dto.PostIdProjection;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
 import com.rhythm_of_soul.content_service.dto.request.PostRequest;
 import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
@@ -29,7 +28,15 @@ import io.minio.errors.*;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,9 +63,10 @@ public class PostServiceImpl implements  PostService {
     LikeMapper likeMapper;
     SaveFileMinio saveFileMinio;
     MinioConfig minioConfig;
+    MongoTemplate mongoTemplate;
 
     @Override
-    public PostResponse storeFile(MultipartFile song, MultipartFile cover , MultipartFile image, String user_id, List<Tag> tags, String title,String caption,String isPublic) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public PostResponse storeFile(MultipartFile song, MultipartFile cover , MultipartFile image, String account_id, List<Tag> tags, String title,String caption,String isPublic) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         String songUrl = saveFileMinio.saveFile(song, minioConfig.getSongsBucket());
         String coverUrl = saveFileMinio.saveFile(cover, minioConfig.getCoversBucket());
         String imageUrl = saveFileMinio.saveFile(image, minioConfig.getImagesBucket());
@@ -71,7 +79,7 @@ public class PostServiceImpl implements  PostService {
                 .build();
         Post post = Post.builder()
                 .id(UUID.randomUUID().toString())
-                .accountId(user_id)
+                .accountId(account_id)
                 .createdAt(Instant.now())
                 .updatedAt(Instant.now())
                 .likeCount(0)
@@ -93,7 +101,7 @@ public class PostServiceImpl implements  PostService {
 
     @Override
     @Transactional
-    public PostResponse createPost(PostRequest postRequest) {
+    public PostResponse createPost(String accountId, PostRequest postRequest) {
         try{
             Post post = postMapper.toPost(postRequest);
             switch (postRequest.getType()){
@@ -125,8 +133,7 @@ public class PostServiceImpl implements  PostService {
 
             }
             // set accountId using accountId in token
-//            post.setAccountId(SecurityContextHolder.getContext().getAuthentication().getName());
-            post.setAccountId("326e6645-aa0f-4f89-b885-019c05b1a970");
+            post.setAccountId(accountId);
 
             postRepository.save(post);
             PostResponse postResponse = postMapper.toPostResponse(post);
@@ -146,8 +153,6 @@ public class PostServiceImpl implements  PostService {
             log.error("Error while creating post", e);
             throw new RuntimeException("Error while creating post", e);
         }
-
-
 
     }
 
@@ -177,7 +182,7 @@ public class PostServiceImpl implements  PostService {
     private List<SongResponse> getSongs(List<String> songIds) {
         List<SongResponse> songsResponse = new ArrayList<>();
         for(String songId : songIds){
-            Post songPost = postRepository.findById(songId).orElseThrow(() -> new RuntimeException("Song not found"));
+            Post songPost = postRepository.findById(songId).orElseThrow(() -> new AppException(ErrorCode.SONG_NOT_FOUND));
             songsResponse.add(SongResponse.builder()
                     .songId(songPost.getId())
                     .title(songPost.getContent().getTitle())
@@ -192,53 +197,18 @@ public class PostServiceImpl implements  PostService {
     @Override
     public List<PostResponse> getPosts(String accountId) {
         List<Post> posts = postRepository.findAllByAccountId(accountId);
-        if (posts.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        // Lấy danh sách postId để kiểm tra trạng thái like
-        List<String> postIds = posts.stream()
-                .map(Post::getId)
-                .collect(Collectors.toList());
-
-        // Truy vấn danh sách postId đã được like bởi accountId
-        List<PostIdProjection> likedPostIdProjections = likeRepository.findLikedPostIdsByAccountIdAndPostIds(accountId, postIds);
-        Set<String> likedPostIdSet = likedPostIdProjections.stream()
-                .map(PostIdProjection::getPostId)
-                .collect(Collectors.toSet());
-
-        List<PostResponse> postResponses = new ArrayList<>();
-        for(Post post : posts){
-            PostResponse postResponse = postMapper.toPostResponse(post);
-
-            boolean liked = likedPostIdSet.contains(post.getId());
-            postResponse.set_liked(liked);
-
-            if(post.getContent() != null){
-                ContentResponse content = postResponse.getContent();
-                if(post.getContent().getImageUrl() != null) content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
-                if(post.getContent().getCoverUrl() != null)  content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
-                postResponse.setContent(content);
-                if(post.getType() == Type.ALBUM || post.getType() == Type.PLAYLIST){
-                    postResponse.getContent().setSongIds(getSongs(post.getContent().getSongIds()));
-                }
-            }
-
-            postResponses.add(postResponse);
-
-        }
-        return postResponses;
+        return processPosts(posts, accountId);
     }
 
     @Override
-    public PostDetailResponse getPost(String postId) {
+    public PostDetailResponse getPost(String accountId, String postId) {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new AppException(ErrorCode.POST_NOT_FOUND));
         PostResponse postResponse = postMapper.toPostResponse(post);
 
-        // set liked of accountId decode from token
-        postResponse.set_liked(likeRepository.existsByAccountIdAndPostId("326e6645-aa0f-4f89-b885-019c05b1a970", postId));
-//                SecurityContextHolder.getContext().getAuthentication().getName(), postId));
+        // set liked of accountId
+        if(accountId != null)
+            postResponse.set_liked(likeRepository.existsByAccountIdAndPostId(accountId, postId));
 
         if(post.getContent() != null){
             ContentResponse content = postResponse.getContent();
@@ -322,6 +292,139 @@ public class PostServiceImpl implements  PostService {
         }
         return albumResponses;
     }
+
+    @Override
+    public List<PostResponse> searchPosts(String accountId, String keyword, String tag, Type type, int page, int size) {
+        // Chuẩn hóa tham số
+        String normalizedKeyword = keyword != null ? keyword.trim().replaceAll("[^a-zA-Z0-9\\s]", "") : null;
+        String normalizedTag = tag != null ? tag.trim().toLowerCase() : null;
+
+        if (page < 0 || size <= 0) {
+            return Collections.emptyList();
+        }
+        long skip = (long) page * size;
+
+        Query query = new Query();
+        List<Criteria> criteriaList = new ArrayList<>();
+
+        if (type != null) {
+            criteriaList.add(Criteria.where("type").is(type));
+        }
+
+        // Điều kiện keyword
+        if (normalizedKeyword != null && !normalizedKeyword.isEmpty()) {
+            List<Criteria> keywordCriteria = new ArrayList<>();
+            if (type == null || type == Type.TEXT) {
+                keywordCriteria.add(Criteria.where("type").is(Type.TEXT)
+                        .and("caption").regex(normalizedKeyword, "i"));
+            }
+            if (type == null || List.of(Type.SONG, Type.ALBUM, Type.PLAYLIST).contains(type)) {
+                keywordCriteria.add(Criteria.where("type").in(Type.SONG, Type.ALBUM, Type.PLAYLIST)
+                        .and("content.title").regex(normalizedKeyword, "i"));
+            }
+            if (!keywordCriteria.isEmpty()) {
+                criteriaList.add(new Criteria().orOperator(keywordCriteria));
+            }
+        }
+
+        if (normalizedTag != null && !normalizedTag.isEmpty()) {
+            criteriaList.add(Criteria.where("content.tags").in(normalizedTag));
+        }
+
+        if (!criteriaList.isEmpty()) {
+            query.addCriteria(new Criteria().andOperator(criteriaList));
+        }
+
+        query.skip(skip).limit(size);
+        List<Post> posts = mongoTemplate.find(query, Post.class);
+
+        return processPosts(posts, accountId);
+    }
+
+    public List<PostResponse> processPosts(List<Post> posts, String accountId) {
+        if (posts.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<PostResponse> postResponses = new ArrayList<>();
+
+        // Chỉ kiểm tra trạng thái like nếu accountId không null
+        Set<String> likedPostIdSet = new HashSet<>();
+        if (accountId != null) {
+            List<String> postIds = posts.stream()
+                    .map(Post::getId)
+                    .collect(Collectors.toList());
+
+            List<LikeRepository.PostIdProjection> likedPostIdProjections = likeRepository.findLikedPostIdsByAccountIdAndPostIds(accountId, postIds);
+            likedPostIdSet = likedPostIdProjections.stream()
+                    .map(LikeRepository.PostIdProjection::getPostId)
+                    .collect(Collectors.toSet());
+        }
+
+        for (Post post : posts) {
+            PostResponse postResponse = postMapper.toPostResponse(post);
+            // Đặt isLiked = false nếu accountId null, ngược lại kiểm tra likedPostIdSet
+            postResponse.set_liked(accountId != null && likedPostIdSet.contains(post.getId()));
+
+            if (post.getContent() != null) {
+                ContentResponse content = postResponse.getContent();
+                if (post.getContent().getImageUrl() != null) {
+                    content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
+                }
+                if (post.getContent().getCoverUrl() != null) {
+                    content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
+                }
+                postResponse.setContent(content);
+                if (post.getType() == Type.ALBUM || post.getType() == Type.PLAYLIST) {
+                    postResponse.getContent().setSongIds(getSongs(post.getContent().getSongIds()));
+                }
+            }
+
+            postResponses.add(postResponse);
+        }
+
+        return postResponses;
+    }
+
+//    public Page<Post> searchPostsWithAggregation(String keyword, String tag, Type type, Pageable pageable) {
+//        List<AggregationOperation> operations = new ArrayList<>();
+//
+//        List<Criteria> criteriaList = new ArrayList<>();
+//        if (type != null) {
+//            criteriaList.add(Criteria.where("type").is(type));
+//        }
+//        if (keyword != null && !keyword.isEmpty()) {
+//            String normalizedKeyword = keyword.trim().replaceAll("[^a-zA-Z0-9\\s]", "");
+//            List<Criteria> keywordCriteria = new ArrayList<>();
+//            if (type == null || type == Type.TEXT) {
+//                keywordCriteria.add(Criteria.where("type").is(Type.TEXT)
+//                        .and("content.caption").regex(normalizedKeyword, "i"));
+//            }
+//            if (type == null || List.of(Type.SONG, Type.ALBUM, Type.PLAYLIST).contains(type)) {
+//                keywordCriteria.add(Criteria.where("type").in(Type.SONG, Type.ALBUM, Type.PLAYLIST)
+//                        .and("content.title").regex(normalizedKeyword, "i"));
+//            }
+//            if (!keywordCriteria.isEmpty()) {
+//                criteriaList.add(new Criteria().orOperator(keywordCriteria));
+//            }
+//        }
+//        if (tag != null && !tag.isEmpty()) {
+//            criteriaList.add(Criteria.where("content.tags").in(tag.trim().toLowerCase()));
+//        }
+//
+//        if (!criteriaList.isEmpty()) {
+//            operations.add(Aggregation.match(new Criteria().andOperator(criteriaList)));
+//        }
+//
+//        operations.add(Aggregation.skip(pageable.getOffset()));
+//        operations.add(Aggregation.limit(pageable.getPageSize()));
+//
+//        Aggregation aggregation = Aggregation.newAggregation(operations);
+//        AggregationResults<Post> results = mongoTemplate.aggregate(aggregation, Post.class, Post.class);
+//
+//        long total = mongoTemplate.count(new Query(criteriaList.isEmpty() ? new Criteria() : new Criteria().andOperator(criteriaList)), Post.class);
+//        return new PageImpl<>(results.getMappedResults(), pageable, total);
+//    }
 
     private List<CommentResponse> getComments(String postId) {
         List<Comment> comments = commentRepository.findAllByPostId(postId);

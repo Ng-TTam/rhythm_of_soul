@@ -6,12 +6,13 @@ import com.rhythm_of_soul.content_service.entity.Post;
 import com.rhythm_of_soul.content_service.repository.PostRepository;
 import com.rhythm_of_soul.content_service.service.AudioStreamService;
 import com.rhythm_of_soul.content_service.utils.SaveFileMinio;
-import io.minio.*;
-import io.minio.http.Method;
+import io.minio.GetObjectArgs;
+import io.minio.MinioClient;
+import io.minio.StatObjectArgs;
+import io.minio.StatObjectResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRange;
@@ -22,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor

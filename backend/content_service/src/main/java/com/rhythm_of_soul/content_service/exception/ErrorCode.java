@@ -13,6 +13,7 @@ public enum ErrorCode {
 
     // 5xxx - post error code
     POST_NOT_FOUND(5000, "Post not found", HttpStatus.NOT_FOUND),
+    SONG_NOT_FOUND(5001, "Song not found", HttpStatus.NOT_FOUND),
 
     // 6xxx - comment error code
     COMMENT_NOT_FOUND(6001, "Comment not found", HttpStatus.NOT_FOUND),

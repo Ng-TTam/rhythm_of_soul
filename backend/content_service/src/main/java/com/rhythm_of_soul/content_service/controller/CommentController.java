@@ -5,6 +5,7 @@ import com.rhythm_of_soul.content_service.dto.request.CommentCreationRequest;
 import com.rhythm_of_soul.content_service.dto.request.CommentUpdateRequest;
 import com.rhythm_of_soul.content_service.dto.response.CommentResponse;
 import com.rhythm_of_soul.content_service.service.CommentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public ApiResponse<CommentResponse> createComment(@RequestBody CommentCreationRequest commentCreationRequest) {
+    public ApiResponse<CommentResponse> createComment(@Valid @RequestBody CommentCreationRequest commentCreationRequest) {
         return ApiResponse.<CommentResponse>builder()
                 .result(commentService.createComment(commentCreationRequest))
                 .build();
@@ -46,7 +47,7 @@ public class CommentController {
     @PutMapping("/{commentId}") //using token to check permission update
     public ApiResponse<CommentResponse> updateComment(
             @PathVariable String commentId,
-            @RequestBody CommentUpdateRequest request) {
+            @Valid @RequestBody CommentUpdateRequest request) {
         return ApiResponse.<CommentResponse>builder()
                 .message("Comment updated")
                 .result(commentService.updateComment(commentId, request))

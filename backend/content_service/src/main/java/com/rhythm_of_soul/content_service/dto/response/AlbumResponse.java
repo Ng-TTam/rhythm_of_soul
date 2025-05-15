@@ -21,8 +21,8 @@ public class AlbumResponse {
     String accountId; // ID người tạo album
     int tracks; // Số lượng bài hát trong album
     List<Tag> tags; // Danh sách tag của album
-    Instant createdAt;
-    Boolean isPublic; // Thời gian phát hành album
+    Instant createdAt; // Thời gian phát hành album
+    Boolean isPublic;
     Instant updatedAt; // Thời gian cập nhật album
     Instant scheduledAt; // Thời gian phát hành album
     int viewCount; // Số lượt xem album

@@ -1,7 +1,8 @@
 package com.rhythm_of_soul.content_service.repository;
 
-import com.rhythm_of_soul.content_service.dto.PostIdProjection;
 import com.rhythm_of_soul.content_service.entity.Like;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -11,7 +12,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LikeRepository extends MongoRepository<Like, String> {
+    @Getter
+    @Setter
+    class PostIdProjection {
+        private String postId;
+    }
+
     List<Like> findAllByPostId(String postId);
+
     Optional<Like> findByAccountIdAndPostId(String accountId, String postId);
 
     @Query(value = "{ 'accountId': ?0, 'postId': { $in: ?1 } }", fields = "{ 'postId': 1, '_id': 0 }")

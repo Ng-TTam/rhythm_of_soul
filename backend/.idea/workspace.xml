@@ -5,16 +5,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e2d90fc8-97dc-4ce7-9f67-c2e934e6f05b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/PostIdProjection.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/PostResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/PostResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/CommentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/CommentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/PostController.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/PostController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/request/CommentCreationRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/request/CommentCreationRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/request/CommentUpdateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/request/CommentUpdateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/request/ContentRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/request/ContentRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/request/PostRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/request/PostRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/response/AlbumResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/response/AlbumResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/mapper/PostMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/mapper/PostMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/entity/Comment.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/entity/Comment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/entity/Like.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/entity/Like.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/entity/ListeningHistory.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/entity/ListeningHistory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/exception/ErrorCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/exception/ErrorCode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/exception/validator/PostRequestValidator.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/exception/validator/PostRequestValidator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/exception/validator/ValidPostRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/exception/validator/ValidPostRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/repository/LikeRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/repository/LikeRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/repository/ListeningHistoryRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/repository/ListeningHistoryRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/repository/PostRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/repository/PostRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/AudioStreamServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/AudioStreamServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/ListeningHistoryServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/ListeningHistoryServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/PostServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/PostServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/ListeningHistoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/ListeningHistoryService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/PostService.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/PostService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -51,6 +63,9 @@
       </MavenGeneralSettings>
     </option>
   </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2
 }</component>
@@ -62,45 +77,45 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
-    "Maven.content_service [clean].executor": "Run",
-    "Maven.identity_service [clean].executor": "Run",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Spring Boot.ApiGatewayApplication.executor": "Run",
-    "Spring Boot.ContentServiceApplication.executor": "Debug",
-    "Spring Boot.IdentityServiceApplication.executor": "Run",
-    "git-widget-placeholder": "content",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/phong/Documents/GitHub/rhythm_of_soul/backend",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "run.configurations.included.in.services": "true",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "settings.editor.splitter.proportion": "0.27624872",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;Maven.content_service [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.identity_service [clean].executor&quot;: &quot;Run&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Spring Boot.ApiGatewayApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.ContentServiceApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.IdentityServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;content&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/phong/Documents/GitHub/rhythm_of_soul/backend&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;settings.editor.splitter.proportion&quot;: &quot;0.27624872&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mariadb"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mariadb&quot;
     ],
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "PLAIN_TEXT"
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;PLAIN_TEXT&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\RhythmOfSoul\backend\content_service\src\main\java\com\rhythm_of_soul" />
@@ -269,7 +284,13 @@
       <workItem from="1746975890127" duration="4986000" />
       <workItem from="1747012928369" duration="2348000" />
       <workItem from="1747096263015" duration="9000000" />
-      <workItem from="1747109694155" duration="12057000" />
+      <workItem from="1747109694155" duration="12236000" />
+      <workItem from="1747134708764" duration="2875000" />
+      <workItem from="1747147497995" duration="3309000" />
+      <workItem from="1747182223597" duration="7925000" />
+      <workItem from="1747191616323" duration="11583000" />
+      <workItem from="1747229237557" duration="6914000" />
+      <workItem from="1747270933793" duration="1379000" />
     </task>
     <servers />
   </component>
