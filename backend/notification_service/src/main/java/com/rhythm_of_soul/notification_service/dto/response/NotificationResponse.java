@@ -2,6 +2,7 @@ package com.rhythm_of_soul.notification_service.dto.response;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -18,5 +19,6 @@ public class NotificationResponse {
     private String id;
     private String message; // Nội dung thông báo
     private String referenceId; // link noti
+    private LocalDateTime createdAt;
   }
 }

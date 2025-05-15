@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { setUserSlice } from "../reducers/userReducer";
 import { Collapse } from "bootstrap";
 import Notification from "./Notification";
+import SearchBox from "./SearchBox";
 
 export default function Nav() {
   const location = useLocation();
@@ -138,74 +139,7 @@ export default function Nav() {
             </div>
             <div className="collapse navbar-collapse" id="navbarSupportedContent" ref={collapseRef}>
               <div className="search-box d-xl-block d-none">
-                <div className="dropdown">
-                  <div className="search-box-drop" id="search-box-drop" data-bs-toggle="dropdown">
-                    <div className="d-flex align-items-center justify-content-between gap-2">
-                      <div className="search-box-inner">
-                        <button type="submit" className="search-box-drop-submit">
-                          <svg fill="none" xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
-                            <circle cx="11.7669" cy="11.7666" r="8.98856" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M18.0186 18.4851L21.5426 22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        </button>
-                        <input type="text" placeholder="Search Here..." />
-                      </div>
-                      <div className="flex-shrink-0 search-box-btn">
-                        <a className="btn  text-capitalize">clt + k</a>
-                      </div>
-                    </div>
-                  </div>
-                  <ul className="p-0 sub-drop dropdown-menu dropdown-menu-end" aria-labelledby="search-drop">
-                    <li className="">
-                      <div className="p-0 card-body all-notification">
-                        <div className="d-flex align-items-center border-bottom search-hover py-2 px-3">
-                          <div className="flex-shrink-0">
-                            <img src="../assets/images/dashboard/64.jpg" className="align-self-center img-fluid avatar-50 rounded-pill" alt="#" />
-                          </div>
-                          <div className="d-flex flex-column ms-3 w-100">
-                            <a href="javascript:void(0);" className="h5">
-                              Paige Turner
-                            </a>
-                            <span>Paige001</span>
-                          </div>
-                        </div>
-                        <div className="d-flex align-items-center border-bottom search-hover py-2 px-3">
-                          <div className="flex-shrink-0">
-                            <img src="../assets/images/dashboard/02.png" className="align-self-center img-fluid avatar-50 rounded-pill" alt="#" />
-                          </div>
-                          <div className="d-flex flex-column ms-3 w-100">
-                            <a href="javascript:void(0);" className="h5">
-                              Monty Carlo
-                            </a>
-                            <span>Carlo.m</span>
-                          </div>
-                        </div>
-                        <div className="d-flex align-items-center search-hover py-2 px-3 border-bottom">
-                          <div className="flex-shrink-0">
-                            <img src="../assets/images/dashboard/03.png" className="align-self-center img-fluid avatar-50 rounded-pill" alt="#" />
-                          </div>
-                          <div className="d-flex flex-column ms-3 w-100">
-                            <a href="javascript:void(0);" className="h5">
-                              Paul Molive
-                            </a>
-                            <span>Paul.45</span>
-                          </div>
-                        </div>
-                        <div className="d-flex align-items-center border-bottom search-hover py-2 px-3">
-                          <div className="flex-shrink-0">
-                            <img src="../assets/images/dashboard/04.png" className="align-self-center img-fluid avatar-50 rounded-pill" alt="#" />
-                          </div>
-                          <div className="d-flex flex-column ms-3 w-100">
-                            <a href="javascript:void(0);" className="h5">
-                              Monty Carlo
-                            </a>
-                            <span>Carlo.m</span>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
+                <SearchBox />
               </div>
               <ul className="mb-2 navbar-nav ms-auto align-items-center navbar-list mb-lg-0">
                 <li className="nav-item dropdown d-xl-none d-block">

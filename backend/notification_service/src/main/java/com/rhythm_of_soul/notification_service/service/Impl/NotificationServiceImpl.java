@@ -3,9 +3,7 @@ package com.rhythm_of_soul.notification_service.service.Impl;
 
 
 import com.rhythm_of_soul.notification_service.constant.NotiType;
-import com.rhythm_of_soul.notification_service.dto.request.BanUserRequest;
-import com.rhythm_of_soul.notification_service.dto.request.FollowRequest;
-import com.rhythm_of_soul.notification_service.dto.request.NewContentEvent;
+import com.rhythm_of_soul.notification_service.dto.request.*;
 import com.rhythm_of_soul.notification_service.dto.response.NotificationResponse;
 import com.rhythm_of_soul.notification_service.entity.Notification;
 import com.rhythm_of_soul.notification_service.payload.NotificationPayload;
@@ -96,9 +94,10 @@ public class NotificationServiceImpl implements NotificationService {
 
       notificationRepository.save(notification);
       NotificationPayload payload = new NotificationPayload(
+              notification.getId(),
               message,
-              event.getReferenceId(),
-              notification.getId()
+              notification.getReferenceId(),
+              notification.getCreatedAt()
       );
 
       websocketService.sendNotification(event.getFollowerId(), payload);
@@ -113,7 +112,7 @@ public class NotificationServiceImpl implements NotificationService {
   @Override
   public ResponseEntity<NotificationResponse> getNotificationList(String userId) {
     try {
-      List<String> allowedTypes = List.of("NEW_POST", "NEW_SONG");
+      List<String> allowedTypes = List.of("NEW_POST", "NEW_SONG", "FOLLOW", "LIKE", "COMMENT");
 
       List<Notification> notifications = notificationRepository
               .findByRecipientIdAndIsReadFalseAndTypeIn(userId, allowedTypes);
@@ -127,7 +126,8 @@ public class NotificationServiceImpl implements NotificationService {
               .map(notification -> new NotificationResponse.NotificationData(
                       notification.getId(),
                       notification.getMessage(),
-                      notification.getReferenceId()))
+                      notification.getReferenceId(),
+                      notification.getCreatedAt()))
               .collect(Collectors.toList());
 
       NotificationResponse response = new NotificationResponse(total, notificationDataList);
@@ -141,10 +141,9 @@ public class NotificationServiceImpl implements NotificationService {
 
 
   @Override
-//    @Transactional
   public void markAllAsRead(String userId) {
     try {
-      List<String> allowedTypes = List.of("NEW_POST", "NEW_SONG");
+      List<String> allowedTypes = List.of("NEW_POST", "NEW_SONG", "FOLLOW", "LIKE", "COMMENT");
       List<Notification> notifications = notificationRepository.findByRecipientIdAndIsReadFalseAndTypeIn(userId, allowedTypes);
       for (Notification notification : notifications) {
         notification.setRead(true);
@@ -157,8 +156,12 @@ public class NotificationServiceImpl implements NotificationService {
   }
 
   @Override
-  public ResponseEntity<NotificationResponse> getTop5LatestNotifications(String userId) {
-    List<Notification> notifications = notificationRepository.findTop5ByRecipientIdOrderByCreatedAtDesc(userId);
+  public ResponseEntity<NotificationResponse> getLatestNotifications(String userId, int x) {
+    LocalDateTime fromDate = LocalDateTime.now().minusDays(x);
+
+    // Lấy tất cả thông báo đã đọc trong vòng x ngày
+    List<Notification> notifications = notificationRepository
+            .findByRecipientIdAndIsReadTrueAndCreatedAtAfterOrderByCreatedAtDesc(userId, fromDate);
 
     if (notifications.isEmpty()) {
       return new ResponseEntity<>(new NotificationResponse(0, List.of()), HttpStatus.OK);
@@ -169,13 +172,15 @@ public class NotificationServiceImpl implements NotificationService {
             .map(notification -> new NotificationResponse.NotificationData(
                     notification.getId(),
                     notification.getMessage(),
-                    notification.getReferenceId()
+                    notification.getReferenceId(),
+                    notification.getCreatedAt()
             ))
             .collect(Collectors.toList());
 
     NotificationResponse response = new NotificationResponse(total, notificationDataList);
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
+
 
   @Override
   public void handleFollowEvent(FollowRequest event) {
@@ -196,9 +201,10 @@ public class NotificationServiceImpl implements NotificationService {
 
       notificationRepository.save(notification);
       NotificationPayload payload = new NotificationPayload(
+              notification.getId(),
               message,
-              "",
-              notification.getId()
+              notification.getReferenceId(),
+              notification.getCreatedAt()
       );
 
       websocketService.sendNotification(event.getFollowedId(), payload);
@@ -207,6 +213,86 @@ public class NotificationServiceImpl implements NotificationService {
 
     } catch (Exception e) {
       log.error("Failed: {}", e.getMessage());
+    }
+  }
+
+  @Override
+  public void handleComment(LikeCommentRequest request) {
+    try {
+
+      // Tùy chọn: bỏ qua nếu người dùng tự cmt bài viết của mình
+      if (request.getAuthorId().equals(request.getPostAuthorId())) {
+        log.info("User comment their own post, no notification sent.");
+        return;
+      }
+      String message = "%s đã bình luận về bài viết của bạn.".formatted(request.getAuthorName());
+
+      Notification notification = Notification.builder()
+              .recipientId(request.getPostAuthorId())   // Người nhận là chủ bài viết
+              .senderId(request.getAuthorId())         // Người gửi là người bình luận
+              .type(NotiType.COMMENT)
+              .referenceId(request.getReferenceId())   // ID của bài viết hoặc comment
+              .referenceType("COMMENT")
+              .message(message)
+              .isRead(false)
+              .createdAt(LocalDateTime.now())
+              .build();
+
+      notificationRepository.save(notification);
+
+      NotificationPayload payload = new NotificationPayload(
+              notification.getId(),
+              message,
+              notification.getReferenceId(),
+              notification.getCreatedAt()
+      );
+
+      websocketService.sendNotification(request.getPostAuthorId(), payload);
+
+      log.info("Saved comment notification for post author {}", request.getPostAuthorId());
+
+    } catch (Exception e) {
+      log.error("Failed to send comment notification: {}", e.getMessage());
+    }
+  }
+
+  @Override
+  public void handleLike(LikeCommentRequest request) {
+    try {
+      // Tùy chọn: bỏ qua nếu người dùng tự like bài viết của mình
+      if (request.getAuthorId().equals(request.getPostAuthorId())) {
+        log.info("User liked their own post, no notification sent.");
+        return;
+      }
+
+      String message = "%s đã thích bài viết của bạn.".formatted(request.getAuthorName());
+
+      Notification notification = Notification.builder()
+              .recipientId(request.getPostAuthorId())   // Người nhận là chủ bài viết
+              .senderId(request.getAuthorId())         // Người gửi là người like
+              .type(NotiType.LIKE)
+              .referenceId(request.getReferenceId())   // ID bài viết
+              .referenceType("LIKE")
+              .message(message)
+              .isRead(false)
+              .createdAt(LocalDateTime.now())
+              .build();
+
+      notificationRepository.save(notification);
+
+      NotificationPayload payload = new NotificationPayload(
+              notification.getId(),
+              message,
+              notification.getReferenceId(),
+              notification.getCreatedAt()
+      );
+
+      websocketService.sendNotification(request.getPostAuthorId(), payload);
+
+      log.info("Saved like notification for post author {}", request.getPostAuthorId());
+
+    } catch (Exception e) {
+      log.error("Failed to send like notification: {}", e.getMessage());
     }
   }
 

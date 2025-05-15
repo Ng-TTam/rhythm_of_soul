@@ -11,6 +11,10 @@ class NotificationService {
   async markAllAsRead(userId: string) {
     return await axios.put(apiConfig.endpoints.notification.markAllRead(userId));
   }
+  async getLatestNotifications(userId: string, days: number = 7) {
+    const res = await axios.get(apiConfig.endpoints.notification.getLatestNoti(userId, days));
+    return res.data;
+  }
 }
 
 const notificationServiceInstance = new NotificationService();

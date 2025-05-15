@@ -2,7 +2,7 @@ package com.rhythm_of_soul.notification_service.redis;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rhythm_of_soul.notification_service.dto.request.FollowRequest;
+import com.rhythm_of_soul.notification_service.dto.request.LikeCommentRequest;
 import com.rhythm_of_soul.notification_service.service.NotificationService;
 import com.rhythm_of_soul.notification_service.util.AESUtil;
 import jakarta.annotation.PostConstruct;
@@ -22,18 +22,18 @@ import java.util.Map;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class FollowStreamConsumer {
+public class LikeCommentConsumer {
   private final RedisTemplate<String, String> redisTemplate;
   private final NotificationService notificationService;
   private final ObjectMapper objectMapper;
 
-  @Value("${redis.stream.follow.key}")
+  @Value("${redis.stream.likecomment.key}")
   private String streamKey;
 
-  @Value("${redis.stream.follow.group}")
+  @Value("${redis.stream.likecomment.group}")
   private String consumerGroup;
 
-  private final String consumerName = "follow-consumer";
+  private final String consumerName = "likecomment-consumer";
 
   private SecretKey secretKey;
 
@@ -86,24 +86,28 @@ public class FollowStreamConsumer {
 
           // ✅ Bây giờ dữ liệu là JSON, có thể parse được
           Map<String, Object> data = objectMapper.readValue(decrypted, new TypeReference<>() {});
-          FollowRequest request = objectMapper.convertValue(data, FollowRequest.class);
+          LikeCommentRequest request = objectMapper.convertValue(data, LikeCommentRequest.class);
 
-          notificationService.handleFollowEvent(request);
+          switch (request.getType()) {
+            case LIKE -> notificationService.handleLike(request);
+            case COMMENT -> notificationService.handleComment(request);
+          }
+
           redisTemplate.opsForStream().acknowledge(streamKey, consumerGroup, message.getId());
           redisTemplate.opsForStream().delete(streamKey, message.getId());
-          log.info("✅ Handle follow event successfully");
+
+          log.info("✅ Handle like-comment notification");
         } else {
           log.warn("⚠️ Unexpected data format: {}", encryptedObject);
         }
       } catch (Exception e) {
-        log.error("🔥 Failed to process Follow message: {}", message, e);
+        log.error("🔥 Failed to process like-cmt message: {}", message, e);
       }
     }
   }
 
 
   private void handleProcessingError(Exception e) {
-    log.error("❌ Error while processing Redis Stream Follow messages: ", e);
+    log.error("❌ Error while processing Redis Stream Like-Cmt messages: ", e);
   }
-
 }

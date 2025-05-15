@@ -10,4 +10,5 @@ public interface FollowService {
     void unfollow(String followedId);
 
     List<User> getFollowers(String userId);
+    List<String> getFollowingUserIds(String userId);
 }

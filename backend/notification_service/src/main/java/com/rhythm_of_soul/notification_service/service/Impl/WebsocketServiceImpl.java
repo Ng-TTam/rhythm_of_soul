@@ -34,12 +34,12 @@ public class WebsocketServiceImpl implements WebsocketService {
             String json = objectMapper.writeValueAsString(payload);
 
             // Encrypt JSON
-            String encryptedJson = AESUtil.encrypt(json, secretKey);
+//            String encryptedJson = AESUtil.encrypt(json, secretKey);
 
             // Send encrypted data via WebSocket
-            messagingTemplate.convertAndSend(destination, encryptedJson);
+            messagingTemplate.convertAndSend(destination, json);
 
-            log.info("Encrypted WebSocket notification sent to {}: {}", userId, encryptedJson);
+            log.info("Encrypted WebSocket notification sent to {}: {}", userId, json);
         } catch (Exception e) {
             log.error("Failed to send encrypted WebSocket notification", e);
         }

@@ -46,9 +46,23 @@ public class FollowController {
 
         ApiResponse<List<UserResponse>> apiResponse = ApiResponse.<List<UserResponse>>builder()
                 .result(response)
-                .message("Get all follower succes")
+                .message("Get all follower successfully")
                 .build();
 
         return ResponseEntity.ok(apiResponse);
     }
+
+    @GetMapping("/{userId}/following")
+    @PreAuthorize("hasAnyRole('USER', 'ARTIST')")
+    public ResponseEntity<ApiResponse<List<String>>> getFollowingUserIds(@PathVariable String userId) {
+        List<String> followingUserIds = followService.getFollowingUserIds(userId);
+
+        ApiResponse<List<String>> apiResponse = ApiResponse.<List<String>>builder()
+                .result(followingUserIds)
+                .message("Get all following users successfully")
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
 }

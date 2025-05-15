@@ -49,9 +49,12 @@ public class NotificationController {
     }
   }
 
-  @GetMapping("/top5/{userId}")
-  public ResponseEntity<?> getTop5Noti(@PathVariable String userId) {
-    return notificationService.getTop5LatestNotifications(userId);
+  @GetMapping("/latest/{userId}")
+  public ResponseEntity<?> getLatestNoti(
+          @PathVariable String userId,
+          @RequestParam(name = "days", defaultValue = "7") int days
+  ) {
+    return notificationService.getLatestNotifications(userId, days);
   }
 
 

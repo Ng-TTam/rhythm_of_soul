@@ -32,6 +32,14 @@ interface AssignArtistRequest {
 interface AssignArtistResponse {
 }
 
+interface SearchUserResponse {
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+  totalElements: number;
+  data: User[];
+}
+
 
 export const getUserByPreEmail = async (preEmail: string): Promise<User> => {
   const response = await apiClient.get<APIResponse<User>>(
@@ -54,4 +62,45 @@ export const getProfile = async (): Promise<User> => {
 export const assignArtist = async (data: AssignArtistRequest): Promise<AssignArtistResponse> => {
   const response = await apiClient.post(apiConfig.endpoints.user.assign_artist, data);
   return response.data;
+};
+
+export const searchUsers = async (searchKey: string, token: string, page: number): Promise<SearchUserResponse> => {
+  console.log("token: ", token);
+  const response = await apiClient.get<APIResponse<SearchUserResponse>>(
+    apiConfig.endpoints.user.searchUser(),
+    {
+      params: { page, size: 5, searchKey },
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  console.log("response: ", response);
+
+  return response.data.result; // 🔥 Trả về đúng `result` từ API
+};
+
+export const followUser = async (userId: string, token: string): Promise<void> => {
+  await apiClient.post(apiConfig.endpoints.user.follow(userId), {}, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const unfollowUser = async (userId: string, token: string): Promise<void> => {
+  await apiClient.delete(apiConfig.endpoints.user.unfollow(userId), {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const getFollowingIds = async (userId: string, token: string): Promise<string[]> => {
+  const response = await apiClient.get<APIResponse<string[]>>(
+    apiConfig.endpoints.user.getFollowingIds(userId),
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  console.log("data: ", response.data);
+
+  // Trả về danh sách userId đang follow
+  return response.data.result;
 };

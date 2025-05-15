@@ -40,6 +40,8 @@ export default function EditProfileDialog({
     createdAt: null,
     updatedAt: null,
     artist: false,
+    followerCount: 0,
+    followedCount: 0,
   });
 
   useEffect(() => {

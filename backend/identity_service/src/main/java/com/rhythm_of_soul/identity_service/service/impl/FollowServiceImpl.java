@@ -101,4 +101,19 @@ public class FollowServiceImpl implements FollowService {
         List<Follow> follows = followRepository.findAllByFollowed(followed);
         return follows.stream().map(Follow::getFollower).collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> getFollowingUserIds(String userId) {
+        User follower = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        List<Follow> follows = followRepository.findAllByFollower(follower);
+
+        // 🔥 Trả về danh sách `followed` userId
+        return follows.stream()
+                .map(f -> f.getFollowed().getId())
+                .collect(Collectors.toList());
+    }
+
 }

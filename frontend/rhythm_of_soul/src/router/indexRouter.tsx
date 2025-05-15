@@ -17,6 +17,7 @@ import AlbumPage from '../components/album/AlbumPage'
 import AlbumsCollectionPage from '../components/album/AlbumCollectionPage'
 import AlbumMain from '../components/album/AlbumMain'
 import AdminUser from '../pages/admin/AdminUser'
+import SearchResult from '../pages/dashboard/SearchResults'
 export const indexRouter: any = {
     path: '/',
     element: (<Dashboard />),
@@ -60,6 +61,7 @@ export const indexRouter: any = {
             { path: 'admin-user', element: <AdminUser /> },
           ],
         },
+        { path: 'search', element: <SearchResult /> },
         { path: '', element: (<MainContent />) },
     ]
 
