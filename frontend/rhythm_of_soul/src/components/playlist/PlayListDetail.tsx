@@ -12,7 +12,7 @@ import '../../style/PlaylistDetail.css';
 import StreamingPlaybackBar from '../songs/PlaybackBar';
 import { useAppDispatch, useAppSelector } from '../../store/hook';
 import { playSingleSong, setPlaylist } from '../../reducers/audioReducer';
-
+import classNames from 'classnames/bind';
 interface Song {
   id: string;
   mediaUrl?: string;
@@ -61,7 +61,7 @@ const PlaylistDetail = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
   const [newComment, setNewComment] = useState('');
-
+  const cx = classNames.bind(require('../../style/PlaylistDetail.css'));
   useEffect(() => {
     const fetchPlaylistData = async () => {
       try {
@@ -217,7 +217,7 @@ const PlaylistDetail = () => {
   const hasSongs = songs.length > 0;
 
   return (
-    <div className="playlist-detail-container">
+    <div className={cx("playlist-detail-container",classNames)}>
       {/* Header */}
       <div 
         className="playlist-header" 

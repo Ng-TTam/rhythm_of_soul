@@ -9,7 +9,7 @@ import { FaPlayCircle } from '@react-icons/all-files/fa/FaPlayCircle';
 import { useNavigate } from 'react-router-dom';
 import { CollectionPostCardProps } from '../../model/post';
 import '../../style/CollectionPostCard.css'; // We'll create this CSS file
-
+import classNames from 'classnames/bind';
 const CollectionPostCard: React.FC<CollectionPostCardProps> = ({ 
   post, 
   playingTrackId, 
@@ -20,13 +20,19 @@ const CollectionPostCard: React.FC<CollectionPostCardProps> = ({
 }) => {
   console.log('CollectionPostCard', post);
   const navigate = useNavigate();
-  
+  const cx = classNames.bind(require('../../style/CollectionPostCard.css'));
   if (!post.content || !post.content.songIds) return null;
   
   const imageUrl = post.content.imageUrl || '/assets/images/default/avatar.jpg';
-
+  const handlePostDetail = (postId: string, postType: string) => {
+    if (postType === 'ALBUM') {
+      navigate(`/albums/${postId}`);
+    } else {
+      navigate(`/playlist/${postId}`);
+    }
+  }
   return (
-    <Card className="collection-post-card">
+    <Card className={cx('collection-post-card',classNames)}>
       <Card.Header className="collection-header">
         <div className="user-info">
           <img
@@ -68,12 +74,12 @@ const CollectionPostCard: React.FC<CollectionPostCardProps> = ({
                 alt={post.content.title}
                 style={{ width: '100%', height: '100%' }}
                 className="collection-cover"
-                onClick={() => navigate(`/post/${post.id}`)}
+                onClick={() => handlePostDetail(post.id, post.type)}
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/assets/images/default/avatar.jpg';
                 }}
               />
-              <div className="play-overlay" onClick={() => navigate(`/post/${post.id}`)}>
+              <div className="play-overlay" onClick={() => handlePostDetail(post.id, post.type)}>
               </div>
             </div>
           </Col>

@@ -8,6 +8,7 @@ import { FaEllipsisH } from '@react-icons/all-files/fa/FaEllipsisH';
 import { TextPostCardProps } from '../../model/post';
 import { useNavigate } from 'react-router-dom';
 import '../../style/TextPostCard.css'; // We'll create this CSS file
+import classNames from 'classnames/bind';
 
 const TextPostCard: React.FC<TextPostCardProps> = ({ 
   post, 
@@ -25,9 +26,9 @@ const TextPostCard: React.FC<TextPostCardProps> = ({
       year: 'numeric'
     });
   };
-
+  const cx = classNames.bind(require('../../style/TextPostCard.css'));
   return (
-    <Card className="text-post-card">
+    <Card className={cx("text-post-card",classNames)}>
       <Card.Header className="post-header">
         <div className="user-info">
           <img

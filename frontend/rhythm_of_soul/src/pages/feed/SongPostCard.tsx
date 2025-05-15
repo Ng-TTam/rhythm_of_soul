@@ -8,7 +8,7 @@ import { Card, Button, ProgressBar } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { SongPostCardProps } from '../../model/post';
 import '../../style/SongPostCard.css'; // We'll create this CSS file
-
+import classNames from 'classnames/bind';
 
 const SongPostCard: React.FC<SongPostCardProps> = ({ 
   post, 
@@ -19,7 +19,7 @@ const SongPostCard: React.FC<SongPostCardProps> = ({
   onComment 
 }) => {
   const navigate = useNavigate();
-  
+  const cx = classNames.bind(require('../../style/SongPostCard.css'));
   if (!post.content) return null;
   
   // Giữ nguyên imageUrl cho ảnh chính
@@ -28,7 +28,7 @@ const SongPostCard: React.FC<SongPostCardProps> = ({
   const hasCover = post.content.coverUrl;
 
   return (
-    <Card className={`song-post-card ${hasCover ? 'with-cover' : ''}`} >
+    <Card className={cx(`song-post-card ${hasCover ? 'with-cover' : ''}`,classNames)} >
       {/* Background cover (chỉ hiển thị nếu có coverUrl) */}
       {hasCover && (
         <div 
@@ -63,7 +63,7 @@ const SongPostCard: React.FC<SongPostCardProps> = ({
             src={songImage}
             alt={post.content.title}
             className="song-thumbnail"
-            onClick={() => navigate(`/post/${post.id}`)}
+            onClick={() => navigate(`/songs/${post.id}`)}
           />
           
           <div className="song-info">

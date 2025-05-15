@@ -144,7 +144,7 @@ export interface Comment {
 export interface PostDetailResponse {
   code: number;
   message: string | null;
-  data: {
+  result: {
     post: Post;
     likes: any[];
     comments: Comment[];

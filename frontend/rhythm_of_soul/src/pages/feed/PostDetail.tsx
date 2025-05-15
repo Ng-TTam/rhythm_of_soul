@@ -3,25 +3,17 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Card, Spinner, Tab, Tabs } from 'react-bootstrap';
 import { currentUser } from '../../model/post';
 import { fetchPostDetail } from '../../services/postService';
-import { useAudioPlayer } from './hooks/useAudioPlayer';
 import PostHeader from './postDetail/PostHeader';
 import TextPostContent from './postDetail/TextPostContent';
-import SongPostContent from './postDetail/SongPostContent';
-import CollectionPostContent from './postDetail/CollectionPostContent';
 import CommentSection from './postDetail/index';
 import PostActions from './postDetail/PostActions';
-import { Post, PostType, Comment } from '../../model/post';
+import { Post, Comment } from '../../model/post';
 import '../../style/PostDetail.css';
-
+import classNames from 'classnames/bind';
 const PostDetail: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
-  const {
-    audioState,
-    handlePlayPause,
-    seekAudio
-  } = useAudioPlayer();
-
+  const [openComment, setOpenComment] = useState(false);
   const [state, setState] = useState({
     post: null as Post | null,
     comments: [] as Comment[],
@@ -34,52 +26,50 @@ const PostDetail: React.FC = () => {
     showAllComments: false,
     likedComments: {} as { [key: string]: boolean }
   });
-  
-  // Track active tab state
-  const [activeTab, setActiveTab] = useState<string>('details');
-
-  // Handle switching to comments tab
-  const handleCommentClick = () => {
-    setActiveTab('comments');
-    // Scroll to comment section after a short delay to ensure tab is shown
-    setTimeout(() => {
-      document.getElementById('comment-section')?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
+  const cx = classNames.bind(require('../../style/PostDetail.css'));
 
   const fetchPostData = useCallback(async () => {
-    if (!postId) return;
-    
     try {
-      setState(prev => ({ ...prev, loading: true }));
-      const response = await fetchPostDetail(postId);
-
-      if (response.code === 200 && response.data) {
-        const postData = {
-          ...response.data.post,
-          username: response.data.post.username || 'Unknown User',
-          userAvatar: response.data.post.userAvatar || currentUser.avatar
-        };
-
-        const formattedComments = response.data.comments.map(comment => ({
-          ...comment,
-          username: comment.username || 'Commenter',
-          userAvatar: comment.userAvatar || currentUser.avatar,
-          likes: comment.likes || 0
-        }));
-
-        setState(prev => ({
-          ...prev,
-          post: postData,
-          comments: formattedComments,
-          likesCount: postData.like_count,
-          loading: false
-        }));
+      if (!postId) {
+        throw new Error('Post ID is missing');
       }
-    } catch (err) {
+
+      setState(prev => ({ ...prev, loading: true, error: null }));
+
+      const response = await fetchPostDetail(postId);
+      console.log('Post detail response:', response);
+      if (response.code !== 200) {
+        throw new Error('Invalid response from server');
+      }
+      const postData = {
+        ...response.result.post,
+        username: response.result.post.username || 'Unknown User',
+        userAvatar: response.result.post.userAvatar || currentUser.avatar,
+        like_count: response.result.post.like_count || 0,
+        view_count: response.result.post.view_count || 0
+      };
+
+      const formattedComments = (response.result.comments || []).map(comment => ({
+        ...comment,
+        username: comment.username || 'Commenter',
+        userAvatar: comment.userAvatar || currentUser.avatar,
+        likes: comment.likes || 0,
+        created_at: comment.created_at || new Date().toISOString()
+      }));
+
       setState(prev => ({
         ...prev,
-        error: 'Failed to load post. Please try again later.',
+        post: postData,
+        comments: formattedComments,
+        likesCount: postData.like_count,
+        loading: false,
+        error: null
+      }));
+    } catch (err) {
+      console.error('Error fetching post:', err);
+      setState(prev => ({
+        ...prev,
+        error: err instanceof Error ? err.message : 'Failed to load post. Please try again later.',
         loading: false
       }));
     }
@@ -95,12 +85,12 @@ const PostDetail: React.FC = () => {
       setState(prev => ({
         ...prev,
         isLiked: !prev.isLiked,
-        likesCount: prev.likesCount + (prev.isLiked ? -1 : 1)
+        likesCount: prev.isLiked ? prev.likesCount - 1 : prev.likesCount + 1
       }));
     } catch (err) {
       console.error('Error liking post:', err);
     }
-  }, [postId, state.isLiked]);
+  }, [postId]);
 
   const handleRepost = useCallback(async () => {
     try {
@@ -108,12 +98,12 @@ const PostDetail: React.FC = () => {
       setState(prev => ({
         ...prev,
         isReposted: !prev.isReposted,
-        repostsCount: prev.repostsCount + (prev.isReposted ? -1 : 1)
+        repostsCount: prev.isReposted ? prev.repostsCount - 1 : prev.repostsCount + 1
       }));
     } catch (err) {
       console.error('Error reposting:', err);
     }
-  }, [postId, state.isReposted]);
+  }, [postId]);
 
   const handleCommentSubmit = useCallback(async (content: string) => {
     if (!postId || !state.post) return;
@@ -131,7 +121,7 @@ const PostDetail: React.FC = () => {
         userAvatar: currentUser.avatar,
         likes: 0
       };
-      
+
       setState(prev => ({
         ...prev,
         comments: [newComment, ...prev.comments]
@@ -145,8 +135,8 @@ const PostDetail: React.FC = () => {
     setState(prev => {
       const wasLiked = prev.likedComments[commentId];
       const updatedComments = prev.comments.map(comment =>
-        comment.id === commentId && comment.likes !== undefined
-          ? { ...comment, likes: comment.likes + (wasLiked ? -1 : 1) }
+        comment.id === commentId
+          ? { ...comment, likes: (comment.likes || 0) + (wasLiked ? -1 : 1) }
           : comment
       );
 
@@ -168,35 +158,19 @@ const PostDetail: React.FC = () => {
     }));
   }, []);
 
+  const handleCommentClick = () => {
+    setOpenComment(prev => !prev);
+    setTimeout(() => {
+      document.getElementById('comment-section')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
   const renderPostContent = () => {
     if (!state.post) return null;
 
     switch (state.post.type) {
       case 'TEXT':
         return <TextPostContent caption={state.post.caption} />;
-      case 'SONG':
-        return (
-          <SongPostContent
-            content={state.post.content || {}}
-            postId={state.post.id}
-            playingTrackId={audioState.playingTrackId}
-            audioPosition={audioState.position}
-            audioProgress={audioState.progress}
-            onPlayPause={handlePlayPause}
-            onSeek={(e) => seekAudio(e, audioState.duration)}
-            audioDuration={audioState.duration}
-          />
-        );
-      case 'ALBUM':
-      case 'PLAYLIST':
-        return (
-          <CollectionPostContent
-            content={state.post.content || {}}
-            type={state.post.type}
-            playingTrackId={audioState.playingTrackId}
-            onPlayPause={handlePlayPause}
-          />
-        );
       default:
         return null;
     }
@@ -204,19 +178,33 @@ const PostDetail: React.FC = () => {
 
   if (state.loading) {
     return (
-      <Container className="loading-container">
-        <Spinner animation="border" variant="primary" />
-        <p>Loading post...</p>
+      <Container className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
       </Container>
     );
   }
 
-  if (state.error || !state.post) {
+  if (state.error) {
     return (
-      <Container className="error-container">
-        <div className="error-card">
-          <h2>{state.error || 'Post not found'}</h2>
-          <button className="btn btn-primary" onClick={() => navigate('/')}>
+      <Container className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+        <div className="text-center">
+          <h2>{state.error}</h2>
+          <button className="btn btn-primary mt-3" onClick={() => navigate('/')}>
+            Back to Home
+          </button>
+        </div>
+      </Container>
+    );
+  }
+
+  if (!state.post) {
+    return (
+      <Container className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+        <div className="text-center">
+          <h2>Post not found</h2>
+          <button className="btn btn-primary mt-3" onClick={() => navigate('/')}>
             Back to Home
           </button>
         </div>
@@ -225,38 +213,17 @@ const PostDetail: React.FC = () => {
   }
 
   return (
-    <Container className="post-detail-container">
+    <Container className={cx('post-detail-container',classNames)}>
       <Card className="post-card">
         <PostHeader
-          userAvatar={state.post.userAvatar || currentUser.avatar}
+          userAvatar={state.post.userAvatar || ''}
           username={state.post.username || 'Unknown User'}
           createdAt={state.post.created_at}
           type={state.post.type}
         />
 
         <Card.Body>
-          <Tabs
-            activeKey={activeTab}
-            onSelect={(k) => setActiveTab(k || 'details')}
-            className="mb-3"
-          >
-            <Tab eventKey="details" title="Details">
-              {renderPostContent()}
-            </Tab>
-            <Tab eventKey="comments" title={`Comments (${state.comments.length})`}>
-              <div id="comment-section">
-                <CommentSection
-                  comments={state.comments}
-                  currentUser={currentUser}
-                  onSubmit={handleCommentSubmit}
-                  onLike={handleCommentLike}
-                  likedComments={state.likedComments}
-                  showAll={state.showAllComments}
-                  onToggleShowAll={toggleShowAllComments}
-                />
-              </div>
-            </Tab>
-          </Tabs>
+          {renderPostContent()}
         </Card.Body>
 
         <PostActions
@@ -271,6 +238,21 @@ const PostDetail: React.FC = () => {
           onCommentClick={handleCommentClick}
         />
       </Card>
+      {openComment && (
+        <div id="comment-section">
+          <CommentSection
+            comments={state.comments}
+            currentUser={currentUser}
+            onSubmit={handleCommentSubmit}
+            onLike={handleCommentLike}
+            likedComments={state.likedComments}
+            showAll={state.showAllComments}
+            onToggleShowAll={toggleShowAllComments}
+          />
+        </div>
+      )
+      }
+
     </Container>
   );
 };

@@ -8,7 +8,7 @@ import { FaEye } from '@react-icons/all-files/fa/FaEye';
 
 import { CollectionPostCardProps } from '../../model/post';
 import '../../style/PlaylistPost.css';
-
+import classNames from 'classnames/bind';
 const PlaylistPostCard: React.FC<CollectionPostCardProps> = ({
   post,
   playingTrackId,
@@ -18,7 +18,7 @@ const PlaylistPostCard: React.FC<CollectionPostCardProps> = ({
   onComment
 }) => {
   const navigate = useNavigate();
-  
+  const cx = classNames.bind(require('../../style/PlaylistPost.css'));
   // Local state fallbacks
   const [localPlayingTrackId, setLocalPlayingTrackId] = useState<string | null>(null);
   const [localLikedTracks, setLocalLikedTracks] = useState<Record<string, boolean>>({});
@@ -73,7 +73,7 @@ const PlaylistPostCard: React.FC<CollectionPostCardProps> = ({
   };
 
   return (
-    <div className="playlist-card" onClick={handleViewDetail}>
+    <div className={cx("playlist-card",classNames)} onClick={handleViewDetail}>
       {/* Header with Banner Background */}
       <div 
         className="card-header-banner"
