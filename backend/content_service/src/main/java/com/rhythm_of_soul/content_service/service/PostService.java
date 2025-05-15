@@ -3,9 +3,12 @@ package com.rhythm_of_soul.content_service.service;
 import com.rhythm_of_soul.content_service.common.Tag;
 import com.rhythm_of_soul.content_service.common.Type;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
+import com.rhythm_of_soul.content_service.dto.request.AlbumCreationRequest;
+import com.rhythm_of_soul.content_service.dto.request.PlaylistCreationRequest;
 import com.rhythm_of_soul.content_service.dto.request.PostRequest;
 import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
 import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
+import com.rhythm_of_soul.content_service.dto.response.SongResponse;
 import io.minio.errors.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,7 +25,7 @@ public interface PostService {
     PostResponse createPost(String accountId, PostRequest postRequest);
     PostResponse addSong(String postId, List<String> songIds);
     List<PostResponse> getPosts(String accountId);
-    PostDetailResponse getPost(String accountId, String postId);
+//<<<<<<< Updated upstream
     List<PostResponse> getSongs(String accountId);
     List<PostResponse> getPlaylists(String accountId);
     List<AlbumResponse> getAlbum(String accountId);
@@ -41,4 +44,14 @@ public interface PostService {
      * @return list post
      */
     List<PostResponse> searchPosts(String accountId, String keyword, String tag, Type type, int page, int size);
+//=======
+    PostDetailResponse getPostDetail(String accountId, String postId);
+    PostResponse getPost(String postId);
+    List<SongResponse> getListSongs();
+    String createFile(MultipartFile file, String type)
+            throws IOException, ServerException, InsufficientDataException,
+            ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException,
+            InvalidResponseException, XmlParserException, InternalException;
+    AlbumResponse createAlbum(AlbumCreationRequest postRequest);
+    PostResponse createPlaylist(PlaylistCreationRequest postRequest);
 }

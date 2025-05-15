@@ -30,7 +30,7 @@ export type PostType = 'TEXT' | 'SONG' | 'ALBUM' | 'PLAYLIST';
 
 export interface PostResponse {
   id: string;
-  user_id: string;
+  account_id: string;
   type: PostType;
   caption?: string;
   content?: ContentResponse | null;
@@ -42,7 +42,7 @@ export interface PostResponse {
   _public: boolean;
 }
 export interface PostRequest {
-  user_id: string;
+  account_id: string;
   type: PostType;
   caption?: string;
   content?: ContentResponse | null;
@@ -115,7 +115,7 @@ export interface SongContent {
 
 export interface Post {
   id: string;
-  user_id: string;
+  account_id: string;
   type: PostType;
   caption?: string;
   content?: ContentResponse | null;
@@ -131,7 +131,7 @@ export interface Post {
 
 export interface Comment {
   id: string;
-  user_id: string;
+  account_id: string;
   post_id: string;
   content: string;
   created_at: string;

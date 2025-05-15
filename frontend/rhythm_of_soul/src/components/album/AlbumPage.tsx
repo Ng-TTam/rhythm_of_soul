@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Card, Badge, Button, Spinner, Tab, Tabs, Form } from 'react-bootstrap';
+import { Container, Row, Col, Card, Badge, Button, Spinner, Form } from 'react-bootstrap';
 import { FaHeart } from '@react-icons/all-files/fa/FaHeart';
 import { FaRegHeart } from '@react-icons/all-files/fa/FaRegHeart';
 import { FaPlay } from '@react-icons/all-files/fa/FaPlay';
@@ -16,6 +16,9 @@ import { FaCalendarAlt } from '@react-icons/all-files/fa/FaCalendarAlt';
 import { FaShare } from '@react-icons/all-files/fa/FaShare';
 import { FaDownload } from '@react-icons/all-files/fa/FaDownload';
 import { FaListUl } from '@react-icons/all-files/fa/FaListUl';
+import { useAppDispatch, useAppSelector } from '../../store/hook';
+import { toggleePlay, setAudio } from '../../reducers/audioReducer';
+
 
 
 interface Song {
@@ -25,6 +28,7 @@ interface Song {
   coverUrl: string;
   songId: string;
   tags: string[];
+  artist?: string;
 }
 
 interface AlbumContent {
@@ -51,7 +55,7 @@ interface AlbumDetail {
 interface Comment {
   id: string;
   content: string;
-  user_id: string;
+  account_id: string;
   username: string;
   avatar: string;
   created_at: string;
@@ -65,17 +69,17 @@ interface DetailPostResponse {
 
 const AlbumDetailView = () => {
   const { albumId } = useParams<{ albumId: string }>();
-
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const audioState = useAppSelector(state => state.audio);
+  
   const [albumDetail, setAlbumDetail] = useState<DetailPostResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
   const [currentSongIndex, setCurrentSongIndex] = useState<number>(-1);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [commentText, setCommentText] = useState('');
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  console.log( albumId);
+
   // Fetch album details
   useEffect(() => {
     const fetchAlbumDetail = async () => {
@@ -84,16 +88,14 @@ const AlbumDetailView = () => {
       try {
         setLoading(true);
         const response = await fetch(`http://localhost:8484/posts/detailPost/${albumId}`);
-        console.log("Response:", response);
         if (!response.ok) {
           throw new Error(`Failed to fetch album details: ${response.status}`);
         }
         
         const data = await response.json();
         
-        if (data.code === 0 && data.result) {
+        if (data.code === 200 && data.result) {
           setAlbumDetail(data.result);
-          // Check if current user has liked this post
           setIsLiked(data.result.likes.includes("1234")); // Replace with actual user ID
         } else {
           throw new Error('Invalid data format');
@@ -109,35 +111,11 @@ const AlbumDetailView = () => {
     fetchAlbumDetail();
   }, [albumId]);
 
-  // Handle audio playback
-  useEffect(() => {
-    if (!albumDetail || currentSongIndex < 0) return;
-    
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.play().catch(err => {
-          console.error("Error playing audio:", err);
-          setIsPlaying(false);
-        });
-      } else {
-        audioRef.current.pause();
-      }
-    }
-  }, [currentSongIndex, isPlaying, albumDetail]);
-
   // Handle like
   const handleLike = async () => {
     if (!albumDetail) return;
     
     try {
-      // Replace with actual API call
-      // const response = await fetch(`http://localhost:8484/posts/like/${id}`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ userId: '1234' }) // Replace with actual user ID
-      // });
-      
-      // For now, update locally
       setIsLiked(prev => !prev);
       setAlbumDetail(prev => {
         if (!prev) return prev;
@@ -150,7 +128,7 @@ const AlbumDetailView = () => {
           },
           likes: isLiked 
             ? prev.likes.filter(userId => userId !== "1234") 
-            : [...prev.likes, "1234"] // Replace with actual user ID
+            : [...prev.likes, "1234"]
         };
       });
     } catch (err) {
@@ -160,21 +138,32 @@ const AlbumDetailView = () => {
 
   // Handle song play
   const playSong = (index: number) => {
-    if (currentSongIndex === index && isPlaying) {
-      setIsPlaying(false);
+    if (!albumDetail) return;
+    
+    const song = albumDetail.post.content.songIds[index];
+    
+    if (audioState.mediaUrlSong === song.mediaUrl) {
+      dispatch(toggleePlay(!audioState.play));
     } else {
       setCurrentSongIndex(index);
-      setIsPlaying(true);
+      dispatch(setAudio({
+        play: true,
+        imageSong: song.imageUrl,
+        titleSong: song.title,
+        artistSong: song.artist || albumDetail.post.user_id,
+        mediaUrlSong: song.mediaUrl
+      }));
     }
   };
 
   // Play/pause current song
   const togglePlayPause = () => {
+    if (!albumDetail) return;
+    
     if (currentSongIndex >= 0) {
-      setIsPlaying(prev => !prev);
-    } else if (albumDetail && albumDetail.post.content.songIds.length > 0) {
-      setCurrentSongIndex(0);
-      setIsPlaying(true);
+      playSong(currentSongIndex);
+    } else if (albumDetail.post.content.songIds.length > 0) {
+      playSong(0);
     }
   };
 
@@ -185,8 +174,8 @@ const AlbumDetailView = () => {
     const totalSongs = albumDetail.post.content.songIds.length;
     if (totalSongs === 0) return;
     
-    setCurrentSongIndex(prev => (prev + 1) % totalSongs);
-    setIsPlaying(true);
+    const nextIndex = (currentSongIndex + 1) % totalSongs;
+    playSong(nextIndex);
   };
 
   // Handle previous song
@@ -196,8 +185,8 @@ const AlbumDetailView = () => {
     const totalSongs = albumDetail.post.content.songIds.length;
     if (totalSongs === 0) return;
     
-    setCurrentSongIndex(prev => (prev - 1 + totalSongs) % totalSongs);
-    setIsPlaying(true);
+    const prevIndex = (currentSongIndex - 1 + totalSongs) % totalSongs;
+    playSong(prevIndex);
   };
 
   // Handle comment submission
@@ -206,22 +195,11 @@ const AlbumDetailView = () => {
     if (!commentText.trim() || !albumDetail) return;
     
     try {
-      // Replace with actual API call
-      // const response = await fetch(`http://localhost:8484/posts/comment/${id}`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ 
-      //     userId: '1234',
-      //     content: commentText 
-      //   })
-      // });
-      
-      // For now, update locally
       const newComment: Comment = {
         id: `temp-${Date.now()}`,
         content: commentText,
-        user_id: "1234", // Replace with actual user ID
-        username: "Current User", // Replace with actual username
+        account_id: "1234",
+        username: "Current User",
         avatar: "https://via.placeholder.com/40",
         created_at: new Date().toISOString()
       };
@@ -280,6 +258,7 @@ const AlbumDetailView = () => {
 
   const { post, comments } = albumDetail;
   const currentSong = currentSongIndex >= 0 ? post.content.songIds[currentSongIndex] : null;
+  const isCurrentSongPlaying = currentSong && audioState.play && audioState.mediaUrlSong === currentSong.mediaUrl;
 
   return (
     <Container className="py-4">
@@ -348,7 +327,7 @@ const AlbumDetailView = () => {
                       onClick={togglePlayPause}
                     >
                       <div className="bg-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: '80px', height: '80px' }}>
-                        {isPlaying ?
+                        {isCurrentSongPlaying ?
                           <FaPause size={32} className="text-primary" /> :
                           <FaPlay size={32} className="text-primary" />
                         }
@@ -422,69 +401,74 @@ const AlbumDetailView = () => {
             </Card.Header>
             <Card.Body className="p-0">
               <div className="list-group list-group-flush">
-                {post.content.songIds.map((song, index) => (
-                  <div 
-                    key={song.songId}
-                    className={`list-group-item list-group-item-action d-flex align-items-center ${currentSongIndex === index ? 'active bg-light text-dark' : ''}`}
-                  >
-                    <div className="me-3" style={{ width: '30px', textAlign: 'center' }}>
-                      {currentSongIndex === index && isPlaying ? (
-                        <div className="equalizer">
-                          <span></span><span></span><span></span>
-                        </div>
-                      ) : (
-                        <span>{index + 1}</span>
-                      )}
-                    </div>
-                    
+                {post.content.songIds.map((song, index) => {
+                  const isCurrent = currentSongIndex === index;
+                  const isPlayingCurrent = isCurrent && audioState.play && audioState.mediaUrlSong === song.mediaUrl;
+                  
+                  return (
                     <div 
-                      className="me-3 position-relative rounded-circle overflow-hidden"
-                      style={{ width: '50px', height: '50px' }}
+                      key={song.songId}
+                      className={`list-group-item list-group-item-action d-flex align-items-center ${isCurrent ? 'active bg-light text-dark' : ''}`}
                     >
-                      <img 
-                        src={song.imageUrl} 
-                        alt={song.title}
-                        className="w-100 h-100 object-fit-cover"
-                      />
-                      <div
-                        className="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center"
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => playSong(index)}
-                      >
-                        {currentSongIndex === index && isPlaying ? (
-                          <FaPause size={16} className="text-white" />
+                      <div className="me-3" style={{ width: '30px', textAlign: 'center' }}>
+                        {isPlayingCurrent ? (
+                          <div className="equalizer">
+                            <span></span><span></span><span></span>
+                          </div>
                         ) : (
-                          <FaPlay size={16} className="text-white" />
+                          <span>{index + 1}</span>
                         )}
                       </div>
-                    </div>
-                    
-                    <div className="flex-grow-1" onClick={() => playSong(index)} style={{ cursor: 'pointer' }}>
-                      <div className="fw-bold">{song.title}</div>
-                      <div className="d-flex flex-wrap gap-1 mt-1">
-                        {song.tags.map((tag, idx) => (
-                          <Badge 
-                            key={idx} 
-                            bg="light" 
-                            text="secondary" 
-                            className="small"
-                            style={{ fontSize: '0.7rem' }}
-                          >
-                            {tag.toLowerCase()}
-                          </Badge>
-                        ))}
+                      
+                      <div 
+                        className="me-3 position-relative rounded-circle overflow-hidden"
+                        style={{ width: '50px', height: '50px' }}
+                      >
+                        <img 
+                          src={song.imageUrl} 
+                          alt={song.title}
+                          className="w-100 h-100 object-fit-cover"
+                        />
+                        <div
+                          className="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center"
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => playSong(index)}
+                        >
+                          {isPlayingCurrent ? (
+                            <FaPause size={16} className="text-white" />
+                          ) : (
+                            <FaPlay size={16} className="text-white" />
+                          )}
+                        </div>
                       </div>
+                      
+                      <div className="flex-grow-1" onClick={() => playSong(index)} style={{ cursor: 'pointer' }}>
+                        <div className="fw-bold">{song.title}</div>
+                        <div className="d-flex flex-wrap gap-1 mt-1">
+                          {song.tags.map((tag, idx) => (
+                            <Badge 
+                              key={idx} 
+                              bg="light" 
+                              text="secondary" 
+                              className="small"
+                              style={{ fontSize: '0.7rem' }}
+                            >
+                              {tag.toLowerCase()}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <Button 
+                        variant="link" 
+                        className="text-muted p-0"
+                        title="Download"
+                      >
+                        <FaDownload />
+                      </Button>
                     </div>
-                    
-                    <Button 
-                      variant="link" 
-                      className="text-muted p-0"
-                      title="Download"
-                    >
-                      <FaDownload />
-                    </Button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </Card.Body>
           </Card>
@@ -573,21 +557,15 @@ const AlbumDetailView = () => {
                     </div>
                   </div>
                   
-                  {/* Audio player */}
-                  <audio
-                    ref={audioRef}
-                    src={`http://localhost:9000/${currentSong.mediaUrl}`}
-                    onEnded={playNextSong}
-                    className="w-100 mb-3"
-                    controls
-                  />
-                  
                   <div className="d-flex justify-content-center gap-3">
                     <Button variant="outline-secondary" onClick={playPreviousSong}>
                       Previous
                     </Button>
-                    <Button variant="primary" onClick={togglePlayPause}>
-                      {isPlaying ? 'Pause' : 'Play'}
+                    <Button 
+                      variant="primary" 
+                      onClick={togglePlayPause}
+                    >
+                      {isCurrentSongPlaying ? 'Pause' : 'Play'}
                     </Button>
                     <Button variant="outline-secondary" onClick={playNextSong}>
                       Next
@@ -645,7 +623,7 @@ const AlbumDetailView = () => {
       </Row>
 
       {/* CSS for audio player animations */}
-      <style >{`
+      <style>{`
         .bg-dark-gradient {
           background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.8) 100%);
         }

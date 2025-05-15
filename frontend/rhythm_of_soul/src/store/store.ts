@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
 import tokenReducer from '../reducers/tokenReducer';
-
+import audioReducer from '../reducers/audioReducer';
 const store = configureStore({
     reducer: {
-            
             token: tokenReducer,
+            audio: audioReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({ serializableCheck: false }),

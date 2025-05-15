@@ -3,10 +3,7 @@ package com.rhythm_of_soul.content_service.utils;
 import com.rhythm_of_soul.content_service.dto.response.CommentResponse;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CommentManager {
     private final Map<String, CommentResponse> commentMap = new HashMap<>();
@@ -39,5 +36,9 @@ public class CommentManager {
 
     public List<CommentResponse> getAllDepartments() {
         return new ArrayList<>(resultMap.values());
+    }
+
+    public void addDepartment(String id, String accountId, String parentId, String content, Date from) {
+
     }
 }

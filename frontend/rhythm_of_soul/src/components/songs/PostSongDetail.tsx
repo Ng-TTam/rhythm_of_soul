@@ -1,20 +1,34 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { 
+  Container, 
+  Row, 
+  Col, 
+  Card, 
+  Button, 
+  Image, 
+  Badge, 
+  Form, 
+  InputGroup,
+  Alert
+} from 'react-bootstrap';
 import { BsPlayFill } from '@react-icons/all-files/bs/BsPlayFill';
 import { BsPauseFill } from '@react-icons/all-files/bs/BsPauseFill';
 import { BsHeart } from '@react-icons/all-files/bs/BsHeart';
 import { BsHeartFill } from '@react-icons/all-files/bs/BsHeartFill';
 import { BsChat } from '@react-icons/all-files/bs/BsChat';
 import { BsEyeFill } from '@react-icons/all-files/bs/BsEyeFill';
-import { BsThreeDots } from '@react-icons/all-files/bs/BsThreeDots';
 import { BsClock } from '@react-icons/all-files/bs/BsClock';
-import { BsDownload } from '@react-icons/all-files/bs/BsDownload';
+import { MdRepeat } from '@react-icons/all-files/md/MdRepeat';
 import { BsReply } from '@react-icons/all-files/bs/BsReply';
-import { useNavigate, useParams } from 'react-router-dom';
 import { MdPublic } from '@react-icons/all-files/md/MdPublic';
+import {MdLock} from '@react-icons/all-files/md/MdLock';
+import { useParams } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../store/hook';
+import { toggleePlay, setAudio } from '../../reducers/audioReducer';
 
 interface Comment {
   id: string;
-  user_id: string;
+  account_id: string;
   content: string;
   created_at: string;
   user: {
@@ -25,7 +39,7 @@ interface Comment {
 
 interface Post {
   content: {
-    imageUrl: string;
+    imageUrl?: string;
     title: string;
     tags: string[];
     coverUrl?: string;
@@ -37,36 +51,32 @@ interface Post {
   like_count: number;
   comment_count: number;
   _public: boolean;
-  user_id: string;
+  account_id: string;
 }
 
 interface SongDetail {
   post: Post;
   likes: Array<{ id: string; user: { name: string; avatar: string }; created_at: string }>;
-  comments: Comment[];
+  comments?: Comment[];
 }
 
 export default function PostSongDetail() {
   const [songDetail, setSongDetail] = useState<SongDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [showAllComments, setShowAllComments] = useState(false);
-  const navigate = useNavigate();
-  // Get postId from URL params or use default
+  const [showComment, setShowComment] = useState(false);
   const postId = useParams<{ songId: string }>();
-  console.log(postId) // In a real app, this would come from route params
+  
+  const dispatch = useAppDispatch();
+  const audioState = useAppSelector(state => state.audio);
   
   useEffect(() => {
     const fetchSongDetail = async () => {
       try {
-        setLoading(true);
-        const url = `http://localhost:8484/posts/${postId.songId}`;
-        console.log(url)
+        const url = `http://localhost:8484/posts/detailPost/${postId.songId}`;
         const response = await fetch(url);
-        console.log(response)
+        
         if (!response.ok) {
           throw new Error('Failed to fetch song details');
         }
@@ -74,22 +84,33 @@ export default function PostSongDetail() {
         const data = await response.json();
         setSongDetail(data.result);
         
-        // Reset states when a new song is loaded
-        setIsPlaying(false);
+        // Reset like state when a new song is loaded
         setIsLiked(false);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
-      } finally {
-        setLoading(false);
+        console.error(err);
+        setSongDetail(null);
       }
     };
     
     fetchSongDetail();
   }, [postId]);
   
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-    // Here you would also implement audio playback logic
+  const handlePlaySong = () => {
+    if (!songDetail) return;
+    
+    const { post } = songDetail;
+    
+    if (audioState.mediaUrlSong === post.content.mediaUrl) {
+      dispatch(toggleePlay(!audioState.play));
+    } else {
+      dispatch(setAudio({
+        play: true,
+        imageSong: post.content.imageUrl || '',
+        titleSong: post.content.title,
+        artistSong: post.account_id,
+        mediaUrlSong: post.content.mediaUrl || ''
+      }));
+    }
   };
   
   const toggleLike = () => {
@@ -100,9 +121,6 @@ export default function PostSongDetail() {
   const handleCommentSubmit = () => {
     if (!newComment.trim()) return;
     
-    // In a real app, you would call an API to post the comment
-    console.log("Submitting comment:", newComment);
-    
     // Mock adding a comment locally
     if (songDetail) {
       const updatedDetail = {
@@ -110,12 +128,12 @@ export default function PostSongDetail() {
         comments: [
           {
             id: `temp-${Date.now()}`,
-            user_id: "current-user",
+            account_id: "current-user",
             content: newComment,
             created_at: new Date().toISOString(),
             user: { name: "Current User", avatar: "/api/placeholder/40/40" }
           },
-          ...songDetail.comments
+          ...(songDetail.comments || [])
         ],
         post: {
           ...songDetail.post,
@@ -128,55 +146,48 @@ export default function PostSongDetail() {
     setNewComment('');
   };
   
-  if (loading) {
-    return (
-      <div className="d-flex justify-content-center my-5">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
-  }
+  const handleOpenCommemtt = () => {
+    setShowComment(!showComment);
+  };
   
-  if (error) {
-    return (
-      <div className="alert alert-danger m-3" role="alert">
-        Error: {error}
-      </div>
-    );
-  }
-  
+  // No song detail
   if (!songDetail) {
     return (
-      <div className="alert alert-warning m-3" role="alert">
-        Song not found
-      </div>
+      <Container>
+        <Alert variant="warning">Song not found</Alert>
+      </Container>
     );
   }
   
-  const { post, likes, comments } = songDetail;
-  const displayComments = showAllComments ? comments : comments.slice(0, 3);
+  const { post, comments } = songDetail;
+  const displayComments = showAllComments 
+    ? (comments ?? []) 
+    : (comments ?? []).slice(0, 3);
+  
+  // Check if current song is playing
+  const isCurrentSongPlaying = audioState.mediaUrlSong === post.content.mediaUrl && audioState.play;
   
   return (
-    <div className="container py-4">
-      <div className="row">
+    <Container className="py-4">
+      <Row>
         {/* Left column: Song info and player */}
-        <div className="col-lg-8 mb-4">
-          <div className="card shadow-sm">
+        <Col lg={8} className="mb-4">
+          <Card className="shadow-sm">
             {/* Song cover and play button */}
             <div className="position-relative">
-              <img 
-                src={post.content.imageUrl} 
+              <Card.Img 
+                variant="top"
+                src={post.content.imageUrl || "/assets/images/default/avatar.jpg"} 
                 alt={post.content.title}
-                className="card-img-top"
                 style={{ maxHeight: '400px', objectFit: 'cover' }}
               />
               <div 
                 className="position-absolute top-50 start-50 translate-middle p-3 bg-dark bg-opacity-50 rounded-circle"
                 style={{ cursor: 'pointer' }}
-                onClick={togglePlay}
+                onClick={handlePlaySong}
+                aria-label={isCurrentSongPlaying ? "Pause song" : "Play song"}
               >
-                {isPlaying ? 
+                {isCurrentSongPlaying ? 
                   <BsPauseFill size={50} color="white" /> : 
                   <BsPlayFill size={50} color="white" />
                 }
@@ -184,8 +195,8 @@ export default function PostSongDetail() {
               
               <div className="position-absolute bottom-0 start-0 m-3 p-2 bg-dark bg-opacity-50 rounded">
                 {post._public ? 
-                  <MdPublic size={24} color="white" /> : 
-                  <MdPublic size={24} color="white" />
+                  <MdPublic size={20} color="white" className="me-1" /> : 
+                  <MdLock size={20} color="white" className="me-1" />
                 }
                 <span className="ms-2 text-white">
                   {post._public ? 'Public' : 'Private'}
@@ -193,10 +204,9 @@ export default function PostSongDetail() {
               </div>
             </div>
             
-            {/* Song title and info */}
-            <div className="card-body">
-              <h3 className="card-title fw-bold">{post.content.title}</h3>
-              {post.caption && <p className="card-text">{post.caption}</p>}
+            <Card.Body>
+              <Card.Title as="h3" className="fw-bold">{post.content.title}</Card.Title>
+              {post.caption && <Card.Text>{post.caption}</Card.Text>}
               
               <div className="d-flex align-items-center mt-3">
                 <div className="me-3">
@@ -214,212 +224,158 @@ export default function PostSongDetail() {
               
               <div className="d-flex mt-3">
                 {post.content.tags.map((tag, idx) => (
-                  <span key={idx} className="badge bg-primary me-1">{tag}</span>
+                  <Badge bg="primary" className="me-1" key={idx}>{tag}</Badge>
                 ))}
               </div>
               
               {/* Action buttons */}
               <div className="mt-4 d-flex">
-                <button 
-                  className={`btn ${isLiked ? 'btn-danger' : 'btn-outline-danger'} me-2`}
+                <Button 
+                  variant={isLiked ? 'danger' : 'outline-danger'} 
+                  className="me-2"
                   onClick={toggleLike}
                 >
                   {isLiked ? <BsHeartFill /> : <BsHeart />}
                   <span className="ms-1">
                     {post.like_count + (isLiked ? 1 : 0)}
                   </span>
-                </button>
+                </Button>
                 
-                <button className="btn btn-outline-primary me-2">
+                <Button variant="outline-primary" className="me-2"
+                onClick={handleOpenCommemtt}>
                   <BsChat />
                   <span className="ms-1">{post.comment_count}</span>
-                </button>
+                </Button>
                 
-                <button className="btn btn-outline-secondary me-2">
-                  <span className="ms-1">Share</span>
-                </button>
-                
-                <button className="btn btn-outline-secondary">
-                  <BsDownload />
-                  <span className="ms-1">Download</span>
-                </button>
+                <Button variant="outline-secondary" className="me-2" >
+                  <MdRepeat/>
+                </Button>
               </div>
-            </div>
-            
-            {/* Audio player would go here in a real implementation */}
-            <div className="card-footer bg-light">
-              <div className="d-flex align-items-center">
-                <button 
-                  className="btn btn-primary me-2" 
-                  onClick={togglePlay}
-                >
-                  {isPlaying ? <BsPauseFill /> : <BsPlayFill />}
-                </button>
-                
-                <div className="progress flex-grow-1">
-                  <div 
-                    className="progress-bar" 
-                    role="progressbar" 
-                    style={{ width: '0%' }} 
-                    aria-valuenow={0} 
-                    aria-valuemin={0} 
-                    aria-valuemax={100}
-                  ></div>
-                </div>
-                
-                <span className="ms-2">0:00 / 0:00</span>
-              </div>
-            </div>
-          </div>
+            </Card.Body>
+          </Card>
           
-          {/* Comment section */}
-          <div className="card mt-4 shadow-sm">
-            <div className="card-header bg-white">
-              <h5 className="m-0">Comments ({post.comment_count})</h5>
-            </div>
-            
-            <div className="card-body">
-              {/* Comment input */}
-              <div className="mb-4">
-                <div className="input-group">
-                  <input 
-                    type="text" 
-                    className="form-control" 
-                    placeholder="Add a comment..." 
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        handleCommentSubmit();
-                      }
-                    }}
-                  />
-                  <button 
-                    className="btn btn-primary"
-                    onClick={handleCommentSubmit}
-                    disabled={!newComment.trim()}
-                  >
-                    Comment
-                  </button>
-                </div>
-              </div>
+          { showComment &&
+            <Card className="mt-4 shadow-sm">
+              <Card.Header>
+                <Card.Title as="h5">Comments ({post.comment_count})</Card.Title>
+              </Card.Header>
               
-              {/* Comments list */}
-              {displayComments.length > 0 ? (
-                <div>
-                  {displayComments.map((comment) => (
-                    <div key={comment.id} className="mb-3 p-3 border-bottom">
-                      <div className="d-flex">
-                        <img 
-                          src={comment.user?.avatar || "/api/placeholder/40/40"} 
-                          alt="User" 
-                          className="rounded-circle me-2"
-                          width="40" 
-                          height="40" 
-                        />
-                        <div>
-                          <div className="d-flex align-items-center">
-                            <strong className="me-2">{comment.user?.name || 'Anonymous'}</strong>
-                            <small className="text-muted">
-                              {new Date(comment.created_at).toLocaleDateString()}
-                            </small>
+              <Card.Body>
+                {/* Comment input */}
+                <div className="mb-4">
+                  <InputGroup>
+                    <Form.Control 
+                      type="text" 
+                      placeholder="Add a comment..." 
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          handleCommentSubmit();
+                        }
+                      }}
+                    />
+                    <Button 
+                      variant="primary"
+                      onClick={handleCommentSubmit}
+                      disabled={!newComment.trim()}
+                    >
+                      Comment
+                    </Button>
+                  </InputGroup>
+                </div>
+                
+                {/* Comments list */}
+                {displayComments.length > 0 ? (
+                  <div>
+                    {displayComments.map((comment) => (
+                      <div key={comment.id} className="mb-3 p-3 border-bottom">
+                        <div className="d-flex">
+                          <Image 
+                            src={comment.user?.avatar || "/api/placeholder/40/40"} 
+                            alt="User" 
+                            roundedCircle
+                            className="me-2"
+                            width={40} 
+                            height={40} 
+                          />
+                          <div>
+                            <div className="d-flex align-items-center">
+                              <strong className="me-2">{comment.user?.name || 'Anonymous'}</strong>
+                              <small className="text-muted">
+                                {new Date(comment.created_at).toLocaleDateString()}
+                              </small>
+                            </div>
+                            <p className="mb-1">{comment.content}</p>
+                            <Button variant="link" size="sm" className="text-muted p-0">
+                              <BsReply /> Reply
+                            </Button>
                           </div>
-                          <p className="mb-1">{comment.content}</p>
-                          <button className="btn btn-sm text-muted p-0">
-                            <BsReply /> Reply
-                          </button>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                  
-                  {comments.length > 3 && (
-                    <button 
-                      className="btn btn-link p-0" 
-                      onClick={() => setShowAllComments(!showAllComments)}
-                    >
-                      {showAllComments ? 'Show less comments' : `Show all ${comments.length} comments`}
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <p className="text-muted text-center">No comments yet. Be the first to comment!</p>
-              )}
-            </div>
-          </div>
-        </div>
+                    ))}
+                    
+                    {(comments ?? []).length > 3 && (
+                      <Button 
+                        variant="link" 
+                        className="p-0" 
+                        onClick={() => setShowAllComments(!showAllComments)}
+                      >
+                        {showAllComments 
+                          ? 'Show less comments' 
+                          : `Show all ${comments?.length || 0} comments`}
+                      </Button>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-muted text-center">No comments yet. Be the first to comment!</p>
+                )}
+              </Card.Body>
+            </Card>
+          }
+        </Col>
         
         {/* Right column: Likes and related info */}
-        <div className="col-lg-4">
-          <div className="card shadow-sm mb-4">
-            <div className="card-header bg-white">
-              <h5 className="m-0">Likes ({likes.length})</h5>
-            </div>
-            
-            <div className="card-body">
-              {likes.length > 0 ? (
-                <div>
-                  {likes.map((like) => (
-                    <div key={like.id} className="d-flex align-items-center mb-2">
-                      <img 
-                        src={like.user?.avatar || "/api/placeholder/32/32"} 
-                        alt="User" 
-                        className="rounded-circle me-2"
-                        width="32" 
-                        height="32" 
-                      />
-                      <div>
-                        <strong>{like.user?.name || 'Anonymous'}</strong>
-                        <small className="d-block text-muted">
-                          {new Date(like.created_at).toLocaleDateString()}
-                        </small>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted text-center">No likes yet.</p>
-              )}
-            </div>
-          </div>
+        <Col lg={4}>
           
           {/* User info card */}
-          <div className="card shadow-sm mb-4">
-            <div className="card-header bg-white">
-              <h5 className="m-0">Posted by</h5>
-            </div>
+          <Card className="shadow-sm mb-4">
+            <Card.Header>
+              <Card.Title as="h5">Posted by</Card.Title>
+            </Card.Header>
             
-            <div className="card-body">
+            <Card.Body>
               <div className="d-flex align-items-center">
-                <img 
+                <Image 
                   src="/api/placeholder/64/64" 
                   alt="User" 
-                  className="rounded-circle me-3"
-                  width="64" 
-                  height="64" 
+                  roundedCircle
+                  className="me-3"
+                  width={64} 
+                  height={64} 
                 />
                 <div>
-                  <h6 className="mb-0">User ID: {post.user_id}</h6>
-                  <button className="btn btn-sm btn-outline-primary mt-2">
+                  <h6 className="mb-0">User ID: {post.account_id}</h6>
+                  <Button variant="outline-primary" size="sm" className="mt-2">
                     Follow
-                  </button>
+                  </Button>
                 </div>
               </div>
-            </div>
-          </div>
+            </Card.Body>
+          </Card>
           
-          {/* Related content would go here in a real implementation */}
-          <div className="card shadow-sm">
-            <div className="card-header bg-white">
-              <h5 className="m-0">Related Songs</h5>
-            </div>
+          {/* Related content */}
+          <Card className="shadow-sm">
+            <Card.Header>
+              <Card.Title as="h5">Related Songs</Card.Title>
+            </Card.Header>
             
-            <div className="card-body">
+            <Card.Body>
               <p className="text-muted text-center">Related songs would appear here</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 }

@@ -8,6 +8,12 @@ import com.rhythm_of_soul.content_service.dto.request.PostRequest;
 import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
 import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
 import com.rhythm_of_soul.content_service.service.ListeningHistoryService;
+import com.rhythm_of_soul.content_service.dto.request.AlbumCreationRequest;
+import com.rhythm_of_soul.content_service.dto.request.PlaylistCreationRequest;
+import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
+import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
+import com.rhythm_of_soul.content_service.dto.request.PostRequest;
+import com.rhythm_of_soul.content_service.dto.response.SongResponse;
 import com.rhythm_of_soul.content_service.service.PostService;
 import io.minio.errors.*;
 import jakarta.validation.Valid;
@@ -41,6 +47,14 @@ public class PostController {
                 .result(postService.storeFile(song,cover,image, account_id, tags, title, caption, isPublic))
                 .build();
     }
+    @PostMapping("/uploadFile")
+    ApiResponse<String> uploadFile(@RequestParam("file") MultipartFile file ,
+                                   @RequestParam("type") String type) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        return ApiResponse.<String>builder()
+                .message("File uploaded successfully")
+                .result(postService.createFile(file,type))
+                .build();
+    }
     @PostMapping
     ApiResponse<PostResponse> createPost(@Valid @RequestBody PostRequest postRequest) {
         // get accountId in token
@@ -50,6 +64,20 @@ public class PostController {
                 .result(postService.createPost("326e6645-aa0f-4f89-b885-019c05b1a970" ,postRequest))
                 .build();
 
+    }
+    @PostMapping("/album")
+    ApiResponse<AlbumResponse> createAlbum(@RequestBody AlbumCreationRequest postRequest) {
+        return ApiResponse.<AlbumResponse>builder()
+                .message("Album created successfully")
+                .result(postService.createAlbum(postRequest))
+                .build();
+    }
+    @PostMapping("/playlist")
+    ApiResponse<PostResponse> createPlaylist(@RequestBody PlaylistCreationRequest postRequest) {
+        return ApiResponse.<PostResponse>builder()
+                .message("Playlist created successfully")
+                .result(postService.createPlaylist(postRequest))
+                .build();
     }
     @GetMapping("/{accountId}/album")
     ApiResponse<List<AlbumResponse>> getAlbum(@PathVariable String accountId) {
@@ -84,11 +112,11 @@ public class PostController {
     }
 
     @GetMapping("/detailPost/{postId}")
-    ApiResponse<PostDetailResponse> getPost(@PathVariable String postId) {
+    ApiResponse<PostDetailResponse> getPostDetail(@PathVariable String postId) {
         // get accountId in token
 //        String accountId = SecurityContextHolder.getContext().getAuthentication().getName();
         return ApiResponse.<PostDetailResponse>builder()
-                .result(postService.getPost("326e6645-aa0f-4f89-b885-019c05b1a970", postId))
+                .result(postService.getPostDetail("326e6645-aa0f-4f89-b885-019c05b1a970", postId))
                 .build();
     }
 
@@ -134,5 +162,17 @@ public class PostController {
             @RequestParam String postId) {
         listeningHistoryService.recordListen(accountId, sessionId, postId);
         return ApiResponse.<Void>builder().build();
+    }
+   @GetMapping("/{postId}/post")
+    ApiResponse<PostResponse> getPost(@PathVariable String postId) {
+        return ApiResponse.<PostResponse>builder()
+                .result(postService.getPost(postId))
+                .build();
+    }
+    @GetMapping("/songs")
+    ApiResponse<List<SongResponse>> getListSongs() {
+        return ApiResponse.<List<SongResponse>>builder()
+                .result(postService.getListSongs())
+                .build();
     }
 }

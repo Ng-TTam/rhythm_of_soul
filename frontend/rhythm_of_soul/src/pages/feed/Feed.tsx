@@ -35,7 +35,7 @@ const Layout: React.FC = () => {
   const [isPostModalOpen, setIsPostModalOpen] = React.useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const navigate = useNavigate();
-
+  console.log(posts);
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
@@ -44,7 +44,7 @@ const Layout: React.FC = () => {
     const newPostId = `post_${Date.now()}`;
     let newPost: PostWithUserInfo = {
       id: newPostId,
-      user_id: currentUser.id,
+      account_id: currentUser.id,
       type: postData.type.toUpperCase(),
       caption: postData.caption || '',
       content: null,

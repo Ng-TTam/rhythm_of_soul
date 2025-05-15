@@ -11,8 +11,8 @@ export const fetchPostDetail = async (postId: string): Promise<PostDetailRespons
   );
   return response.data;
 };
-export const postSong = async (user_id: string): Promise<PostResponse[]> => {
-  const response = await axios.get<APIResponse<PostResponse[]>>(`${API_BASE_URL}/posts/${user_id}/songs` );
+export const postSong = async (account_id: string): Promise<PostResponse[]> => {
+  const response = await axios.get<APIResponse<PostResponse[]>>(`${API_BASE_URL}/posts/${account_id}/songs` );
   return response.data.result;
 };
 export const likePost = async (postId: string) => {
@@ -30,7 +30,7 @@ export const addComment = async (postId: string, content: string) => {
 export const likeComment = async (commentId: string) => {
   await axios.post(`${API_BASE_URL}/comments/${commentId}/like`);
 };
-export const getPlaylist = async (user_id: string) : Promise<PlaylistResponse[]> => {
-  const response = await axios.get<APIResponse<PlaylistResponse[]>>(`${API_BASE_URL}/posts/${user_id}/playlists` );
+export const getPlaylist = async (account_id: string) : Promise<PlaylistResponse[]> => {
+  const response = await axios.get<APIResponse<PlaylistResponse[]>>(`${API_BASE_URL}/posts/${account_id}/playlists` );
   return response.data.result;
 };

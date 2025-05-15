@@ -24,6 +24,9 @@ export default function Sidebar() {
   const handleProfileUser = () => {
     redirectPath(`/userProfile`);
   }
+  const handleRanking = () => {
+    redirectPath('/ranking');
+  }
   return (
     <>
       <aside
@@ -221,7 +224,7 @@ export default function Sidebar() {
                     </a>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link " href="release.html">
+                    <button className="nav-link " onClick={handleRanking} >
                       <i className="icon svg-icon">
                         <svg
                           className="icon-10"
@@ -244,7 +247,7 @@ export default function Sidebar() {
                         R
                       </i>
                       <span className="item-name">Release</span>
-                    </a>
+                    </button>
                   </li>
                   <li className="nav-item">
                     <a className="nav-link " href="albums.html">

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Container, Row, Col, Button, Badge, Spinner, Nav, Tab } from 'react-bootstrap';
 import { FaHeart } from '@react-icons/all-files/fa/FaHeart';
 import { FaRegHeart } from '@react-icons/all-files/fa/FaRegHeart';
 import { FaPlay } from '@react-icons/all-files/fa/FaPlay';
@@ -12,49 +11,64 @@ import { FaLock } from '@react-icons/all-files/fa/FaLock';
 import { FaComment } from '@react-icons/all-files/fa/FaComment';
 import { FaFilter } from '@react-icons/all-files/fa/FaFilter';
 import { useNavigate } from 'react-router-dom';
-const AlbumPost = () => {
-  interface Album {
-    id: string;
-    title: string;
-    tracks: number;
-    isPublic: boolean;
-    likeCount: number;
-    commentCount: number;
-    viewCount: number;
-    coverUrl: string;
-    imageUrl: string;
-    tags?: string[];
-    crateAt: string;
-  }
+import { 
+  Card, Container, Row, Col, Button, Badge, Spinner, Nav, Tab, Alert 
+} from 'react-bootstrap';
+import { FaPlus} from '@react-icons/all-files/fa/FaPlus';
+import AddAlbumModal from './AddAlbumForm';
+import axios from 'axios';
 
+interface Album {
+  id: string;
+  title: string;
+  tracks: number;
+  isPublic: boolean;
+  likeCount: number;
+  commentCount: number;
+  viewCount: number;
+  coverUrl: string;
+  imageUrl: string;
+  tags?: string[];
+  createdAt: string;
+}
+
+interface Track {
+  title: string;
+  duration: string;
+}
+
+const AlbumPost = () => {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [playingAlbumId, setPlayingAlbumId] = useState(null);
+  const [playingAlbumId, setPlayingAlbumId] = useState<string | null>(null);
   const [likedAlbums, setLikedAlbums] = useState<Record<string, boolean>>({});
   const [activeTab, setActiveTab] = useState('all');
+  const [showAddModal, setShowAddModal] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch albums from the API
     const fetchAlbums = async () => {
       try {
-        // Replace with the actual user ID
         const userId = "1234";
         const response = await fetch(`http://localhost:8484/posts/${userId}/album`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch albums');
         }
-
+        
         const data = await response.json();
-        if (data.code === 0 && Array.isArray(data.result)) {
+        
+        if (data.code === 200 && Array.isArray(data.result)) {
+          console.log('Fetched albums:', data);
           setAlbums(data.result);
+
         } else {
           throw new Error('Invalid data format');
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
-        console.error("Error fetching albums:", err);
       } finally {
         setLoading(false);
       }
@@ -62,21 +76,16 @@ const AlbumPost = () => {
 
     fetchAlbums();
   }, []);
-  const navigate = useNavigate();
+
   const handleClickPost = (albumId: string) => {
-    // Navigate to the album detail page
-    
     navigate(`/albums/${albumId}`);
-  }
-  // Handle play/pause for an album
-  // Removed misplaced code block as 'album' is not defined in this scope
+  };
+
   const handleLike = (albumId: string) => {
     setLikedAlbums(prev => {
       const isCurrentlyLiked = prev[albumId];
       const newLikedState = { ...prev, [albumId]: !isCurrentlyLiked };
 
-      // In a real app, you would send a request to your backend
-      // Update album like count locally for now
       setAlbums(albums.map(album => {
         if (album.id === albumId) {
           return {
@@ -91,7 +100,79 @@ const AlbumPost = () => {
     });
   };
 
-  // Format date
+  const handleAddAlbum = async (newAlbumData: {
+    title: string;
+    isPublic: boolean;
+    tags: string[];
+    coverImage: File | null;
+    image: File | null;
+    scheduleAt: Date | null;
+    tracks: string[];
+  }) => {
+    try {
+      // First upload the images if they exist
+      let cover = '';
+      let image = '';
+  
+      if (newAlbumData.coverImage) {
+        const coverFormData = new FormData();
+        coverFormData.append('file', newAlbumData.coverImage);
+        coverFormData.append('type', 'cover');
+        const coverResponse = await axios.post('http://localhost:8484/posts/uploadFile', coverFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        console.log('Cover image response:', coverResponse);
+        cover = coverResponse.data.result;
+      }
+  
+      if (newAlbumData.image) {
+        const imageFormData = new FormData();
+        imageFormData.append('file', newAlbumData.image);
+        imageFormData.append('type', 'image');
+        const imageResponse = await axios.post('http://localhost:8484/posts/uploadFile', imageFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        image = imageResponse.data.result;
+      }
+  
+      // Prepare the request body
+      const requestBody = {
+        title: newAlbumData.title,
+        isPublic: newAlbumData.isPublic,
+        tags: newAlbumData.tags,
+        cover,
+        image,
+        accountId: '1234', // Replace with actual user ID
+        scheduleAt: newAlbumData.scheduleAt?.toISOString(),
+        songIds: newAlbumData.tracks
+      };
+  
+      console.log('Request body:', requestBody);
+  
+      // Send the request
+      const response = await axios.post('http://localhost:8484/posts/album', requestBody, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      if (response.data.code === 200) {
+        console.log('Album added successfully:', response.data);
+        setAlbums([response.data.result, ...albums]);
+        console.log('Albums after adding new one:', albums);
+        return Promise.resolve();
+      }
+      throw new Error(response.data.message || 'Failed to add album');
+    } catch (err) {
+      console.error("Error adding album:", err);
+      return Promise.reject(err);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -100,7 +181,6 @@ const AlbumPost = () => {
     });
   };
 
-  // Filter albums based on active tab
   const getFilteredAlbums = () => {
     switch (activeTab) {
       case 'public':
@@ -112,9 +192,9 @@ const AlbumPost = () => {
     }
   };
 
-  // Count albums by visibility
   const publicCount = albums.filter(album => album.isPublic).length;
   const privateCount = albums.filter(album => !album.isPublic).length;
+  const filteredAlbums = getFilteredAlbums();
 
   if (loading) {
     return (
@@ -126,39 +206,30 @@ const AlbumPost = () => {
 
   if (error) {
     return (
-      <div className="alert alert-danger" role="alert">
-        <h4 className="alert-heading">Error loading albums</h4>
+      <Alert variant="danger" className="m-3">
+        <Alert.Heading>Error loading albums</Alert.Heading>
         <p>{error}</p>
-      </div>
+      </Alert>
     );
   }
-
-  if (albums.length === 0) {
-    return (
-      <Card className="text-center p-5 bg-light border-dashed">
-        <Card.Body>
-          <FaMusic size={48} className="text-secondary mb-3" />
-          <h3>No albums found</h3>
-          <p className="text-muted">Start creating your first album!</p>
-        </Card.Body>
-      </Card>
-    );
-  }
-
-  const filteredAlbums = getFilteredAlbums();
 
   return (
-    <Container style={{ maxWidth: "100%" }}>
+    <Container className="py-4" style={{ maxWidth: '100%' }}>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="fw-bold mb-0">Music Albums</h2>
+        <Button 
+          variant="primary" 
+          onClick={() => setShowAddModal(true)}
+          className="d-flex align-items-center"
+        >
+          <FaPlus className="me-2" />
+          New Album
+        </Button>
+      </div>
 
-      {/* Filter tabs */}
       <Tab.Container
-        id="album-tabs"
         activeKey={activeTab}
-        onSelect={(eventKey) => {
-          if (eventKey) {
-            setActiveTab(eventKey);
-          }
-        }}
+        onSelect={(k) => k && setActiveTab(k)}
       >
         <Nav variant="tabs" className="mb-4">
           <Nav.Item>
@@ -182,212 +253,168 @@ const AlbumPost = () => {
         </Nav>
 
         <Tab.Content>
-          <Tab.Pane eventKey={activeTab}>
+          <Tab.Pane eventKey={activeTab} style={{width :"100%"}}>
             {filteredAlbums.length === 0 ? (
-              <Card className="text-center p-4 bg-light">
+              <Card className="text-center p-5 bg-light border-dashed">
                 <Card.Body>
-                  <p className="text-muted mb-0">No {activeTab !== 'all' ? activeTab : ''} albums found</p>
+                  <FaMusic size={48} className="text-secondary mb-3" />
+                  <h3>No albums found</h3>
+                  <p className="text-muted">Start by creating a new album!</p>
+                  <Button 
+                      variant="primary" 
+                    onClick={() => setShowAddModal(true)}
+                    className="mt-3"
+                  >
+                    <FaPlus className="me-2" />
+                    Create Album
+                  </Button>
                 </Card.Body>
               </Card>
             ) : (
-              <Row xs={1} md={1} className="g-4" style={{ maxWidth: "100%",alignContent : "center",justifyContent : "center" }}>
-            {filteredAlbums.map(album => (
-              <Col key={album.id} style={{ maxWidth: "90%" }}>
-                <Card className="h-100 shadow-sm hover-lift">
-                  {/* Banner with cover image */}
-                  <div
-                    className="position-relative"
-                    style={{
-                      height: '150px',
-                      backgroundImage: `url(${album.coverUrl})`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
-                  >
-                    {/* Gradient overlay */}
-                    <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark-gradient"></div>
-
-                    {/* Header content */}
-                    <div className="position-absolute top-0 start-0 w-100 p-3 d-flex justify-content-between align-items-center" >
-                      <div className="d-flex align-items-center">
-                        <div className="rounded-circle bg-primary d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
-                          <FaMusic color="white" size={16} />
-                        </div>
-                        <div className="ms-2">
-                          <div className="text-black fw-bold">Album</div>
-                          <small className="text-black-50">{formatDate(album.crateAt)}</small>
-                        </div>
-                      </div>
-                      <Badge bg={album.isPublic ? 'success' : 'warning'} className="d-flex align-items-center">
-                        {album.isPublic ?
-                          <><FaGlobeAmericas size={10} className="me-1" /> Public</> :
-                          <><FaLock size={10} className="me-1" /> Private</>
-                        }
-                      </Badge>
-                    </div>
-
-                    {/* Banner content */}
-                    <div className="position-absolute bottom-0 start-0 w-100 p-3">
-                      <h2 className="text-black fw-bold text-truncate">{album.title}</h2>
-                      <div className="text-black-50 small d-flex align-items-center">
-                        <FaMusic size={12} className="me-1" />
-                        <span>{album.tracks} tracks</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Card.Body onClick={() => handleClickPost(album.id)}>
-                    <Row>
-                      {/* Album cover */}
-                      <Col md={5} className="mb-3 mb-md-0" style={{ width: '20%', marginRight: '10%' }}>
-                        <div className="position-relative rounded overflow-hidden shadow-sm" style={{ aspectRatio: '1/1' }}>
-                          <img
-                            src={album.imageUrl}
-                            alt={album.title}
-                            className="w-100 h-100 object-fit-cover"
-                          />
-                          <div
-                            className="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-25 d-flex align-items-center justify-content-center opacity-0 hover-opacity-100"
-                            style={{ cursor: 'pointer', transition: 'opacity 0.3s' }}
-
-                          >
-                            <div className="bg-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: '60px', height: '60px' }}>
-                              {playingAlbumId === album.id ?
-                                <FaPause size={24} className="text-primary" /> :
-                                <FaPlay size={24} className="text-primary" />
-                              }
+              <Row xs={1} md={2} lg={3} className="g-4" style={{width :"100%",justifyContent :"center"}}>
+                {filteredAlbums.map(album => (
+                  <Col key={album.id} style={{width :"80%"}} >
+                    <Card className="h-100 shadow-sm hover-lift">
+                      <div
+                        className="position-relative"
+                        style={{
+                          height: '150px',
+                          backgroundImage: `url(${album.coverUrl})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center'
+                        }}
+                      >
+                        <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark-gradient"></div>
+                        <div className="position-absolute top-0 start-0 w-100 p-3 d-flex justify-content-between align-items-center">
+                          <div className="d-flex align-items-center">
+                            <div className="rounded-circle bg-primary d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
+                              <FaMusic color="white" size={16} />
+                            </div>
+                            <div className="ms-2">
+                              <div className="text-white fw-bold">Album</div>
+                              <small className="text-white-50">{formatDate(album.createdAt)}</small>
                             </div>
                           </div>
-                          {/* Album status indicator */}
-                          {playingAlbumId === album.id && (
-                            <Badge bg="primary" className="position-absolute bottom-0 end-0 m-2 pulse">
-                              Now Playing
-                            </Badge>
-                          )}
+                          <Badge bg={album.isPublic ? 'success' : 'warning'}>
+                            {album.isPublic ? 'Public' : 'Private'}
+                          </Badge>
                         </div>
-                      </Col>
-
-                      {/* Album details */}
-                      <Col md={7}>
-                        {/* Tags */}
-                        <div className="mb-3 d-flex flex-wrap gap-2">
-                          {album.tags?.map((tag, index) => (
-                            <Badge key={index} bg="light" text="primary" className="d-flex align-items-center">
-                              <FaTag size={10} className="me-1" />
-                              {tag.toLowerCase()}
-                            </Badge>
-                          ))}
+                        <div className="position-absolute bottom-0 start-0 w-100 p-3">
+                          <h2 className="text-white fw-bold">{album.title}</h2>
+                          <div className="text-white-50 small">
+                            <FaMusic size={12} className="me-1" />
+                            {album.tracks} tracks
+                          </div>
                         </div>
-
-                        {/* Basic album info */}
-                        <Card className="bg-light border-0">
-                          <Card.Body>
-                            <Row className="mb-2">
-                              <Col xs={4} className="fw-bold text-muted">Album:</Col>
-                              <Col>{album.title}</Col>
-                            </Row>
-                            <Row className="mb-2">
-                              <Col xs={4} className="fw-bold text-muted">Tracks:</Col>
-                              <Col>{album.tracks}</Col>
-                            </Row>
-                            <Row>
-                              <Col xs={4} className="fw-bold text-muted">Visibility:</Col>
-                              <Col className={`text-${album.isPublic ? 'success' : 'warning'} d-flex align-items-center`}>
-                                {album.isPublic ?
-                                  <><FaGlobeAmericas size={12} className="me-1" /> Public</> :
-                                  <><FaLock size={12} className="me-1" /> Private</>
-                                }
-                              </Col>
-                            </Row>
-                          </Card.Body>
-                        </Card>
-                      </Col>
-                    </Row>
-                  </Card.Body>
-
-                  {/* Action buttons */}
-                  <Card.Footer className="bg-white border-top">
-                    <div className="d-flex justify-content-between align-items-center">
-                      <Button
-                        variant={likedAlbums[album.id] ? "danger" : "light"}
-                        size="sm"
-                        className="d-flex align-items-center"
-                        onClick={() => handleLike(album.id)}
-                      >
-                        {likedAlbums[album.id] ?
-                          <FaHeart size={16} className="me-2" /> :
-                          <FaRegHeart size={16} className="me-2" />
-                        }
-                        <span>{album.likeCount || 0}</span>
-                      </Button>
-
-                      <Button
-                        variant="light"
-                        size="sm"
-                        className="d-flex align-items-center"
-                      >
-                        <FaComment size={16} className="me-2" />
-                        <span>{album.commentCount || 0}</span>
-                      </Button>
-
-                      <div className="d-flex align-items-center text-muted">
-                        <FaEye size={16} className="me-2" />
-                        <span>{album.viewCount || 0}</span>
                       </div>
-                    </div>
-                  </Card.Footer>
-                </Card>
-              </Col>
-            ))}
-          </Row>
+
+                      <Card.Body onClick={() => handleClickPost(album.id)}>
+                        <Row>
+                          <Col md={5} className="mb-3 mb-md-0">
+                            <div className="position-relative rounded overflow-hidden shadow-sm" style={{ aspectRatio: '1/1' }}>
+                              <img
+                                src={album.imageUrl}
+                                alt={album.title}
+                                className="w-100 h-100 object-fit-cover"
+                              />
+                              <div
+                                className="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-25 d-flex align-items-center justify-content-center opacity-0 hover-opacity-100"
+                                style={{ cursor: 'pointer', transition: 'opacity 0.3s' }}
+                              >
+                                <div className="bg-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: '60px', height: '60px' }}>
+                                  {playingAlbumId === album.id ? 
+                                    <FaPause size={24} className="text-primary" /> : 
+                                    <FaPlay size={24} className="text-primary" />
+                                  }
+                                </div>
+                              </div>
+                              {playingAlbumId === album.id && (
+                                <Badge bg="primary" className="position-absolute bottom-0 end-0 m-2 pulse">
+                                  Now Playing
+                                </Badge>
+                              )}
+                            </div>
+                          </Col>
+
+                          <Col md={7}>
+                            {album.tags && album.tags.length > 0 && (
+                              <div className="mb-3 d-flex flex-wrap gap-2">
+                                {album.tags.map((tag, index) => (
+                                  <Badge key={index} bg="light" text="dark" className="d-flex align-items-center">
+                                    <FaTag size={10} className="me-1" />
+                                    {tag}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                            <Card className="bg-light border-0">
+                              <Card.Body>
+                                <Row className="mb-2">
+                                  <Col xs={4} className="fw-bold text-muted">Album:</Col>
+                                  <Col>{album.title}</Col>
+                                </Row>
+                                <Row className="mb-2">
+                                  <Col xs={4} className="fw-bold text-muted">Tracks:</Col>
+                                  <Col>{album.tracks}</Col>
+                                </Row>
+                                <Row>
+                                  <Col xs={4} className="fw-bold text-muted">Visibility:</Col>
+                                  <Col className={`text-${album.isPublic ? 'success' : 'warning'}`}>
+                                    {album.isPublic ? 'Public' : 'Private'}
+                                  </Col>
+                                </Row>
+                              </Card.Body>
+                            </Card>
+                          </Col>
+                        </Row>
+                      </Card.Body>
+
+                      <Card.Footer className="bg-white border-top">
+                        <div className="d-flex justify-content-between align-items-center">
+                          <Button
+                            variant={likedAlbums[album.id] ? "danger" : "light"}
+                            size="sm"
+                            onClick={() => handleLike(album.id)}
+                            className="d-flex align-items-center"
+                          >
+                            {likedAlbums[album.id] ? 
+                              <FaHeart className="me-2" /> : 
+                              <FaRegHeart className="me-2" />
+                            }
+                            {album.likeCount || 0}
+                          </Button>
+
+                          <Button
+                            variant="light"
+                            size="sm"
+                            className="d-flex align-items-center"
+                          >
+                            <FaComment className="me-2" />
+                            {album.commentCount || 0}
+                          </Button>
+
+                          <div className="d-flex align-items-center text-muted">
+                            <FaEye className="me-2" />
+                            {album.viewCount || 0}
+                          </div>
+                        </div>
+                      </Card.Footer>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
             )}
-        </Tab.Pane>
-      </Tab.Content>
-    </Tab.Container>
-    </Container >
+          </Tab.Pane>
+        </Tab.Content>
+      </Tab.Container>
+
+      <AddAlbumModal 
+        show={showAddModal}
+        onHide={() => setShowAddModal(false)}
+        onAddAlbum={handleAddAlbum}
+      />
+    </Container>
   );
 };
-
-// Add these CSS styles to your global CSS file
-const globalStyles = `
-  .bg-dark-gradient {
-    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1) 100%);
-  }
-  
-  .hover-lift {
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-  
-  .hover-lift:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-  }
-  
-  .hover-opacity-100:hover {
-    opacity: 1 !important;
-  }
-  
-  .object-fit-cover {
-    object-fit: cover;
-  }
-  
-  .border-dashed {
-    border-style: dashed !important;
-  }
-  
-  .pulse {
-    animation: pulse-animation 2s infinite;
-  }
-  
-  @keyframes pulse-animation {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
-  }
-  
-  .text-white-50 {
-    color: rgba(255, 255, 255, 0.5);
-  }
-`;
 
 export default AlbumPost;

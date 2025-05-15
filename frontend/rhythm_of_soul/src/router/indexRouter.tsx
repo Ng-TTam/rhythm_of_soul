@@ -16,6 +16,7 @@ import AlbumMain from '../components/album/AlbumMain'
 import  PostSong  from '../components/songs/PostSong'
 import PostSongDetail from '../components/songs/PostSongDetail'
 import Songs from '../components/songs/Songs'
+import RankSong from '../components/ranking/RankSong'
 export const indexRouter: any = {
     path: '/',
     element: (<Dashboard />),
@@ -30,6 +31,7 @@ export const indexRouter: any = {
             ]
 
         },
+        {path: 'ranking', element: (<RankSong />) },
         {
           path: 'songs',
               element: (<Songs />),

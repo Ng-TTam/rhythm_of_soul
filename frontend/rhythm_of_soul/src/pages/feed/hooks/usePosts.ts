@@ -21,7 +21,7 @@ const usePosts = (currentUser: CurrentUser) => {
       const result = await response.json();
       console.log('Fetched posts:', result);
       
-      if (result.code === 0 && Array.isArray(result.result)) {
+      if (result.code === 200 && Array.isArray(result.result)) {
         const postsWithUserInfo = result.result.map((post: any) => ({
           ...post,
           username: currentUser.username,

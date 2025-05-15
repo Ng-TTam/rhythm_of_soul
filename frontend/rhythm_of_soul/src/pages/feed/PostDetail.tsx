@@ -54,7 +54,7 @@ const PostDetail: React.FC = () => {
       setState(prev => ({ ...prev, loading: true }));
       const response = await fetchPostDetail(postId);
 
-      if (response.code === 0 && response.data) {
+      if (response.code === 200 && response.data) {
         const postData = {
           ...response.data.post,
           username: response.data.post.username || 'Unknown User',
@@ -122,7 +122,7 @@ const PostDetail: React.FC = () => {
       // await addComment(postId, content);
       const newComment: Comment = {
         id: `temp-${Date.now()}`,
-        user_id: currentUser.id,
+        account_id: currentUser.id,
         post_id: postId,
         content,
         created_at: new Date().toISOString(),

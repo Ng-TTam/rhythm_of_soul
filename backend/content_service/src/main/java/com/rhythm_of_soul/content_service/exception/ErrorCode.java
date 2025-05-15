@@ -10,6 +10,7 @@ public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     UNAUTHENTICATED(9990, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1003, "You do not have permission", HttpStatus.FORBIDDEN),
+    FILE_TYPE_NOT_FOUND(1004, "File not found", HttpStatus.NOT_FOUND),
 
     // 5xxx - post error code
     POST_NOT_FOUND(5000, "Post not found", HttpStatus.NOT_FOUND),

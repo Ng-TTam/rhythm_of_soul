@@ -15,12 +15,12 @@ const PostModal: React.FC<PostModalProps> = ({
   const [errorMessage, setErrorMessage] = useState('');
   
   const visibilityOptions = ['Public', 'Private'];
-  const tagOptions = ['ROCK', 'POP', 'JAZZ', 'CLASSICAL', 'HIP-HOP', 'ELECTRONIC'];
+  const tagOptions = ['ROCK', 'POP', 'JAZZ', 'CLASSICAL', 'HIP_HOP', 'ELECTRONIC'];
   
   const [formData, setFormData] = useState<{
     caption: string;
     title: string;
-    user_id: string;
+    account_id: string;
     type: string;
     tag: string[];
     song: File | null;
@@ -30,7 +30,7 @@ const PostModal: React.FC<PostModalProps> = ({
   }>({
     caption: '',
     title: '',
-    user_id: currentUserId || '',
+    account_id: currentUserId || '',
     type: activeTab,
     tag: [],
     song: null,
@@ -78,7 +78,7 @@ const PostModal: React.FC<PostModalProps> = ({
       const updatedFormData = {
         ...formData,
         type: activeTab,
-        user_id: currentUserId
+        account_id: currentUserId
       };
       
       // Kiểm tra các trường bắt buộc khi là tab SONG
@@ -110,7 +110,7 @@ const PostModal: React.FC<PostModalProps> = ({
           // Tạo dữ liệu để gửi đi trong body của request
           const textPostData = {
             caption: updatedFormData.caption,
-            user_id: updatedFormData.user_id,
+            account_id: updatedFormData.account_id,
             type: updatedFormData.type,
             isPublic: updatedFormData.isPublic,
             content : null
@@ -148,7 +148,7 @@ const PostModal: React.FC<PostModalProps> = ({
         formDataToSend.append('isPublic', formData.isPublic.toString());
         
         // Thêm các trường thông tin
-        formDataToSend.append('user_id', currentUserId);
+        formDataToSend.append('account_id', currentUserId);
         if (formData.title) formDataToSend.append('title', formData.title);
         
         // Thêm caption vào form data nếu có

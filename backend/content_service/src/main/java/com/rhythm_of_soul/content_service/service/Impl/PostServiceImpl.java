@@ -5,6 +5,8 @@ import com.rhythm_of_soul.content_service.common.Type;
 import com.rhythm_of_soul.content_service.config.MinioConfig;
 import com.rhythm_of_soul.content_service.dto.ContentResponse;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
+import com.rhythm_of_soul.content_service.dto.request.AlbumCreationRequest;
+import com.rhythm_of_soul.content_service.dto.request.PlaylistCreationRequest;
 import com.rhythm_of_soul.content_service.dto.request.PostRequest;
 import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
 import com.rhythm_of_soul.content_service.dto.response.CommentResponse;
@@ -141,11 +143,11 @@ public class PostServiceImpl implements  PostService {
                 return postResponse;
             }
             ContentResponse content = postResponse.getContent();
-             content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
-             content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
+            content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
+            content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
             postResponse.setContent(content);
             if(postRequest.getType() == Type.ALBUM || postRequest.getType() == Type.PLAYLIST){
-                postResponse.getContent().setSongIds(getSongs(postRequest.getContent().getSongIds()));
+              if(post.getContent().getSongIds() != null)  postResponse.getContent().setSongIds(getSongs(postRequest.getContent().getSongIds()));
 
             }
             return postResponse;
@@ -201,34 +203,6 @@ public class PostServiceImpl implements  PostService {
     }
 
     @Override
-    public PostDetailResponse getPost(String accountId, String postId) {
-        Post post = postRepository.findById(postId).orElseThrow(
-                () -> new AppException(ErrorCode.POST_NOT_FOUND));
-        PostResponse postResponse = postMapper.toPostResponse(post);
-
-        // set liked of accountId
-        if(accountId != null)
-            postResponse.set_liked(likeRepository.existsByAccountIdAndPostId(accountId, postId));
-
-        if(post.getContent() != null){
-            ContentResponse content = postResponse.getContent();
-            if (post.getContent().getImageUrl() != null) content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
-            if (post.getContent().getCoverUrl() != null) content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
-            if(post.getType() == Type.ALBUM || post.getType() == Type.PLAYLIST){
-                content.setSongIds(getSongs(post.getContent().getSongIds()));
-            }
-            postResponse.setContent(content);
-        }
-
-        List <Like> likes = likeRepository.findAllByPostId(postId);
-        return PostDetailResponse.builder()
-                .post(postResponse)
-                .likes(likes.stream().map(likeMapper::toLikeResponse).toList())
-                .comments(getComments(postId))
-                .build();
-    }
-
-    @Override
     public List<PostResponse> getSongs(String accountId) {
         List<Post> posts = postRepository.findAllByAccountIdAndType(accountId, Type.SONG);
         List<PostResponse> postResponses = new ArrayList<>();
@@ -257,7 +231,7 @@ public class PostServiceImpl implements  PostService {
                 ContentResponse content = postResponse.getContent();
                 if(post.getContent().getImageUrl() != null) content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
                 if(post.getContent().getCoverUrl() != null)  content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
-                postResponse.getContent().setSongIds(getSongs(post.getContent().getSongIds()));
+                if (post.getContent().getSongIds() != null) postResponse.getContent().setSongIds(getSongs(post.getContent().getSongIds()));
                 postResponse.setContent(content);
             }
             postResponses.add(postResponse);
@@ -341,6 +315,165 @@ public class PostServiceImpl implements  PostService {
         return processPosts(posts, accountId);
     }
 
+    @Override
+    public PostDetailResponse getPostDetail(String accountId, String postId) {
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new AppException(ErrorCode.POST_NOT_FOUND));
+        PostResponse postResponse = postMapper.toPostResponse(post);
+
+        // set liked of accountId
+        if(accountId != null)
+            postResponse.set_liked(likeRepository.existsByAccountIdAndPostId(accountId, postId));
+
+        if(post.getContent() != null){
+            ContentResponse content = postResponse.getContent();
+            if (post.getContent().getImageUrl() != null) content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
+            if (post.getContent().getCoverUrl() != null) content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
+            if(post.getType() == Type.ALBUM || post.getType() == Type.PLAYLIST){
+                if( post.getContent().getSongIds() != null) content.setSongIds(getSongs(post.getContent().getSongIds()));
+            }
+            postResponse.setContent(content);
+        }
+
+        List <Like> likes = likeRepository.findAllByPostId(postId);
+        return PostDetailResponse.builder()
+                .post(postResponse)
+                .likes(likes.stream().map(likeMapper::toLikeResponse).toList())
+                .comments(getComments(postId))
+                .build();
+    }
+
+    @Override
+    public PostResponse getPost(String postId) {
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new AppException(ErrorCode.POST_NOT_FOUND));
+        PostResponse postResponse = postMapper.toPostResponse(post);
+        if(post.getContent() != null){
+            ContentResponse content = postResponse.getContent();
+            if (post.getContent().getImageUrl() != null) content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
+            if (post.getContent().getCoverUrl() != null) content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
+            postResponse.setContent(content);
+        }
+        if(post.getType() == Type.ALBUM || post.getType() == Type.PLAYLIST){
+            assert post.getContent() != null;
+            if( post.getContent().getSongIds() != null) postResponse.getContent().setSongIds(getSongs(post.getContent().getSongIds()));
+        }
+
+        return postResponse;
+    }
+
+    @Override
+    public List<SongResponse> getListSongs() {
+        List<Post> posts = postRepository.findAllByType(Type.SONG);
+        List<SongResponse> songsResponse = new ArrayList<>();
+        for(Post post : posts){
+            songsResponse.add(SongResponse.builder()
+                    .songId(post.getId())
+                    .title(post.getContent().getTitle())
+                    .mediaUrl(post.getContent().getMediaUrl())
+                    .imageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()))
+                    .coverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()))
+                    .tags(post.getContent().getTags())
+                    .build());
+        }
+        return songsResponse;
+    }
+
+    @Override
+    public String createFile(MultipartFile file, String type) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        try{
+            switch (type){
+                case "song":
+                    return saveFileMinio.saveFile(file, minioConfig.getSongsBucket());
+                case "cover":
+                    return saveFileMinio.saveFile(file, minioConfig.getCoversBucket());
+                case "image":
+                    return saveFileMinio.saveFile(file, minioConfig.getImagesBucket());
+            }
+        }catch (Exception e){
+            log.error("Error while creating file", e);
+            throw new RuntimeException("Error while creating file", e);
+        }
+        return null;
+    }
+    @Override
+    public AlbumResponse createAlbum(AlbumCreationRequest postRequest) {
+        try {
+            Post post = Post.builder()
+                    .id(UUID.randomUUID().toString())
+                    .accountId(postRequest.getAccountId())
+                    .createdAt(Instant.now())
+                    .updatedAt(null)
+                    .likeCount(0)
+                    .type(Type.ALBUM)
+                    .content(Content.builder()
+                            .tags(postRequest.getTags())
+                            .title(postRequest.getTitle())
+                            .imageUrl(postRequest.getImage())
+                            .coverUrl(postRequest.getCover())
+                            .songIds(postRequest.getSongIds())
+                            .build())
+                    .commentCount(0)
+                    .viewCount(0)
+                    .isPublic(postRequest.getIsPublic())
+                    .scheduledAt(postRequest.getSheduleAt())
+                    .build();
+            postRepository.save(post);
+            return AlbumResponse.builder()
+                    .id(post.getId())
+                    .title(post.getContent().getTitle())
+                    .imageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()))
+                    .coverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()))
+                    .tracks(post.getContent().getSongIds().size())
+                    .createdAt(post.getCreatedAt())
+                    .updatedAt(post.getUpdatedAt() != null ? post.getUpdatedAt() : null)
+                    .tags(post.getContent().getTags())
+                    .isPublic(post.isPublic())
+                    .accountId(post.getAccountId())
+                    .viewCount(post.getViewCount())
+                    .likeCount(post.getLikeCount())
+                    .commentCount(post.getCommentCount())
+                    .scheduledAt(post.getScheduledAt() != null ? post.getScheduledAt() : null)
+                    .build();
+        }catch (Exception e){
+            log.error("Error while creating album", e);
+            throw new RuntimeException("Error while creating album", e);
+        }
+    }
+
+    @Override
+    public PostResponse createPlaylist(PlaylistCreationRequest postRequest) {
+        try {
+            Post post = Post.builder()
+                    .id(UUID.randomUUID().toString())
+                    .accountId(postRequest.getAccountId())
+                    .createdAt(Instant.now())
+                    .updatedAt(null)
+                    .likeCount(0)
+                    .type(Type.PLAYLIST)
+                    .content(Content.builder()
+                            .tags(postRequest.getTags())
+                            .title(postRequest.getTitle())
+                            .imageUrl(postRequest.getImage())
+                            .coverUrl(postRequest.getCover())
+                            .build())
+                    .commentCount(0)
+                    .viewCount(0)
+                    .isPublic(postRequest.getIsPublic())
+                    .build();
+            postRepository.save(post);
+            PostResponse postResponse = postMapper.toPostResponse(post);
+            ContentResponse content = postResponse.getContent();
+            content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
+            content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
+            postResponse.setContent(content);
+            return postResponse;
+        }catch (Exception e){
+            log.error("Error while creating playlist", e);
+            throw new RuntimeException("Error while creating playlist", e);
+        }
+    }
+
     public List<PostResponse> processPosts(List<Post> posts, String accountId) {
         if (posts.isEmpty()) {
             return Collections.emptyList();
@@ -376,7 +509,7 @@ public class PostServiceImpl implements  PostService {
                 }
                 postResponse.setContent(content);
                 if (post.getType() == Type.ALBUM || post.getType() == Type.PLAYLIST) {
-                    postResponse.getContent().setSongIds(getSongs(post.getContent().getSongIds()));
+                    if (post.getContent().getSongIds() != null) postResponse.getContent().setSongIds(getSongs(post.getContent().getSongIds()));
                 }
             }
 
