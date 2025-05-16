@@ -5,42 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e2d90fc8-97dc-4ce7-9f67-c2e934e6f05b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/request/AlbumCreationRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/request/PlaylistCreationRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a455a8a9-323a-4e2a-a30a-86249259fe0d.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/PostController.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/PostController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/request/CommentCreationRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/request/CommentCreationRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/exception/ErrorCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/exception/ErrorCode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/repository/PostRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/repository/PostRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/PostServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/PostServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/PostService.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/PostService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/utils/CommentManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/utils/CommentManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/Sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/Sidebar.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/album/AddAlbumForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/album/AddAlbumForm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/album/AlbumCollectionPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/album/AlbumCollectionPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/album/AlbumPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/album/AlbumPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/playlist/CreatePlaylistDialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/playlist/CreatePlaylistDialog.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/playlist/PlayListDetail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/playlist/PlayListDetail.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/playlist/PlayListGrid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/playlist/PlayListGrid.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/playlist/PlayListPost.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/playlist/PlayListPost.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/playlist/hooks/playlistPosts.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/playlist/hooks/playlistPosts.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/PlaybackBar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/PlaybackBar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/PostSong.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/PostSong.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/PostSongDetail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/PostSongDetail.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/model/post.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/model/post.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/Feed.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/Feed.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/mainContent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/mainContent.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/SongTop.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/SongTop.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/SongTrending.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/songs/SongTrending.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/PostDetail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/PostDetail.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/PostModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/PostModal.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/hooks/usePosts.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/hooks/usePosts.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/utils/formatTime.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/utils/formatTime.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/router/indexRouter.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/router/indexRouter.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/postDetail/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/postDetail/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/router/authRouter.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/router/authRouter.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/services/postService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/services/postService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/store/store.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/store/store.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/style/PlaylistPost.css" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/style/PlaylistPost.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/services/profileService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/services/profileService.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,17 +74,17 @@
   &quot;keyToString&quot;: {
     &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
     &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
-    &quot;Docker.content_service.app: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.content_service.minio: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.content_service.mongodb: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.content_service [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.identity_service [clean].executor&quot;: &quot;Run&quot;,
     &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
     &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
     &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
     &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;Spring Boot.ApiGatewayApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.ContentServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.ContentServiceApplication.executor&quot;: &quot;Debug&quot;,
     &quot;Spring Boot.IdentityServiceApplication.executor&quot;: &quot;Run&quot;,
     &quot;git-widget-placeholder&quot;: &quot;content&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
@@ -118,10 +98,12 @@
     &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;settings.editor.splitter.proportion&quot;: &quot;0.27624872&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
   &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mariadb&quot;
+    ],
     &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
       &quot;PLAIN_TEXT&quot;
     ]
@@ -292,21 +274,6 @@
       <workItem from="1746655873493" duration="7726000" />
       <workItem from="1746679607323" duration="4872000" />
       <workItem from="1746684595321" duration="6739000" />
-      <workItem from="1746694007708" duration="1541000" />
-      <workItem from="1746723196111" duration="5535000" />
-      <workItem from="1746756136276" duration="530000" />
-      <workItem from="1746756711296" duration="2201000" />
-      <workItem from="1746982713829" duration="8207000" />
-      <workItem from="1747005484890" duration="4007000" />
-      <workItem from="1747016369657" duration="291000" />
-      <workItem from="1747061022375" duration="5395000" />
-      <workItem from="1747091643517" duration="348000" />
-      <workItem from="1747092941868" duration="4818000" />
-      <workItem from="1747149122052" duration="1334000" />
-      <workItem from="1747150649611" duration="132000" />
-      <workItem from="1747157567625" duration="6819000" />
-      <workItem from="1747178215355" duration="4926000" />
-      <workItem from="1747257978453" duration="9072000" />
       <workItem from="1746975890127" duration="4986000" />
       <workItem from="1747012928369" duration="2348000" />
       <workItem from="1747096263015" duration="9000000" />
@@ -316,7 +283,10 @@
       <workItem from="1747182223597" duration="7925000" />
       <workItem from="1747191616323" duration="11583000" />
       <workItem from="1747229237557" duration="6914000" />
-      <workItem from="1747270933793" duration="1379000" />
+      <workItem from="1747270933793" duration="6003000" />
+      <workItem from="1747288364187" duration="127000" />
+      <workItem from="1747322700814" duration="350000" />
+      <workItem from="1747359725310" duration="642000" />
     </task>
     <servers />
   </component>
@@ -328,7 +298,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/content" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -336,25 +318,5 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <option name="LAST_COMMIT_MESSAGE" value="" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/PostServiceImpl.java</url>
-          <line>157</line>
-          <properties>
-            <option name="lambda-ordinal" value="-1" />
-          </properties>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/utils/CommentManager.java</url>
-          <line>13</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

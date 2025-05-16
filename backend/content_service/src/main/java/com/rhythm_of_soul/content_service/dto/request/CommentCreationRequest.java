@@ -9,10 +9,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommentCreationRequest {
-    @NotBlank
+    @NotBlank(message = "BLANK_POST_ID")
     private String postId;
 
-    @NotBlank
+    @NotBlank(message = "BLANK_COMMENT")
     private String content;
     private String parentId;
 }

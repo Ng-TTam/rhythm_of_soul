@@ -1,7 +1,6 @@
 import Nav from "../../components/Nav";
 import PlaybackBar from "../../components/songs/PlaybackBar";
 
-import FloatMenu from "../../components/floatMenu/FloatMenu";
 import Sidebar from "../../components/Sidebar";
 import { Outlet } from 'react-router-dom';
 import { useEffect } from "react";
@@ -30,7 +29,6 @@ export default function Dashboard() {
       </main>
       
       <PlaybackBar />
-      <FloatMenu />
     </>
   );
 }

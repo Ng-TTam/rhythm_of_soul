@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Card, Spinner } from 'react-bootstrap';
-import { fetchPostDetail } from '../../services/postService';
+import { addComment, fetchPostDetail, likePost, unlikePost } from '../../services/postService';
 import PostHeader from './postDetail/PostHeader';
 import TextPostContent from './postDetail/TextPostContent';
 import CommentSection from './postDetail/index';
@@ -81,6 +81,7 @@ const PostDetail: React.FC = () => {
   const handleLike = useCallback(async () => {
     try {
       // await likePost(postId!);
+      state.isLiked ? unlikePost(postId!) : likePost(postId!);
       setState(prev => ({
         ...prev,
         isLiked: !prev.isLiked,
@@ -109,6 +110,7 @@ const PostDetail: React.FC = () => {
 
     try {
       // await addComment(postId, content);
+      addComment({postId: postId, content: content, parentId: null});
       const newComment: Comment = {
         id: `temp-${Date.now()}`,
         account_id: currentUser.id,

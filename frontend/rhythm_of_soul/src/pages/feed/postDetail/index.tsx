@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from 'react-bootstrap';
 import CommentList from './CommentList';
 import CommentForm from './CommentForm';
@@ -23,6 +23,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   showAll,
   onToggleShowAll
 }) => {
+
   return (
     <div className="comments-section">
       <CommentForm onSubmit={onSubmit} />

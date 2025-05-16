@@ -134,7 +134,7 @@ public class PostController {
                 .build();
     }
 
-    @GetMapping("/songs/history")
+    @GetMapping("/songs/recently")
     public ApiResponse<List<PostResponse>> getSongPostsListened(
             @RequestParam(required = false) String accountId,
             @RequestParam(defaultValue = "0") int page,

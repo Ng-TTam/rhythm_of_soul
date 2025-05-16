@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { PostWithUserInfo, CurrentUser } from '../../../model/post/post';
+import { likePost, unlikePost } from '../../../services/postService';
 
 const usePosts = (currentUser: CurrentUser) => {
   const [posts, setPosts] = useState<PostWithUserInfo[]>([]);
@@ -49,6 +50,7 @@ const usePosts = (currentUser: CurrentUser) => {
     setPosts(prev =>
       prev.map(post => {
         if (post.id === postId) {
+          alreadyLiked ? unlikePost(post.id) : likePost(post.id);
           return { 
             ...post, 
             like_count: post.like_count + (alreadyLiked ? -1 : 1) 

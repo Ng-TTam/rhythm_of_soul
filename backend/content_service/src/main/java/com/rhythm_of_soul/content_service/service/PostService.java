@@ -25,7 +25,7 @@ public interface PostService {
     PostResponse createPost(String accountId, PostRequest postRequest);
     PostResponse addSong(String postId, List<String> songIds);
     List<PostResponse> getPosts(String accountId);
-//<<<<<<< Updated upstream
+
     List<PostResponse> getSongs(String accountId);
     List<PostResponse> getPlaylists(String accountId);
     List<AlbumResponse> getAlbum(String accountId);
@@ -44,7 +44,7 @@ public interface PostService {
      * @return list post
      */
     List<PostResponse> searchPosts(String accountId, String keyword, String tag, Type type, int page, int size);
-//=======
+
     PostDetailResponse getPostDetail(String accountId, String postId);
     PostResponse getPost(String postId);
     List<SongResponse> getListSongs();

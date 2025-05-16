@@ -7,6 +7,12 @@ import { Song,SongEditForm,SongDetail } from '../model/post/Song';
 
 const API_BASE_URL = 'http://localhost:8484';
 
+interface CommentCreationRequest { 
+  postId: string;
+  content: string;
+  parentId: string | null;
+}
+
 export const fetchPostDetail = async (postId: string): Promise<PostDetailResponse> => {
   const response = await axios.get<PostDetailResponse>(
     `${API_BASE_URL}/posts/detailPost/${postId}`
@@ -17,17 +23,46 @@ export const postSong = async (account_id: string): Promise<PostResponse[]> => {
   const response = await axios.get<APIResponse<PostResponse[]>>(`${API_BASE_URL}/posts/${account_id}/songs` );
   return response.data.result;
 };
-export const likePost = async (postId: string) => {
-  await axios.post(`${API_BASE_URL}/posts/${postId}/like`);
+
+export const getSongRecently = async (): Promise<PostResponse[]>  => {
+  const response = await axios.get<APIResponse<PostResponse[]>>(`${API_BASE_URL}/posts/songs/history` );
+  return response.data.result;
+}
+
+export const likePost = (postId: string) => {
+  axios.post(`${API_BASE_URL}/likes?postId=${postId}`);
+};
+export const unlikePost = (postId: string) => {
+  axios.delete(`${API_BASE_URL}/likes?postId=${postId}`);
 };
 
 export const repost = async (postId: string) => {
   await axios.post(`${API_BASE_URL}/posts/${postId}/repost`);
 };
 
-export const addComment = async (postId: string, content: string) => {
-  await axios.post(`${API_BASE_URL}/posts/${postId}/comments`, { content });
+export const addComment = async ( content: CommentCreationRequest) => {
+  await axios.post(`${API_BASE_URL}/comments`, content );
 };
+
+export const editComment = async ( commentId: string, content: string) => {
+  await axios.put(`${API_BASE_URL}/comments?commentId=${commentId}`, { content });
+};
+
+export const deleteComment = async ( commentId: string ) => {
+  await axios.delete(`${API_BASE_URL}/comments?commentId=${commentId}`);
+};
+
+export const getTopLevelComment = async ( postId: string ) => {
+  await axios.get(`${API_BASE_URL}/comments/top-level/${postId}`);
+};
+
+export const getReplies = async ( parentCommentId: string ) => {
+  await axios.get(`${API_BASE_URL}/comments/replies/${parentCommentId}`);
+};
+
+export const getTopSongWeekly = async () => {
+  await axios.get(`${API_BASE_URL}/top/songs/weekly`)
+}
 
 export const likeComment = async (commentId: string) => {
   await axios.post(`${API_BASE_URL}/comments/${commentId}/like`);

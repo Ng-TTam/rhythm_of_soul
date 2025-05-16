@@ -15,9 +15,11 @@ public enum ErrorCode {
     // 5xxx - post error code
     POST_NOT_FOUND(5000, "Post not found", HttpStatus.NOT_FOUND),
     SONG_NOT_FOUND(5001, "Song not found", HttpStatus.NOT_FOUND),
+    BLANK_POST_ID(5002, "Blank post id", HttpStatus.BAD_REQUEST),
 
     // 6xxx - comment error code
     COMMENT_NOT_FOUND(6001, "Comment not found", HttpStatus.NOT_FOUND),
+    BLANK_COMMENT(6002, "Blank comment", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

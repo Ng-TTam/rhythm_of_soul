@@ -4,7 +4,6 @@ import { FaTimes } from '@react-icons/all-files/fa/FaTimes';
 import { FaSearch } from '@react-icons/all-files/fa/FaSearch';
 import { FaCheck } from '@react-icons/all-files/fa/FaCheck';
 import { FaCalendarAlt } from '@react-icons/all-files/fa/FaCalendarAlt';
-import { FaPlay } from '@react-icons/all-files/fa/FaPlay';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
