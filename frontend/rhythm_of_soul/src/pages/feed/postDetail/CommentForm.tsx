@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { FaPaperPlane } from '@react-icons/all-files/fa/FaPaperPlane';
-import { currentUser } from '../../../model/post'; // Adjust the import path as necessary
+import { currentUser } from '../../../model/post/post'; // Adjust the import path as necessary
 
 interface CommentFormProps {
   onSubmit: (content: string) => void;

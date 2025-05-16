@@ -7,48 +7,14 @@ import { FaEye } from '@react-icons/all-files/fa/FaEye';
 import { FaMusic } from '@react-icons/all-files/fa/FaMusic';
 import { FaArrowLeft } from '@react-icons/all-files/fa/FaArrowLeft';
 import { FaPlay } from '@react-icons/all-files/fa/FaPlay';
-import { FaListUl } from '@react-icons/all-files/fa/FaListUl';
 import '../../style/PlaylistDetail.css';
 import StreamingPlaybackBar from '../songs/PlaybackBar';
 import { useAppDispatch, useAppSelector } from '../../store/hook';
 import { playSingleSong, setPlaylist } from '../../reducers/audioReducer';
 import classNames from 'classnames/bind';
-interface Song {
-  id: string;
-  mediaUrl?: string;
-  imageUrl?: string;
-  title?: string;
-  artist?: string;
-  tags?: string[];
-}
+import { Song,PlaylistData } from '../../model/post/Playlist';
 
-interface PlaylistData {
-  post: {
-    content: {
-      coverUrl?: string;
-      title?: string;
-      songIds?: Song[];
-      imageUrl?: string;
-      tags?: string[];
-      description?: string;
-    };
-    type?: string;
-    created_at?: string;
-    view_count?: number;
-    like_count?: number;
-    comment_count?: number;
-    caption?: string;
-  };
-  comments?: {
-    user?: { 
-      avatar?: string; 
-      username?: string 
-    };
-    created_at?: string;
-    content?: string;
-  }[];
-  isLiked?: boolean;
-}
+import { getPlaylistDetail } from '../../services/postService';
 
 const PlaylistDetail = () => {
   const { playlistId } = useParams<{ playlistId: string }>();
@@ -66,27 +32,25 @@ const PlaylistDetail = () => {
     const fetchPlaylistData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8484/posts/detailPost/${playlistId}`);
+        const response = await getPlaylistDetail(playlistId || '');
         
-        if (!response.ok) {
+        if (response.code !== 200) {
           throw new Error('Không thể tải dữ liệu playlist');
         }
         
-        const data = await response.json();
-        console.log(data);
-        setPlaylistData(data.result || { post: {} });
-        setIsLiked(data.result?.isLiked || false);
+        setPlaylistData(response.result || { post: {} });
+        setIsLiked(response.result?.isLiked || false);
 
         // Cập nhật playlist vào Redux store
-        if (data.result?.post?.content?.songIds) {
-          const validSongs = data.result.post.content.songIds
+        if (response.result?.post?.content?.songIds) {
+          const validSongs = response.result.post.content.songIds
             .filter((song: Song) => song.mediaUrl)
             .map((song: Song) => ({
               id: song.id || Math.random().toString(36).substr(2, 9),
               title: song.title || 'Không có tiêu đề',
               artist: song.artist || 'Nghệ sĩ không xác định',
-              coverUrl: song.imageUrl || '/assets/images/default/track-thumbnail.jpg',
-              audioUrl:song.mediaUrl || '/assets/images/default/track-thumbnail.jpg',
+              imageUrl: song.imageUrl || '/assets/images/default/track-thumbnail.jpg',
+              mediaUrl: song.mediaUrl || '/assets/images/default/track-thumbnail.jpg',
             }));
           
           dispatch(setPlaylist(validSongs));

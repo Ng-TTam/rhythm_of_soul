@@ -5,7 +5,7 @@ import { FaComment } from '@react-icons/all-files/fa/FaComment';
 import { FaPlayCircle } from '@react-icons/all-files/fa/FaPlayCircle';
 import { FaEllipsisH } from '@react-icons/all-files/fa/FaEllipsisH';
 
-import { TextPostCardProps } from '../../model/post';
+import { TextPostCardProps } from '../../model/post/post';
 import { useNavigate } from 'react-router-dom';
 import '../../style/TextPostCard.css'; // We'll create this CSS file
 import classNames from 'classnames/bind';

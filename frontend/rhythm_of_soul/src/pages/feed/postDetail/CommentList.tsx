@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import { FaHeart } from '@react-icons/all-files/fa/FaHeart';
-import { Comment, getRelativeTime } from '../../../model/post';
+import { Comment, getRelativeTime } from '../../../model/post/post';
 
 interface CommentListProps {
   comments: Comment[];

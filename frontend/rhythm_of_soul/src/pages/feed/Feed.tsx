@@ -9,7 +9,7 @@ import CollectionPostCard from './CollectionPostCard';
 import PostModal from './PostModal';
 import ErrorBoundary from './ErrorBoundary';
 import SkeletonPost from './SkeletonPost';
-import { CurrentUser, PostWithUserInfo } from '../../model/post';
+import { CurrentUser, PostWithUserInfo } from '../../model/post/post';
 
 const currentUser: CurrentUser = {
   id: "1234",

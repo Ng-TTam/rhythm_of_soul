@@ -6,7 +6,7 @@ import { FaComment } from '@react-icons/all-files/fa/FaComment';
 import { FaShare } from '@react-icons/all-files/fa/FaShare';
 import { FaPlay } from '@react-icons/all-files/fa/FaPlay';
 
-import { formatPlays } from '../../../model/post';
+import { formatPlays } from '../../../model/post/post';
 
 interface PostActionsProps {
   isLiked: boolean;

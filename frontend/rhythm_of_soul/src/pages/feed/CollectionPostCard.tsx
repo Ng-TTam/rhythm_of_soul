@@ -7,7 +7,7 @@ import { FaComment } from '@react-icons/all-files/fa/FaComment';
 import { FaPlayCircle } from '@react-icons/all-files/fa/FaPlayCircle';
 
 import { useNavigate } from 'react-router-dom';
-import { CollectionPostCardProps } from '../../model/post';
+import { CollectionPostCardProps } from '../../model/post/post';
 import '../../style/CollectionPostCard.css'; // We'll create this CSS file
 import classNames from 'classnames/bind';
 const CollectionPostCard: React.FC<CollectionPostCardProps> = ({ 

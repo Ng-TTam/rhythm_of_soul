@@ -6,7 +6,6 @@ import { BsHeart } from '@react-icons/all-files/bs/BsHeart';
 import { BsEyeFill } from '@react-icons/all-files/bs/BsEyeFill';
 import { BsChat } from '@react-icons/all-files/bs/BsChat';
 import { BsThreeDots } from '@react-icons/all-files/bs/BsThreeDots';
-import { MdEdit } from '@react-icons/all-files/md/MdEdit';
 import { MdPublic } from '@react-icons/all-files/md/MdPublic';
 import { MdLock } from '@react-icons/all-files/md/MdLock';
 import { useNavigate } from 'react-router-dom';
@@ -14,30 +13,8 @@ import { useAppDispatch, useAppSelector } from '../../store/hook';
 import { toggleePlay, setAudio } from '../../reducers/audioReducer';
 import Swal from 'sweetalert2';
 import EditSongModal from './SongEditForm';
-
-interface Song {
-  id: string | number;
-  content: {
-    imageUrl: string;
-    title: string;
-    tags: string[];
-    mediaUrl: string;
-  };
-  caption?: string;
-  _public: boolean;
-  like_count?: number;
-  comment_count?: number;
-  view_count?: number;
-  created_at: string;
-  account_id: string; 
-}
-
-interface SongEditForm {
-  title: string;
-  caption: string;
-  tags: string[];
-}
-
+import { Song,SongEditForm } from '../../model/post/Song';
+import  { getSongs, editSong } from '../../services/postService';
 export default function SongDisplay() {
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,7 +22,7 @@ export default function SongDisplay() {
   const [likedSongs, setLikedSongs] = useState<Record<string | number, boolean>>({});
   const [showDropdown, setShowDropdown] = useState<number | string | null>(null);
   const [editingSong, setEditingSong] = useState<{
-    id: string | number;
+    id: string;
     data: {
       title: string;
       caption?: string;
@@ -57,16 +34,15 @@ export default function SongDisplay() {
   const navigate = useNavigate();
   const audioState = useAppSelector(state => state.audio);
   
-  const userId = "1234";
-  const API_URL = `http://localhost:8484/posts/${userId}/songs`;
+  const accountId = "1234";
+  
 
   useEffect(() => {
     const fetchSongs = async () => {
       try {
-        const response = await fetch(API_URL);
-        if (!response.ok) throw new Error('Failed to fetch songs');
-        const data = await response.json();
-        setSongs(data.result || []);
+        const response = await getSongs(accountId);
+        if (response.code !== 200) throw new Error(response.message);
+        setSongs(response.result || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
       } finally {
@@ -75,7 +51,7 @@ export default function SongDisplay() {
     };
     
     fetchSongs();
-  }, [API_URL]);
+  }, [accountId]);
 
   const handlePlaySong = (e: React.MouseEvent, song: Song) => {
     e.stopPropagation();
@@ -122,19 +98,9 @@ export default function SongDisplay() {
 
   const handleSaveEdit = async (updatedData: SongEditForm) => {
     try {
-      const response = await fetch(`http://localhost:8484/posts/${editingSong?.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: updatedData.title,
-          caption: updatedData.caption,
-          tags: updatedData.tags
-        })
-      });
+      const response = await editSong(editingSong?.id ?? '', updatedData);
 
-      if (!response.ok) throw new Error('Failed to update song');
+      if (response.code !== 200) throw new Error(response.message);
       
       // Update local state
       setSongs(songs.map(song => 

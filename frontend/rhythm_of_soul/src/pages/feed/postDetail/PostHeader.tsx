@@ -4,7 +4,7 @@ import { FaFileAlt } from '@react-icons/all-files/fa/FaFileAlt';
 import { FaMusic } from '@react-icons/all-files/fa/FaMusic';
 import { FaListUl } from '@react-icons/all-files/fa/FaListUl';
 
-import { PostType, getRelativeTime } from '../../../model/post';
+import { PostType, getRelativeTime } from '../../../model/post/post';
 
 interface PostHeaderProps {
   userAvatar: string;

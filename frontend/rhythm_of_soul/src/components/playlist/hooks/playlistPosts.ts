@@ -1,8 +1,8 @@
 // src/hooks/usePlaylistPosts.ts
 import { useState, useEffect, useCallback } from 'react';
-import { PostWithUserInfo, CurrentUser } from '../../../model/post';
+import { PostWithUserInfo, CurrentUser } from '../../../model/post/post';
 import axios from 'axios';
-
+import { fetchPlaylists,uploadFile,createPlaylist } from '../../../services/postService';
 const usePlaylistPosts = (currentUser: CurrentUser) => {
   const [posts, setPosts] = useState<PostWithUserInfo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -16,16 +16,14 @@ const usePlaylistPosts = (currentUser: CurrentUser) => {
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8484/posts/${currentUser.id}/playlists`);
+      const response = await fetchPlaylists(currentUser.id);
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+      if (response.code !== 200) {
+        throw new Error(`HTTP error! Status: ${response.message}`);
       }
       
-      const result = await response.json();
-      
-      if (result.code === 200 && Array.isArray(result.result)) {
-        const postsWithUserInfo = result.result.map((post: any) => ({
+      if (response.code === 200 && Array.isArray(response.result)) {
+        const postsWithUserInfo = response.result.map((post: any) => ({
           ...post,
           username: currentUser.username,
           userAvatar: currentUser.avatar
@@ -62,49 +60,36 @@ const usePlaylistPosts = (currentUser: CurrentUser) => {
       let image = '';
   
       if (playlistData.cover) {
-        const coverFormData = new FormData();
-        coverFormData.append('file', playlistData.cover);
-        coverFormData.append('type', 'cover');
-        const coverResponse = await axios.post('http://localhost:8484/posts/uploadFile', coverFormData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
+       const coverResponse = await uploadFile(
+          {
+            file: playlistData.cover,
+            type: 'cover'
           }
-        });
-        console.log('Cover image response:', coverResponse);
-        cover = coverResponse.data.result;
+       );
+        cover = coverResponse.result;
       }
   
       if (playlistData.image) {
-        const imageFormData = new FormData();
-        imageFormData.append('file', playlistData.image);
-        imageFormData.append('type', 'image');
-        const imageResponse = await axios.post('http://localhost:8484/posts/uploadFile', imageFormData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
+        const imageResponse = await uploadFile(
+          {
+            file: playlistData.image,
+            type: 'image'
           }
-        });
-        image = imageResponse.data.result;
+        );
+        image = imageResponse.result;
       }
       // Prepare the request body
       const requestBody = {
-        title:playlistData.title,
-        isPublic:playlistData.isPublic,
-        tags:playlistData.tags,
+        title: playlistData.title,
+        isPublic: playlistData.isPublic ?? false, // Ensure isPublic is a boolean
+        tags: playlistData.tags || [], // Ensure tags is an array
         cover,
         image,
         accountId: '1234', // Replace with actual user ID
       };
   
-      console.log('Request body:', requestBody);
-      
-
-      const response = await axios.post('http://localhost:8484/posts/playlist', requestBody, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      console.log('Response:', response);
-      const result = await response.data.result;
+      const response = await createPlaylist(requestBody);
+      const result = await response.result;
       
       if (result.code === 200) {
         const newPost: PostWithUserInfo = {

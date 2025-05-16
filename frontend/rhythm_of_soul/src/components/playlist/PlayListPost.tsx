@@ -6,7 +6,7 @@ import { FaComment } from '@react-icons/all-files/fa/FaComment';
 import { FaEye } from '@react-icons/all-files/fa/FaEye';
 
 
-import { CollectionPostCardProps } from '../../model/post';
+import { CollectionPostCardProps } from '../../model/post/post';
 import '../../style/PlaylistPost.css';
 import classNames from 'classnames/bind';
 const PlaylistPostCard: React.FC<CollectionPostCardProps> = ({
@@ -19,12 +19,7 @@ const PlaylistPostCard: React.FC<CollectionPostCardProps> = ({
 }) => {
   const navigate = useNavigate();
   const cx = classNames.bind(require('../../style/PlaylistPost.css'));
-  // Local state fallbacks
-  const [localPlayingTrackId, setLocalPlayingTrackId] = useState<string | null>(null);
   const [localLikedTracks, setLocalLikedTracks] = useState<Record<string, boolean>>({});
-  
-  // Use provided state or local state
-  const currentPlayingTrackId = playingTrackId || localPlayingTrackId;
   const currentLikedTracks = likedTracks || localLikedTracks;
 
   if (!post.content) return null;
@@ -40,14 +35,6 @@ const PlaylistPostCard: React.FC<CollectionPostCardProps> = ({
   const coverImage = post.content.coverUrl || '/assets/images/default/playlist-cover.jpg';
   const playlistImage = post.content.imageUrl || '/assets/images/default/playlist-thumbnail.jpg';
 
-  const handleTrackPlay = (trackId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onPlayTrack) {
-      onPlayTrack(trackId);
-    } else {
-      setLocalPlayingTrackId(prev => prev === trackId ? null : trackId);
-    }
-  };
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();

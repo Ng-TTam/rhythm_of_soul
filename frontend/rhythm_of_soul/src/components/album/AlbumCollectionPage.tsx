@@ -17,25 +17,9 @@ import {
 import { FaPlus} from '@react-icons/all-files/fa/FaPlus';
 import AddAlbumModal from './AddAlbumForm';
 import axios from 'axios';
+import { Album } from '../../model/post/Album';
+import {getAlbumOfUser,uploadFile,createALbum} from '../../services/postService';
 
-interface Album {
-  id: string;
-  title: string;
-  tracks: number;
-  isPublic: boolean;
-  likeCount: number;
-  commentCount: number;
-  viewCount: number;
-  coverUrl: string;
-  imageUrl: string;
-  tags?: string[];
-  createdAt: string;
-}
-
-interface Track {
-  title: string;
-  duration: string;
-}
 
 const AlbumPost = () => {
   const [albums, setAlbums] = useState<Album[]>([]);
@@ -51,18 +35,11 @@ const AlbumPost = () => {
   useEffect(() => {
     const fetchAlbums = async () => {
       try {
-        const userId = "1234";
-        const response = await fetch(`http://localhost:8484/posts/${userId}/album`);
+        const accountId = "1234";
+        const response = await getAlbumOfUser(accountId);
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch albums');
-        }
-        
-        const data = await response.json();
-        
-        if (data.code === 200 && Array.isArray(data.result)) {
-          console.log('Fetched albums:', data);
-          setAlbums(data.result);
+        if (response.code === 200 && Array.isArray(response.result)) {
+          setAlbums(response.result);
 
         } else {
           throw new Error('Invalid data format');
@@ -115,30 +92,20 @@ const AlbumPost = () => {
       let image = '';
   
       if (newAlbumData.coverImage) {
-        const coverFormData = new FormData();
-        coverFormData.append('file', newAlbumData.coverImage);
-        coverFormData.append('type', 'cover');
-        const coverResponse = await axios.post('http://localhost:8484/posts/uploadFile', coverFormData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+        const coverResponse = await uploadFile({
+          file: newAlbumData.coverImage,
+          type: 'cover'
         });
-        console.log('Cover image response:', coverResponse);
-        cover = coverResponse.data.result;
+        cover = coverResponse.result;
       }
   
       if (newAlbumData.image) {
-        const imageFormData = new FormData();
-        imageFormData.append('file', newAlbumData.image);
-        imageFormData.append('type', 'image');
-        const imageResponse = await axios.post('http://localhost:8484/posts/uploadFile', imageFormData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+        const imageResponse = await uploadFile({
+          file: newAlbumData.image,
+          type: 'image'
         });
-        image = imageResponse.data.result;
+        image = imageResponse.result;
       }
-  
       // Prepare the request body
       const requestBody = {
         title: newAlbumData.title,
@@ -150,23 +117,14 @@ const AlbumPost = () => {
         scheduleAt: newAlbumData.scheduleAt?.toISOString(),
         songIds: newAlbumData.tracks
       };
-  
-      console.log('Request body:', requestBody);
-  
       // Send the request
-      const response = await axios.post('http://localhost:8484/posts/album', requestBody, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await createALbum(requestBody);
   
-      if (response.data.code === 200) {
-        console.log('Album added successfully:', response.data);
-        setAlbums([response.data.result, ...albums]);
-        console.log('Albums after adding new one:', albums);
+      if (response.code === 200) {
+        setAlbums([response.result, ...albums]);
         return Promise.resolve();
       }
-      throw new Error(response.data.message || 'Failed to add album');
+      throw new Error(response.message || 'Failed to add album');
     } catch (err) {
       console.error("Error adding album:", err);
       return Promise.reject(err);

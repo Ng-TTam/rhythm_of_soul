@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from 'react-bootstrap';
 import CommentList from './CommentList';
 import CommentForm from './CommentForm';
-import { Comment, User } from '../../../model/post';
+import { Comment, User } from '../../../model/post/post';
 
 interface CommentSectionProps {
   comments: Comment[];

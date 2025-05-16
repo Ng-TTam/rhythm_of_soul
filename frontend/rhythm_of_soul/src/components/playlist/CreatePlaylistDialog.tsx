@@ -1,23 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Modal, Form, Button, Spinner, Row, Col } from 'react-bootstrap';
-import { CurrentUser } from '../../model/post';
-
+import {AddPlaylistModalProps} from '../../model/post/Playlist';
 const MUSIC_TAGS = ['ROCK', 'POP', 'JAZZ', 'CLASSICAL', 'HIP-HOP', 'ELECTRONIC'];
-
-interface AddPlaylistModalProps {
-  show: boolean;
-  onHide: () => void;
-  currentUser: CurrentUser;
-  onCreate: (playlistData: {
-    title: string;
-    isPublic: boolean;
-    cover?: File;
-    image? : File
-    tags: string[];
-  }) => Promise<void>;
-  isCreating: boolean;
-  error?: string | null;
-}
 
 const AddPlaylistModal: React.FC<AddPlaylistModalProps> = ({
   show,

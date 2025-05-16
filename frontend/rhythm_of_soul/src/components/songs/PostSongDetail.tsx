@@ -25,41 +25,8 @@ import {MdLock} from '@react-icons/all-files/md/MdLock';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hook';
 import { toggleePlay, setAudio } from '../../reducers/audioReducer';
-
-interface Comment {
-  id: string;
-  account_id: string;
-  content: string;
-  created_at: string;
-  user: {
-    name: string;
-    avatar: string;
-  };
-}
-
-interface Post {
-  content: {
-    imageUrl?: string;
-    title: string;
-    tags: string[];
-    coverUrl?: string;
-    mediaUrl?: string;
-  };
-  caption?: string;
-  created_at: string;
-  view_count: number;
-  like_count: number;
-  comment_count: number;
-  _public: boolean;
-  account_id: string;
-}
-
-interface SongDetail {
-  post: Post;
-  likes: Array<{ id: string; user: { name: string; avatar: string }; created_at: string }>;
-  comments?: Comment[];
-}
-
+import  {SongDetail} from '../../model/post/Song';
+import { getSongDetail } from '../../services/postService';
 export default function PostSongDetail() {
   const [songDetail, setSongDetail] = useState<SongDetail | null>(null);
   const [isLiked, setIsLiked] = useState(false);
@@ -74,15 +41,13 @@ export default function PostSongDetail() {
   useEffect(() => {
     const fetchSongDetail = async () => {
       try {
-        const url = `http://localhost:8484/posts/detailPost/${postId.songId}`;
-        const response = await fetch(url);
+        const response = await getSongDetail(postId.songId ?? '');
         
-        if (!response.ok) {
-          throw new Error('Failed to fetch song details');
+        if (response.code !== 200) {
+          throw new Error( response.message );
         }
         
-        const data = await response.json();
-        setSongDetail(data.result);
+        setSongDetail(response.result);
         
         // Reset like state when a new song is loaded
         setIsLiked(false);

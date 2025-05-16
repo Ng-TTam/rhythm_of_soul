@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect} from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Badge, Button, Spinner, Form } from 'react-bootstrap';
 import { FaHeart } from '@react-icons/all-files/fa/FaHeart';
@@ -18,55 +18,8 @@ import { FaDownload } from '@react-icons/all-files/fa/FaDownload';
 import { FaListUl } from '@react-icons/all-files/fa/FaListUl';
 import { useAppDispatch, useAppSelector } from '../../store/hook';
 import { toggleePlay, setAudio } from '../../reducers/audioReducer';
-
-
-
-interface Song {
-  title: string;
-  mediaUrl: string;
-  imageUrl: string;
-  coverUrl: string;
-  songId: string;
-  tags: string[];
-  artist?: string;
-}
-
-interface AlbumContent {
-  title: string;
-  imageUrl: string;
-  coverUrl: string;
-  tags: string[];
-  songIds: Song[];
-}
-
-interface AlbumDetail {
-  id: string;
-  user_id: string;
-  type: string;
-  caption: string;
-  content: AlbumContent;
-  view_count: number;
-  like_count: number;
-  comment_count: number;
-  created_at: string;
-  _public: boolean;
-}
-
-interface Comment {
-  id: string;
-  content: string;
-  account_id: string;
-  username: string;
-  avatar: string;
-  created_at: string;
-}
-
-interface DetailPostResponse {
-  post: AlbumDetail;
-  likes: string[];
-  comments: Comment[];
-}
-
+import { Comment, DetailPostResponse} from '../../model/post/Album';
+import { getAlbumDetail } from '../../services/postService';
 const AlbumDetailView = () => {
   const { albumId } = useParams<{ albumId: string }>();
   const navigate = useNavigate();
@@ -87,16 +40,15 @@ const AlbumDetailView = () => {
       
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8484/posts/detailPost/${albumId}`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch album details: ${response.status}`);
+        const response = await getAlbumDetail(albumId);
+        if (response.code !== 200) {
+          throw new Error(`Failed to fetch album details: ${response.message}`);
         }
         
-        const data = await response.json();
         
-        if (data.code === 200 && data.result) {
-          setAlbumDetail(data.result);
-          setIsLiked(data.result.likes.includes("1234")); // Replace with actual user ID
+        if (response.code === 200 && response.result) {
+          setAlbumDetail(response.result);
+          setIsLiked(response.result.likes.includes("1234")); // Replace with actual user ID
         } else {
           throw new Error('Invalid data format');
         }

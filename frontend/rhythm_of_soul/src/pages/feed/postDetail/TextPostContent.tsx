@@ -5,7 +5,6 @@ interface TextPostContentProps {
 }
 
 const TextPostContent: React.FC<TextPostContentProps> = ({ caption }) => {
-  console.log('TextPostContent render');
   return (
     <div className="text-post-content">
       <div className="post-caption">{caption}</div>

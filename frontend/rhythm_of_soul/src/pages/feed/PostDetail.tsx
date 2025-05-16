@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Card, Spinner, Tab, Tabs } from 'react-bootstrap';
-import { currentUser } from '../../model/post';
+import { Container, Card, Spinner } from 'react-bootstrap';
 import { fetchPostDetail } from '../../services/postService';
 import PostHeader from './postDetail/PostHeader';
 import TextPostContent from './postDetail/TextPostContent';
 import CommentSection from './postDetail/index';
 import PostActions from './postDetail/PostActions';
-import { Post, Comment } from '../../model/post';
+import { Post, Comment,currentUser } from '../../model/post/post';
 import '../../style/PostDetail.css';
 import classNames from 'classnames/bind';
 const PostDetail: React.FC = () => {
@@ -49,7 +48,7 @@ const PostDetail: React.FC = () => {
         view_count: response.result.post.view_count || 0
       };
 
-      const formattedComments = (response.result.comments || []).map(comment => ({
+      const formattedComments = (response.result.comments || []).map((comment: Comment) => ({
         ...comment,
         username: comment.username || 'Commenter',
         userAvatar: comment.userAvatar || currentUser.avatar,

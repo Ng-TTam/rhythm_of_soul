@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Modal, Button, Form, Tab, Tabs } from 'react-bootstrap';
-import { PostModalProps } from '../../model/post';
+import { PostModalProps } from '../../model/post/post';
 import axios from 'axios';
 
 const PostModal: React.FC<PostModalProps> = ({

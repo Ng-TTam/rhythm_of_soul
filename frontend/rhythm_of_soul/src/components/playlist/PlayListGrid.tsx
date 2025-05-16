@@ -5,7 +5,7 @@ import { FaPlus } from '@react-icons/all-files/fa/FaPlus';
 import playlistPosts from './hooks/playlistPosts';
 import ErrorBoundary from '../../pages/feed/ErrorBoundary';
 import SkeletonPost from '../../pages/feed/SkeletonPost';
-import { CurrentUser } from '../../model/post';
+import { CurrentUser } from '../../model/post/post';
 import PlayListPost from './PlayListPost';
 import AddPlaylistModal from './CreatePlaylistDialog'; // Import the new modal
 

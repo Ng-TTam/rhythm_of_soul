@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { PostWithUserInfo, CurrentUser } from '../../../model/post';
+import { PostWithUserInfo, CurrentUser } from '../../../model/post/post';
 
 const usePosts = (currentUser: CurrentUser) => {
   const [posts, setPosts] = useState<PostWithUserInfo[]>([]);

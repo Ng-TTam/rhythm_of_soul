@@ -6,7 +6,7 @@ import { FaComment } from '@react-icons/all-files/fa/FaComment';
 import { FaEllipsisH } from '@react-icons/all-files/fa/FaEllipsisH';
 import { Card, Button, ProgressBar } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { SongPostCardProps } from '../../model/post';
+import { SongPostCardProps } from '../../model/post/post';
 import '../../style/SongPostCard.css'; // We'll create this CSS file
 import classNames from 'classnames/bind';
 

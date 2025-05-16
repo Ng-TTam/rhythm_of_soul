@@ -8,29 +8,9 @@ import { FaPlay } from '@react-icons/all-files/fa/FaPlay';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-
-
+import {Track, AddAlbumModalProps} from '../../model/post/Album';
 import { FaTimesCircle } from '@react-icons/all-files/fa/FaTimesCircle';
-
-interface AddAlbumModalProps {
-  show: boolean;
-  onHide: () => void;
-  onAddAlbum: (newAlbum: {
-    title: string;
-    isPublic: boolean;
-    tags: string[];
-    coverImage: File | null;
-    image: File | null;
-    tracks: string[];
-    scheduleAt: Date | null;
-  }) => Promise<void>;
-}
-
-interface Track {
-  songId: string;
-  title: string;
-  imageUrl: string;
-}
+import { getTrack } from '../../services/postService';
 
 const GENRE_TAGS = ['ROCK', 'POP', 'JAZZ', 'CLASSICAL', 'HIP-HOP', 'ELECTRONIC'];
 
@@ -65,10 +45,10 @@ const AddAlbumModal = ({ show, onHide, onAddAlbum }: AddAlbumModalProps) => {
     const fetchTracks = async () => {
       try {
         setLoading(prev => ({ ...prev, tracks: true }));
-        const response = await axios.get('http://localhost:8484/posts/songs');
-        if (response.data && Array.isArray(response.data.result)) {
-          setAllTracks(response.data.result);
-          setFilteredTracks(response.data.result);
+        const response = await getTrack();
+        if (response && Array.isArray(response.result)) {
+          setAllTracks(response.result);
+          setFilteredTracks(response.result);
         }
       } catch (err) {
         console.error("Error fetching tracks:", err);
