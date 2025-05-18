@@ -34,4 +34,21 @@ public class UserResponse {
     public static UserResponse fromEntity(User user) {
         return UserResponse.builder().id(user.getId()).build();
     }
+
+    public static UserResponse cvFromEntity(User user) {
+        return UserResponse.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .dateOfBirth(user.getDateOfBirth())
+                .gender(user.getGender())
+                .phoneNumber(user.getPhoneNumber())
+                .isArtist(user.isArtist())
+                .avatar(user.getAvatar())
+                .cover(user.getCover())
+                .followerCount(user.getFollowerCount())
+                .followedCount(user.getFollowedCount())
+                .build();
+    }
+
 }

@@ -18,6 +18,8 @@ import AlbumsCollectionPage from '../components/album/AlbumCollectionPage'
 import AlbumMain from '../components/album/AlbumMain'
 import AdminUser from '../pages/admin/AdminUser'
 import SearchResult from '../pages/dashboard/SearchResults'
+import FollowTabs from '../pages/user/FollowTabs'
+import PublicUserProfile from '../pages/user/PublicUserProfile'
 export const indexRouter: any = {
     path: '/',
     element: (<Dashboard />),
@@ -39,7 +41,7 @@ export const indexRouter: any = {
             { path: 'songs', element: <div>Songs</div> },
             { path: 'albums', element: <div>Albums</div> },
             { path: 'playlists', element: <div>Playlists</div> },
-            { index: true, element: <Feeds /> } // mặc định là feeds
+            { index: true, element: <Feeds /> } 
           ]
         },
         { path: 'albums', element: (<AlbumMain />),
@@ -62,6 +64,18 @@ export const indexRouter: any = {
           ],
         },
         { path: 'search', element: <SearchResult /> },
+        {
+          path: "user/:userId/followers",
+          element: <FollowTabs />
+        },
+        {
+          path: "user/:userId/following",
+          element: <FollowTabs />
+        },
+        {
+          path: 'user/:userId',
+          element: <PublicUserProfile />
+        },
         { path: '', element: (<MainContent />) },
     ]
 

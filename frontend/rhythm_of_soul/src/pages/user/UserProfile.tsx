@@ -14,17 +14,30 @@ import { RootState } from "../../store/store";
 import { useDispatch } from "react-redux";
 import { setUserSlice, updateUser } from "../../reducers/userReducer";
 import { getProfile } from "../../services/api/userService";
+import { Link } from "react-router-dom";
+import { Toast } from 'primereact/toast';
+import { useRef } from 'react';
+import '../../styles/toast.css';
 
 export default function UserProfile() {
   const [isEditVisible, setEditVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch();
+  const toast = useRef<Toast>(null);
+
 
   const userRedux = useSelector((state: RootState) => state.user.currentUser);
   const [user, setUser] = useState<User | null>(null);
 
   const handleSave = (data: User) => {
-    setUser(data); // Cập nhật state
+    setUser(data);
+    toast.current?.show({
+      severity: "success",
+      summary: "Success",
+      detail: "Profile updated!",
+      life: 3000,
+      className: "custom-success-toast",
+    }); // Cập nhật state
     setEditVisible(false);
   };
 
@@ -91,6 +104,7 @@ export default function UserProfile() {
           </div>
         </div>
     } */}
+      <Toast ref={toast} />
       <Container className="my-5">
         {/* Cover Image */}
         <div
@@ -147,6 +161,21 @@ export default function UserProfile() {
                   <FaPencilAlt className="me-2" />
                   Edit Profile
                 </Button>
+                <div className="d-flex justify-content-center mt-3 gap-4">
+                  <div className="text-center">
+                    <Link to={`/user/${user?.id}/followers`}>
+                      <small className="text-muted">Followers</small>
+                      <h6 className="mb-0">{user?.followerCount ?? 0}</h6>
+                    </Link>
+                  </div>
+                  <div className="text-center">
+                    <Link to={`/user/${user?.id}/following`}>
+                      <small className="text-muted">Following</small>
+                      <h6 className="mb-0">{user?.followedCount ?? 0}</h6>
+                    </Link>
+
+                  </div>
+                </div>
               </Card.Body>
             </Card>
             <EditProfileDialog visible={isEditVisible} onClose={handleEditClose} onSave={handleSave} initialData={user} />

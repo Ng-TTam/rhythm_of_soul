@@ -11,4 +11,6 @@ public interface FollowService {
 
     List<User> getFollowers(String userId);
     List<String> getFollowingUserIds(String userId);
+    List<User> getFollowingUsers(String userId);
+
 }

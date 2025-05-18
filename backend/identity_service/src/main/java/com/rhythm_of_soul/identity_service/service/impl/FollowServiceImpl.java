@@ -115,5 +115,10 @@ public class FollowServiceImpl implements FollowService {
                 .map(f -> f.getFollowed().getId())
                 .collect(Collectors.toList());
     }
+    public List<User> getFollowingUsers(String userId) {
+        List<String> followingIds = getFollowingUserIds(userId);
+        return userRepository.findAllById(followingIds);
+    }
+
 
 }

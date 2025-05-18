@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { searchUsers, followUser, unfollowUser, getFollowingIds } from "../../services/api/userService";
 import { User } from "../../model/profile/UserProfile";
 import { useSelector } from "react-redux";
@@ -16,6 +16,7 @@ const SearchResult: React.FC = () => {
   const searchKey = searchParams.get("query") || "";
   const token = sessionStorage.getItem("accessToken") || "";
   const user = useSelector((state: RootState) => state.user.currentUser);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!searchKey.trim() || !user?.id) return;
@@ -46,7 +47,7 @@ const SearchResult: React.FC = () => {
     };
 
     fetchUsers();
-  }, [searchKey, activeTab, user, currentPage]); // Thêm `currentPage` vào dependency
+  }, [searchKey, activeTab, user, currentPage]);
 
   return (
     <div className="search-results-container text-dark p-4" style={{ marginBottom: "80px" }}>
@@ -86,14 +87,17 @@ const SearchResult: React.FC = () => {
                     className="rounded-circle border"
                     width={55}
                     height={55}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => navigate(`/user/${u.id}`, { state: u })}
                   />
                   <div>
-                    <Link
-                      to={`/user/${u.id}`}
+                    <span
                       className="text-decoration-none text-dark fw-semibold"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => navigate(`/user/${u.id}`, { state: u })}
                     >
                       {u.firstName} {u.lastName}
-                    </Link>
+                    </span>
                     <div>
                       <small className="text-muted">👥 {u.followerCount} followers</small>
                     </div>

@@ -40,3 +40,10 @@ jwt:
 
 aes:
   secret-key: Unl0aE1vRnNPdUwxMkAqNw==
+
+minio:
+  url: http://localhost:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket: user-media
+

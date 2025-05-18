@@ -20,6 +20,8 @@ interface UserEndpoints {
   follow: (userId: string) => string;
   unfollow: (userId: string) => string;
   getFollowingIds: (userId: string) => string;
+  getFollowers: (userId: string) => string;
+  getFollowing: (userId: string) => string;
   
 }
 
@@ -38,12 +40,17 @@ interface NotificationEndpoints {
   getLatestNoti: (userId: string, days?: number) => string;
 }
 
+interface UploadEndpoints {
+  presignedUrl: (objectName: string, contentType: string) => string;
+}
+
 interface ApiEndpoints {
   auth: AuthEndpoints;
   user: UserEndpoints;
   artist: ArtistEndpoints;
   admin: AdminEndpoints;
   notification: NotificationEndpoints;
+  upload: UploadEndpoints;
 }
 
 export const apiConfig = {
@@ -66,7 +73,9 @@ export const apiConfig = {
       searchUser: () => `${config.apiBaseUrl}/identity/users/searchUser`,
       follow: (userId: string) => `${config.apiBaseUrl}/identity/follow/${userId}`,
       unfollow: (userId: string) => `${config.apiBaseUrl}/identity/unfollow/${userId}`,
-      getFollowingIds: (userId: string) => `${config.apiBaseUrl}/identity/${userId}/following`,
+      getFollowingIds: (userId: string) => `${config.apiBaseUrl}/identity/${userId}/followingIds`,
+      getFollowers: (userId: string) => `${config.apiBaseUrl}/identity/${userId}/followers`,
+      getFollowing: (userId: string) => `${config.apiBaseUrl}/identity/${userId}/following`,
     },
     artist: {
     },
@@ -79,7 +88,11 @@ export const apiConfig = {
       markAllRead: (userId: string) => `http://localhost:8081/notification/mark-all-read/${userId}`,
       getLatestNoti: (userId: string, days: number = 7) =>
         `http://localhost:8081/notification/latest/${userId}?days=${days}`,
-    }
+    },
+    upload: {
+      presignedUrl: (objectName: string, contentType: string) =>
+        `${config.apiBaseUrl}/identity/api/upload/presigned-url?objectName=${objectName}&contentType=${encodeURIComponent(contentType)}`
+    },
 
   } as ApiEndpoints,
   timeout: config.timeout,

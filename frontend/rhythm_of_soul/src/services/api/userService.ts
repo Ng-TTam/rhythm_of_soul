@@ -104,3 +104,38 @@ export const getFollowingIds = async (userId: string, token: string): Promise<st
   // Trả về danh sách userId đang follow
   return response.data.result;
 };
+
+export const getPresignedUrl = async (objectName: string, contentType: string, token: string) => {
+  const response = await apiClient.get<{ url: string; objectUrl: string }>(
+    apiConfig.endpoints.upload.presignedUrl(objectName, contentType),
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+export const getFollowers = async (userId: string, token: string): Promise<User[]> => {
+  const response = await apiClient.get<APIResponse<User[]>>(
+    apiConfig.endpoints.user.getFollowers(userId),
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data.result;
+};
+export const getFollowing = async (userId: string, token: string): Promise<User[]> => {
+  const response = await apiClient.get<APIResponse<User[]>>(
+    apiConfig.endpoints.user.getFollowing(userId),
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data.result;
+};
+
