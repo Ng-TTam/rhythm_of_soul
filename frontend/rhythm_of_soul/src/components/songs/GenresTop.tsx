@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { SkeletonSongList } from "./SongTop";
+import SkeletonCardSongLoad from "./SkeletonCardSongLoad";
 
 export default function GenresTop() {
-  const [isLoading, setLoading] = useState<boolean>(true);
+  const [isLoading, setLoading] = useState<boolean>(false);
+  // const [genres, setGenres] = useState([]);
+
   const genres = [
     { title: "sorrow", img: "17.png" },
     { title: "relax", img: "18.png" },
@@ -12,7 +14,16 @@ export default function GenresTop() {
     { title: "relax", img: "18.png" },
   ];
 
-  if (isLoading) return <SkeletonSongList />;
+  if (isLoading) return <SkeletonCardSongLoad length={7}/>;
+
+  if (genres.length === 0) {
+    return (
+      <div className="d-flex flex-column align-items-center justify-content-center py-5">
+        <img className="mb3 " src="../assets/images/undraw_server-down_lxs9.svg" style={{ width: "200px", marginBottom: "20px" }} alt="no data" />
+        <p className="text-muted">Fail to get data!</p>
+      </div>
+    );
+  }
 
   return (
     <div className="swiper overflow-hidden" data-swiper="geners-slider">

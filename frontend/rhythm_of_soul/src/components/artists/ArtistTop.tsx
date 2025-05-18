@@ -44,6 +44,15 @@ const [isLoading, setLoading] = useState<boolean>(true);
 
   if(isLoading) return <SkeletonCardSongLoad length={7} />
 
+  if (artists.length === 0) {
+    return (
+      <div className="d-flex flex-column align-items-center justify-content-center py-5">
+        <img className="mb3 " src="../assets/images/undraw_server-down_lxs9.svg" style={{ width: "200px", marginBottom: "20px" }} alt="no data" />
+        <p className="text-muted">Fail to get data!</p>
+      </div>
+    );
+  }
+
   return (
     <div className="d-flex overflow-auto flex-nowrap">
       {artists.map((artist, index) => (

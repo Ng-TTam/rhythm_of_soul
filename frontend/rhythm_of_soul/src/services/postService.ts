@@ -20,7 +20,7 @@ export const postSong = async (account_id: string): Promise<PostResponse[]> => {
 };
 
 export const getSongRecently = async (): Promise<PostResponse[]>  => {
-  const response = await axios.get<APIResponse<PostResponse[]>>(`${API_BASE_URL}/posts/songs/history` );
+  const response = await axios.get<APIResponse<PostResponse[]>>(`${API_BASE_URL}/posts/songs/recently` );
   return response.data.result;
 }
 
@@ -57,8 +57,9 @@ export const getReplies = async ( parentCommentId: string ) => {
   await axios.get(`${API_BASE_URL}/comments/replies/${parentCommentId}`);
 };
 
-export const getTopSongWeekly = async () => {
-  await axios.get(`${API_BASE_URL}/top/songs/weekly`)
+export const getTopSongWeekly = async (page: number, size: number) => {
+  const response = await axios.get(`${API_BASE_URL}/top/songs/weekly?page=${page}&size=${size}`)
+  return response.data.result;
 }
 
 export const likeComment = async (commentId: string) => {

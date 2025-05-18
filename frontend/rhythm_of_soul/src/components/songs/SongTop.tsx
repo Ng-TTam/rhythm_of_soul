@@ -1,61 +1,88 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { getTopSongWeekly } from "../../services/postService";
+import { PostResponse } from "../../model/post/post";
+import { formatNumberShort } from "../../pages/feed/utils/formatNumberShort";
 
 export default function SongTop() {
-  // const [songs, setSongs] = useState([]);
+  const [songs, setSongs] = useState<PostResponse[]>([]);
   const [isLoading, setLoading] = useState<boolean>(true);
 
-  const songs = [
-    {
-      title: "Saturday party",
-      artist: "john deo",
-      listens: "8.6k",
-      image: "../assets/images/dashboard/22.png",
-    },
-    {
-      title: "Saturday party",
-      artist: "angle wings",
-      listens: "8.2k",
-      image: "../assets/images/dashboard/23.png",
-    },
-    {
-      title: "Ferrari",
-      artist: "smith euc",
-      listens: "7.9k",
-      image: "../assets/images/dashboard/24.png",
-    },
-    {
-      title: "Saturday party",
-      artist: "john deo",
-      listens: "8.6k",
-      image: "../assets/images/dashboard/22.png",
-    },
-    {
-      title: "Saturday party",
-      artist: "angle wings",
-      listens: "8.2k",
-      image: "../assets/images/dashboard/23.png",
-    },
-    {
-      title: "Ferrari",
-      artist: "smith euc",
-      listens: "7.9k",
-      image: "../assets/images/dashboard/24.png",
-    },
-    {
-      title: "Saturday party",
-      artist: "angle wings",
-      listens: "8.2k",
-      image: "../assets/images/dashboard/23.png",
-    },
-    {
-      title: "Ferrari",
-      artist: "smith euc",
-      listens: "7.9k",
-      image: "../assets/images/dashboard/24.png",
-    },
-  ];
+  useEffect(() => {
+      const fetchSongs = async () => {
+        try {
+          const data = await getTopSongWeekly(0,16);
+          setSongs(data);
+        } catch (error) {
+          console.error("Failed to fetch songs:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchSongs();
+    }, []);
+
+  // const songs = [
+  //   {
+  //     title: "Saturday party",
+  //     artist: "john deo",
+  //     listens: "8.6k",
+  //     image: "../assets/images/dashboard/22.png",
+  //   },
+  //   {
+  //     title: "Saturday party",
+  //     artist: "angle wings",
+  //     listens: "8.2k",
+  //     image: "../assets/images/dashboard/23.png",
+  //   },
+  //   {
+  //     title: "Ferrari",
+  //     artist: "smith euc",
+  //     listens: "7.9k",
+  //     image: "../assets/images/dashboard/24.png",
+  //   },
+  //   {
+  //     title: "Saturday party",
+  //     artist: "john deo",
+  //     listens: "8.6k",
+  //     image: "../assets/images/dashboard/22.png",
+  //   },
+  //   {
+  //     title: "Saturday party",
+  //     artist: "angle wings",
+  //     listens: "8.2k",
+  //     image: "../assets/images/dashboard/23.png",
+  //   },
+  //   {
+  //     title: "Ferrari",
+  //     artist: "smith euc",
+  //     listens: "7.9k",
+  //     image: "../assets/images/dashboard/24.png",
+  //   },
+  //   {
+  //     title: "Saturday party",
+  //     artist: "angle wings",
+  //     listens: "8.2k",
+  //     image: "../assets/images/dashboard/23.png",
+  //   },
+  //   {
+  //     title: "Ferrari",
+  //     artist: "smith euc",
+  //     listens: "7.9k",
+  //     image: "../assets/images/dashboard/24.png",
+  //   },
+  // ];
 
   if (isLoading) return <SkeletonSongList />;
+
+  if (songs.length === 0) {
+    return (
+      <div className="d-flex flex-column align-items-center justify-content-center py-5">
+        <img className="mb3 " src="../assets/images/undraw_server-down_lxs9.svg" style={{ width: "200px", marginBottom: "20px" }} alt="no data" />
+        <p className="text-muted">Fail to get data!</p>
+      </div>
+    );
+  }
 
   return (
     <div className="row">
@@ -67,14 +94,14 @@ export default function SongTop() {
               .map((song, i) => (
                 <li key={i} className={`border-bottom ${i === 0 ? "pb-3" : "py-3"}`}>
                   <div className="d-flex">
-                    <img src={song.image} className="img-fluid rounded me-3 avatar-55" alt="song" />
+                    <img src={song.content?.imageUrl} className="img-fluid rounded me-3 avatar-55" alt="song" />
                     <div className="d-flex align-items-center justify-content-between flex-wrap w-100">
                       <div>
                         <a href="music-player.html" className="text-capitalize h5 mt-3">
-                          {song.title}
+                          {song.content?.title}
                         </a>
                         <br />
-                        <small className="text-capitalize">{song.artist}</small>
+                        <small className="text-capitalize">{song.account_id}</small>
                       </div>
                       <div className="d-flex align-items-center heading-color">
                         <svg xmlns="http://www.w3.org/2000/svg" width={20} height={20} viewBox="0 0 20 20" fill="none">
@@ -83,7 +110,7 @@ export default function SongTop() {
                             fill="#4A525F"
                           />
                         </svg>
-                        <small className="ms-2">{song.listens}</small>
+                        <small className="ms-2">{formatNumberShort(song.view_count)}</small>
                       </div>
                     </div>
                   </div>
