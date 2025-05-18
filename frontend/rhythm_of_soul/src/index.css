@@ -1,0 +1,72 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+.playlist-tabs {
+  display: flex;
+  align-items: center; /* tùy chỉnh màu nền */
+  padding: 1rem;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.tab-item {
+  font-weight: bold;
+  cursor: pointer;
+  position: relative;
+  padding-bottom: 5px;
+  color: #bfbfbf;
+}
+
+.tab-item.active {
+  color: #a259ff; /* màu chữ */
+}
+
+.tab-item.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #a259ff; /* màu gạch dưới */
+  border-radius: 1px;
+}
+.track-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.track-avatar:hover {
+  transform: scale(1.1);
+}
+
+.track-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.track-image:hover {
+  transform: scale(1.05);
+}
+/*Sidebar */
+.btn-sidebar {
+  background-color: white;
+    border: none;
+    width: 100%;
+    text-align: left;
+}
+/* PostDetail */
