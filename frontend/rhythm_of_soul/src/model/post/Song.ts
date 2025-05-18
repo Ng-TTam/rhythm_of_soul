@@ -8,11 +8,12 @@ export interface Song {
   };
   caption?: string;
   _public: boolean;
-  like_count?: number;
+  like_count: number;
   comment_count?: number;
   view_count?: number;
   created_at: string;
   account_id: string; 
+  _liked: boolean;
 }
 
 export interface SongEditForm {

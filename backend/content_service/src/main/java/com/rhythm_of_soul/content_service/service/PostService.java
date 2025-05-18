@@ -7,6 +7,7 @@ import com.rhythm_of_soul.content_service.dto.request.AlbumCreationRequest;
 import com.rhythm_of_soul.content_service.dto.request.PlaylistCreationRequest;
 import com.rhythm_of_soul.content_service.dto.request.PostRequest;
 import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
+import com.rhythm_of_soul.content_service.dto.response.CommentResponse;
 import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
 import com.rhythm_of_soul.content_service.dto.response.SongResponse;
 import io.minio.errors.*;
@@ -29,6 +30,7 @@ public interface PostService {
     List<PostResponse> getSongs(String accountId);
     List<PostResponse> getPlaylists(String accountId);
     List<AlbumResponse> getAlbum(String accountId);
+
 
     /**
      * Search post with key
@@ -54,4 +56,5 @@ public interface PostService {
             InvalidResponseException, XmlParserException, InternalException;
     AlbumResponse createAlbum(AlbumCreationRequest postRequest);
     PostResponse createPlaylist(PlaylistCreationRequest postRequest);
+    List<CommentResponse> getComments(String postId);
 }

@@ -5,15 +5,13 @@ import com.rhythm_of_soul.content_service.common.Type;
 import com.rhythm_of_soul.content_service.dto.ApiResponse;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
 import com.rhythm_of_soul.content_service.dto.request.PostRequest;
-import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
-import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
+import com.rhythm_of_soul.content_service.dto.response.*;
 import com.rhythm_of_soul.content_service.service.ListeningHistoryService;
 import com.rhythm_of_soul.content_service.dto.request.AlbumCreationRequest;
 import com.rhythm_of_soul.content_service.dto.request.PlaylistCreationRequest;
 import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
 import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
 import com.rhythm_of_soul.content_service.dto.request.PostRequest;
-import com.rhythm_of_soul.content_service.dto.response.SongResponse;
 import com.rhythm_of_soul.content_service.service.PostService;
 import io.minio.errors.*;
 import jakarta.validation.Valid;
@@ -119,7 +117,12 @@ public class PostController {
                 .result(postService.getPostDetail("326e6645-aa0f-4f89-b885-019c05b1a970", postId))
                 .build();
     }
-
+    @GetMapping("/{postId}/comments")
+    ApiResponse<List<CommentResponse>> getComments(@PathVariable String postId) {
+        return ApiResponse.<List<CommentResponse>>builder()
+                .result(postService.getComments(postId))
+                .build();
+    }
     @GetMapping("/search")
     public ApiResponse<List<PostResponse>> searchPosts(
             @RequestParam String accountId,

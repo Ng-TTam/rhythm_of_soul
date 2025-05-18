@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
+@Setter 
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,7 +19,9 @@ public class CommentResponse {
     String id;          // comment_id
     String accountId;      // Người comment
     String content;     // Nội dung comment
-    String parentId; // ID comment cha (nếu là reply)
+    String parentId ;    // ID comment cha (nếu là reply)
+    String username;
+    String userAvatar;
     Instant createdAt; // Thời gian tạo comment
     Instant updatedAt;
     List<CommentResponse> child_comments;// Danh sách comment con (nếu có)
@@ -31,6 +33,8 @@ public class CommentResponse {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.content = content;
+        this.username = "User";
+        this.userAvatar ="/assets/images/default/avatar.jpg";
     }
 
 

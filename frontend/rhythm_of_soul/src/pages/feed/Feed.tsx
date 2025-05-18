@@ -12,7 +12,7 @@ import SkeletonPost from './SkeletonPost';
 import { CurrentUser, PostWithUserInfo } from '../../model/post/post';
 
 const currentUser: CurrentUser = {
-  id: "1234",
+  id: "326e6645-aa0f-4f89-b885-019c05b1a970",
   username: "Current User",
   avatar: "https://i1.sndcdn.com/avatars-6zJmWE24BNXpCEdL-qVvuHg-t120x120.jpg"
 };
@@ -22,7 +22,6 @@ const Layout: React.FC = () => {
     posts,
     loading,
     error,
-    commentOpen,
     likedPosts,
     playingTrackId,
     fetchPosts,
@@ -51,6 +50,7 @@ const Layout: React.FC = () => {
       view_count: 0,
       like_count: 0,
       comment_count: 0,
+      _liked: false,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       _public: postData._public,
@@ -144,11 +144,11 @@ const Layout: React.FC = () => {
             </Col>
           ) : (
             posts.map((post) => (
-              <Col xs={12} key={post.id} className="mb-4">
+              <Col xs={12} key={post.id} className="mb-4" >
                 {post.type === 'TEXT' ? (
                   <TextPostCard 
                     post={post}
-                    isLiked={!!likedPosts[post.id]}
+                    isLiked={post._liked}
                     onLike={() => handleLike(post.id)}
                     onComment={() => toggleComment(post.id)}
                   />
@@ -156,7 +156,7 @@ const Layout: React.FC = () => {
                   <SongPostCard 
                     post={post}
                     isPlaying={playingTrackId === post.id}
-                    isLiked={!!likedPosts[post.id]}
+                    isLiked={post._liked}
                     onPlay={() => handlePlayTrack(post.id)}
                     onLike={() => handleLike(post.id)}
                     onComment={() => toggleComment(post.id)}
@@ -165,7 +165,6 @@ const Layout: React.FC = () => {
                   <CollectionPostCard 
                     post={post}
                     playingTrackId={playingTrackId}
-                    likedTracks={likedPosts}
                     onPlayTrack={handlePlayTrack}
                     onLike={() => handleLike(post.id)}
                     onComment={() => toggleComment(post.id)}

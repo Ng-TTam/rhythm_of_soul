@@ -36,7 +36,7 @@ public class CommentServiceImpl implements CommentService {
 //    @PreAuthorize("hasRole('USER') or hasRole('ARTIST')")
     public CommentResponse createComment(CommentCreationRequest request) {
         Post post = postRepository.findById(request.getPostId()).orElseThrow(
-                () -> new AppException(ErrorCode.POST_NOT_FOUND));
+                () ->   new AppException(ErrorCode.POST_NOT_FOUND));
         if( request.getParentId() != null ) {
             commentRepository.findById(request.getParentId()).orElseThrow(
                     () -> new AppException(ErrorCode.COMMENT_NOT_FOUND));

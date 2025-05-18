@@ -1,27 +1,26 @@
 import React, { useState, useEffect} from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Card, Badge, Button, Spinner, Form } from 'react-bootstrap';
-import { FaHeart } from '@react-icons/all-files/fa/FaHeart';
-import { FaRegHeart } from '@react-icons/all-files/fa/FaRegHeart';
+import { Container, Row, Col, Card, Badge, Button, Spinner} from 'react-bootstrap';
 import { FaPlay } from '@react-icons/all-files/fa/FaPlay';
 import { FaPause } from '@react-icons/all-files/fa/FaPause';
-import { FaEye } from '@react-icons/all-files/fa/FaEye';
 import { FaMusic } from '@react-icons/all-files/fa/FaMusic';
 import { FaTag } from '@react-icons/all-files/fa/FaTag';
 import { FaGlobeAmericas } from '@react-icons/all-files/fa/FaGlobeAmericas';
 import { FaLock } from '@react-icons/all-files/fa/FaLock';
-import { FaComment } from '@react-icons/all-files/fa/FaComment';
 import { FaUser } from '@react-icons/all-files/fa/FaUser';
 import { FaCalendarAlt } from '@react-icons/all-files/fa/FaCalendarAlt';
-import { FaShare } from '@react-icons/all-files/fa/FaShare';
 import { FaDownload } from '@react-icons/all-files/fa/FaDownload';
 import { FaListUl } from '@react-icons/all-files/fa/FaListUl';
 import { useAppDispatch, useAppSelector } from '../../store/hook';
 import { toggleePlay, setAudio } from '../../reducers/audioReducer';
-import { Comment, DetailPostResponse} from '../../model/post/Album';
+import { DetailPostResponse} from '../../model/post/Album';
 import { getAlbumDetail } from '../../services/postService';
-const AlbumDetailView = () => {
-  const { albumId } = useParams<{ albumId: string }>();
+ 
+interface AlbumDetailProps {
+  albumId: string;
+}
+
+const AlbumDetailView : React.FC<AlbumDetailProps> = ({ albumId }) =>{
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const audioState = useAppSelector(state => state.audio);
@@ -29,9 +28,7 @@ const AlbumDetailView = () => {
   const [albumDetail, setAlbumDetail] = useState<DetailPostResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isLiked, setIsLiked] = useState(false);
   const [currentSongIndex, setCurrentSongIndex] = useState<number>(-1);
-  const [commentText, setCommentText] = useState('');
 
   // Fetch album details
   useEffect(() => {
@@ -48,7 +45,6 @@ const AlbumDetailView = () => {
         
         if (response.code === 200 && response.result) {
           setAlbumDetail(response.result);
-          setIsLiked(response.result.likes.includes("1234")); // Replace with actual user ID
         } else {
           throw new Error('Invalid data format');
         }
@@ -63,30 +59,6 @@ const AlbumDetailView = () => {
     fetchAlbumDetail();
   }, [albumId]);
 
-  // Handle like
-  const handleLike = async () => {
-    if (!albumDetail) return;
-    
-    try {
-      setIsLiked(prev => !prev);
-      setAlbumDetail(prev => {
-        if (!prev) return prev;
-        
-        return {
-          ...prev,
-          post: {
-            ...prev.post,
-            like_count: prev.post.like_count + (isLiked ? -1 : 1)
-          },
-          likes: isLiked 
-            ? prev.likes.filter(userId => userId !== "1234") 
-            : [...prev.likes, "1234"]
-        };
-      });
-    } catch (err) {
-      console.error("Error liking album:", err);
-    }
-  };
 
   // Handle song play
   const playSong = (index: number) => {
@@ -141,40 +113,6 @@ const AlbumDetailView = () => {
     playSong(prevIndex);
   };
 
-  // Handle comment submission
-  const handleCommentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!commentText.trim() || !albumDetail) return;
-    
-    try {
-      const newComment: Comment = {
-        id: `temp-${Date.now()}`,
-        content: commentText,
-        account_id: "1234",
-        username: "Current User",
-        avatar: "https://via.placeholder.com/40",
-        created_at: new Date().toISOString()
-      };
-      
-      setAlbumDetail(prev => {
-        if (!prev) return prev;
-        
-        return {
-          ...prev,
-          post: {
-            ...prev.post,
-            comment_count: prev.post.comment_count + 1
-          },
-          comments: [...prev.comments, newComment]
-        };
-      });
-      
-      setCommentText('');
-    } catch (err) {
-      console.error("Error submitting comment:", err);
-    }
-  };
-
   // Format date
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -208,7 +146,7 @@ const AlbumDetailView = () => {
     );
   }
 
-  const { post, comments } = albumDetail;
+  const { post } = albumDetail;
   const currentSong = currentSongIndex >= 0 ? post.content.songIds[currentSongIndex] : null;
   const isCurrentSongPlaying = currentSong && audioState.play && audioState.mediaUrlSong === currentSong.mediaUrl;
 
@@ -305,39 +243,6 @@ const AlbumDetailView = () => {
                     ))}
                   </div>
                   
-                  <div className="mb-4">
-                    <div className="d-flex text-muted mb-2">
-                      <div className="me-4 d-flex align-items-center">
-                        <FaMusic className="me-2" />
-                        <span>{post.content.songIds.length} tracks</span>
-                      </div>
-                      <div className="me-4 d-flex align-items-center">
-                        <FaEye className="me-2" />
-                        <span>{post.view_count} views</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="d-flex gap-2">
-                    <Button
-                      variant={isLiked ? "danger" : "outline-danger"}
-                      className="d-flex align-items-center"
-                      onClick={handleLike}
-                    >
-                      {isLiked ? <FaHeart className="me-2" /> : <FaRegHeart className="me-2" />}
-                      {post.like_count}
-                    </Button>
-                    
-                    <Button variant="outline-secondary" className="d-flex align-items-center">
-                      <FaComment className="me-2" />
-                      {post.comment_count}
-                    </Button>
-                    
-                    <Button variant="outline-primary" className="d-flex align-items-center">
-                      <FaShare className="me-2" />
-                      Share
-                    </Button>
-                  </div>
                 </Col>
               </Row>
             </Card.Body>
@@ -422,65 +327,6 @@ const AlbumDetailView = () => {
                   );
                 })}
               </div>
-            </Card.Body>
-          </Card>
-
-          {/* Comments */}
-          <Card className="shadow-sm">
-            <Card.Header className="bg-white">
-              <h3 className="fs-5 mb-0 d-flex align-items-center">
-                <FaComment className="me-2" />
-                Comments ({post.comment_count})
-              </h3>
-            </Card.Header>
-            <Card.Body>
-              {/* Comment form */}
-              <Form onSubmit={handleCommentSubmit} className="mb-4">
-                <Form.Group className="mb-3">
-                  <Form.Control
-                    as="textarea"
-                    rows={3}
-                    placeholder="Write a comment..."
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                  />
-                </Form.Group>
-                <div className="d-flex justify-content-end">
-                  <Button type="submit" variant="primary">
-                    Post Comment
-                  </Button>
-                </div>
-              </Form>
-              
-              <hr />
-              
-              {/* Comments list */}
-              {comments.length === 0 ? (
-                <p className="text-center text-muted my-4">No comments yet. Be the first to comment!</p>
-              ) : (
-                <div className="comment-list">
-                  {comments.map((comment) => (
-                    <div key={comment.id} className="d-flex mb-4">
-                      <div className="me-3">
-                        <img
-                          src={comment.avatar || "https://via.placeholder.com/40"}
-                          alt={comment.username}
-                          className="rounded-circle"
-                          width="40"
-                          height="40"
-                        />
-                      </div>
-                      <div className="flex-grow-1">
-                        <div className="d-flex justify-content-between align-items-center mb-1">
-                          <h6 className="mb-0 fw-bold">{comment.username}</h6>
-                          <small className="text-muted">{formatDate(comment.created_at)}</small>
-                        </div>
-                        <p className="mb-0">{comment.content}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </Card.Body>
           </Card>
         </Col>

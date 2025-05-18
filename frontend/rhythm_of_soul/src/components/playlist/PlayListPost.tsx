@@ -6,13 +6,13 @@ import { FaComment } from '@react-icons/all-files/fa/FaComment';
 import { FaEye } from '@react-icons/all-files/fa/FaEye';
 
 
-import { CollectionPostCardProps } from '../../model/post/post';
+import { PlaylistPostCardProps} from '../../model/post/post';
 import '../../style/PlaylistPost.css';
 import classNames from 'classnames/bind';
-const PlaylistPostCard: React.FC<CollectionPostCardProps> = ({
+const PlaylistPostCard: React.FC<PlaylistPostCardProps> = ({
   post,
   playingTrackId,
-  likedTracks,
+  isLiked,
   onPlayTrack,
   onLike,
   onComment
@@ -20,8 +20,7 @@ const PlaylistPostCard: React.FC<CollectionPostCardProps> = ({
   const navigate = useNavigate();
   const cx = classNames.bind(require('../../style/PlaylistPost.css'));
   const [localLikedTracks, setLocalLikedTracks] = useState<Record<string, boolean>>({});
-  const currentLikedTracks = likedTracks || localLikedTracks;
-
+  console.log('PlaylistPostCard', post);
   if (!post.content) return null;
 
   const formattedDate = new Date(post.created_at).toLocaleDateString('en-US', {
@@ -31,10 +30,9 @@ const PlaylistPostCard: React.FC<CollectionPostCardProps> = ({
   });
 
   const songs = post.content.songIds || [];
-  const isLiked = currentLikedTracks[post.id];
   const coverImage = post.content.coverUrl || '/assets/images/default/playlist-cover.jpg';
   const playlistImage = post.content.imageUrl || '/assets/images/default/playlist-thumbnail.jpg';
-
+console.log( isLiked)
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -56,7 +54,7 @@ const PlaylistPostCard: React.FC<CollectionPostCardProps> = ({
   };
 
   const handleViewDetail = () => {
-    navigate(`/playlist/${post.id}`);
+    navigate(`/post/${post.id}`);
   };
 
   return (

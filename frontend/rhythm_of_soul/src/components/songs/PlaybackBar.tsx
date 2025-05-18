@@ -266,7 +266,7 @@ const StreamingPlaybackBar: React.FC = () => {
   // Calculate buffered regions
   const getBufferedRegions = useCallback(() => {
     if (!loadedRanges || !duration) return [];
-    
+
     return Array.from({ length: loadedRanges.length }, (_, i) => ({
       start: (loadedRanges.start(i) / duration) * 100,
       end: (loadedRanges.end(i) / duration) * 100
@@ -284,18 +284,18 @@ const StreamingPlaybackBar: React.FC = () => {
 
   return (
     <div className="music-player-container">
-      <audio 
+      <audio
         ref={audioRef}
         src={audioUrl}
         preload="auto"
       />
-      
+
       {/* Playlist Modal */}
       {showPlaylist && playlist && (
         <div className="playlist-modal bg-dark text-white p-3">
           <div className="d-flex justify-content-between mb-3">
             <h5>Playlist ({playlist.songs.length} tracks)</h5>
-            <button 
+            <button
               className="btn btn-link text-white"
               onClick={() => setShowPlaylist(false)}
             >
@@ -304,11 +304,10 @@ const StreamingPlaybackBar: React.FC = () => {
           </div>
           <ul className="list-group">
             {playlist.songs.map((song, index) => (
-              <li 
+              <li
                 key={song.id}
-                className={`list-group-item bg-${
-                  currentSong?.id === song.id ? 'primary' : 'dark'
-                } text-white d-flex justify-content-between align-items-center`}
+                className={`list-group-item bg-${currentSong?.id === song.id ? 'primary' : 'dark'
+                  } text-white d-flex justify-content-between align-items-center`}
                 onClick={() => {
                   dispatch(playSingleSong(song));
                   setShowPlaylist(false);
@@ -329,9 +328,9 @@ const StreamingPlaybackBar: React.FC = () => {
       {/* Player Controls */}
       <footer className="fixed-bottom bg-dark">
         {/* Progress bar */}
-        <div 
+        <div
           ref={progressContainerRef}
-          className="progress-container position-relative" 
+          className="progress-container position-relative"
           style={{ height: '15px', cursor: 'pointer', padding: '5px 0' }}
           onClick={handleProgressClick}
           onMouseDown={handleMouseDown}
@@ -339,7 +338,7 @@ const StreamingPlaybackBar: React.FC = () => {
           {/* Buffer indicators */}
           <div className="buffer-regions position-absolute" style={{ width: '100%', height: '5px', top: '5px' }}>
             {bufferedRegions.map((region, idx) => (
-              <div 
+              <div
                 key={idx}
                 className="buffer-region bg-secondary opacity-50"
                 style={{
@@ -351,23 +350,23 @@ const StreamingPlaybackBar: React.FC = () => {
               />
             ))}
           </div>
-          
+
           {/* Progress bar */}
           <div className="progress" style={{ height: '5px', position: 'relative', zIndex: 1 }}>
-            <div 
-              className="progress-bar bg-primary" 
-              role="progressbar" 
+            <div
+              className="progress-bar bg-primary"
+              role="progressbar"
               style={{ width: `${(currentTime / duration) * 100}%` }}
-              aria-valuenow={currentTime} 
-              aria-valuemin={0} 
+              aria-valuenow={currentTime}
+              aria-valuemin={0}
               aria-valuemax={duration}
             />
           </div>
-          
+
           {/* Seek handle */}
-          <div 
-            className="seek-handle" 
-            style={{ 
+          <div
+            className="seek-handle"
+            style={{
               position: 'absolute',
               left: `calc(${(currentTime / duration) * 100}% - 6px)`,
               top: '2px',
@@ -381,18 +380,18 @@ const StreamingPlaybackBar: React.FC = () => {
             }}
           />
         </div>
-        
+
         {/* Player controls */}
         <div className="container-fluid py-2">
           <div className="row align-items-center">
             {/* Track info */}
             <div className="col-md-3">
               <div className="d-flex align-items-center">
-                <div 
-                  className="track-art me-3 rounded" 
-                  style={{ 
-                    width: '50px', 
-                    height: '50px', 
+                <div
+                  className="track-art me-3 rounded"
+                  style={{
+                    width: '50px',
+                    height: '50px',
                     backgroundImage: `url(${currentTrack.imageUrl})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
@@ -402,7 +401,7 @@ const StreamingPlaybackBar: React.FC = () => {
                   <h6 className="text-white mb-0">{currentTrack.title}</h6>
                   <small className="text-secondary">{currentTrack.artist}</small>
                 </div>
-                <button 
+                <button
                   className={`btn btn-link text-${isFavorite ? 'danger' : 'white'} ms-3`}
                   onClick={() => setIsFavorite(!isFavorite)}
                   aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
@@ -411,11 +410,11 @@ const StreamingPlaybackBar: React.FC = () => {
                 </button>
               </div>
             </div>
-            
+
             {/* Main controls */}
             <div className="col-md-6">
               <div className="d-flex justify-content-center align-items-center">
-                <button 
+                <button
                   className={`btn btn-link text-${shuffle ? 'primary' : 'white'} mx-2`}
                   onClick={() => dispatch(toggleShuffle())}
                   aria-label="Shuffle"
@@ -425,25 +424,31 @@ const StreamingPlaybackBar: React.FC = () => {
                 <button className="btn btn-link text-white mx-2" onClick={skipBackward}>
                   <BsSkipBackwardFill size={20} />
                 </button>
-                <button 
-                  className="btn btn-primary rounded-circle p-2 mx-3" 
+                <button
+                  className="btn btn-primary rounded-circle p-2 mx-3"
                   onClick={togglePlay}
                   aria-label={play ? "Pause" : "Play"}
+                  disabled={!currentSong && !mediaUrlSong} // Vô hiệu hóa nếu không có dữ liệu
                 >
-                  {isBuffering ? (
+                  {(!currentSong && !mediaUrlSong) ? (
+                    <BsMusicNoteList size={24} /> // Icon "không có bài hát"
+                  ) : isBuffering ? (
                     <div className="spinner-border spinner-border-sm text-white" role="status">
                       <span className="visually-hidden">Loading...</span>
                     </div>
-                  ) : play ? <BsPauseFill size={24} /> : <BsFillPlayFill size={24} />}
+                  ) : play ? (
+                    <BsPauseFill size={24} />
+                  ) : (
+                    <BsFillPlayFill size={24} />
+                  )}
                 </button>
                 <button className="btn btn-link text-white mx-2" onClick={skipForward}>
                   <BsSkipForwardFill size={20} />
                 </button>
-                <button 
-                  className={`btn btn-link text-${
-                    repeatMode === 'one' ? 'primary' : 
-                    repeatMode === 'all' ? 'info' : 'white'
-                  } mx-2`}
+                <button
+                  className={`btn btn-link text-${repeatMode === 'one' ? 'primary' :
+                      repeatMode === 'all' ? 'info' : 'white'
+                    } mx-2`}
                   onClick={() => dispatch(toggleRepeatMode())}
                   aria-label={`Repeat ${repeatMode}`}
                 >
@@ -451,7 +456,7 @@ const StreamingPlaybackBar: React.FC = () => {
                 </button>
               </div>
             </div>
-            
+
             {/* Right controls */}
             <div className="col-md-3">
               <div className="d-flex align-items-center justify-content-end">
@@ -461,10 +466,10 @@ const StreamingPlaybackBar: React.FC = () => {
                     <small>Buffering...</small>
                   </div>
                 )}
-                
+
                 <div className="volume-control d-flex align-items-center me-3">
-                  <button 
-                    className="btn btn-link text-white p-0 me-2" 
+                  <button
+                    className="btn btn-link text-white p-0 me-2"
                     onClick={() => setIsMuted(!isMuted)}
                     aria-label={isMuted ? "Unmute" : "Mute"}
                   >
@@ -480,24 +485,23 @@ const StreamingPlaybackBar: React.FC = () => {
                     onChange={handleVolumeChange}
                   />
                 </div>
-                
+
                 <div className="time-display text-white me-3">
                   <small>{formatTime(currentTime)} / {formatTime(duration)}</small>
                 </div>
-                
+
                 <div className="additional-controls d-flex">
-                  <button 
-                    className={`btn btn-link text-${
-                      showPlaylist ? 'primary' : 'secondary'
-                    } me-2`}
+                  <button
+                    className={`btn btn-link text-${showPlaylist ? 'primary' : 'secondary'
+                      } me-2`}
                     onClick={() => setShowPlaylist(!showPlaylist)}
                     disabled={!playlist}
                     aria-label="Show playlist"
-                    >
+                  >
                     <BsMusicNoteList size={18} />
                   </button>
-                  <button 
-                    className="btn btn-link text-secondary" 
+                  <button
+                    className="btn btn-link text-secondary"
                     onClick={() => setIsFullscreen(!isFullscreen)}
                     aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
                   >
@@ -509,11 +513,12 @@ const StreamingPlaybackBar: React.FC = () => {
           </div>
         </div>
       </footer>
-      
+
       <style>{`
         .music-player-container {
           position: relative;
           z-index: 1000;
+          margin-top :80px;
         }
         
         .playlist-modal {

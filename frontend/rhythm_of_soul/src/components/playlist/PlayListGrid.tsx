@@ -10,7 +10,7 @@ import PlayListPost from './PlayListPost';
 import AddPlaylistModal from './CreatePlaylistDialog'; // Import the new modal
 
 const currentUser: CurrentUser = {
-  id: "1234",
+  id: "326e6645-aa0f-4f89-b885-019c05b1a970",
   username: "Current User",
   avatar: "https://i1.sndcdn.com/avatars-6zJmWE24BNXpCEdL-qVvuHg-t120x120.jpg"
 };
@@ -111,8 +111,8 @@ const PlaylistGrid: React.FC = () => {
               <PlayListPost 
                 post={post}
                 playingTrackId={playingTrackId}
-                likedTracks={likedPosts}
                 onPlayTrack={handlePlayTrack}
+                isLiked={likedPosts[post.id]}
                 onLike={() => handleLike(post.id)}
                 onComment={() => toggleComment(post.id)}
               />

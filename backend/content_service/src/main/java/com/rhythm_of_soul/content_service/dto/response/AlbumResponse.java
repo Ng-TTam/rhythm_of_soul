@@ -28,4 +28,5 @@ public class AlbumResponse {
     int viewCount; // Số lượt xem album
     int likeCount; // Số lượt thích album
     int commentCount; // Số lượng bình luận album
+    Boolean isLiked; // Trạng thái đã thích album hay chưa
 }

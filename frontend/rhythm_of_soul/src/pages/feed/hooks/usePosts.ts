@@ -28,8 +28,15 @@ const usePosts = (currentUser: CurrentUser) => {
           username: currentUser.username,
           userAvatar: currentUser.avatar
         }));
-        
+        postsWithUserInfo.forEach((post: PostWithUserInfo) => {
+          setLikedPosts(prev => ({
+            ...prev,
+            [post.id]: post._liked
+          }));
+        })
         setPosts(postsWithUserInfo);
+        
+
       } else {
         throw new Error('Invalid data format');
       }
@@ -53,7 +60,8 @@ const usePosts = (currentUser: CurrentUser) => {
           alreadyLiked ? unlikePost(post.id) : likePost(post.id);
           return { 
             ...post, 
-            like_count: post.like_count + (alreadyLiked ? -1 : 1) 
+            like_count: post.like_count + (alreadyLiked ? -1 : 1), 
+            _liked : !alreadyLiked
           };
         }
         return post;

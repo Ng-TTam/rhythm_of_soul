@@ -10,8 +10,8 @@ spring:
       uri: mongodb://localhost:27017/rhythm_db
   servlet:
     multipart:
-      max-file-size: 20MB
-      max-request-size: 20MB
+      max-file-size: 2000MB
+      max-request-size: 2000MB
 
 minio:
   url: http://localhost:9000

@@ -63,7 +63,7 @@ const SongPostCard: React.FC<SongPostCardProps> = ({
             src={songImage}
             alt={post.content.title}
             className="song-thumbnail"
-            onClick={() => navigate(`/songs/${post.id}`)}
+            onClick={() => navigate(`/post/${post.id}`)}
           />
           
           <div className="song-info">

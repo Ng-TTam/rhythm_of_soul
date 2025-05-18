@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import {  useNavigate } from 'react-router-dom';
 import { FaHeart } from '@react-icons/all-files/fa/FaHeart';
-import { FaRegHeart } from '@react-icons/all-files/fa/FaRegHeart';
 import { FaComment } from '@react-icons/all-files/fa/FaComment';
 import { FaEye } from '@react-icons/all-files/fa/FaEye';
 import { FaMusic } from '@react-icons/all-files/fa/FaMusic';
@@ -15,9 +14,10 @@ import classNames from 'classnames/bind';
 import { Song,PlaylistData } from '../../model/post/Playlist';
 
 import { getPlaylistDetail } from '../../services/postService';
-
-const PlaylistDetail = () => {
-  const { playlistId } = useParams<{ playlistId: string }>();
+interface PlaylistDetailProps {
+  playlistId: string;
+}
+const PlaylistDetail : React.FC<PlaylistDetailProps> = ({ playlistId }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { currentSong } = useAppSelector(state => state.audio);
@@ -25,8 +25,6 @@ const PlaylistDetail = () => {
   const [playlistData, setPlaylistData] = useState<PlaylistData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isLiked, setIsLiked] = useState(false);
-  const [newComment, setNewComment] = useState('');
   const cx = classNames.bind(require('../../style/PlaylistDetail.css'));
   useEffect(() => {
     const fetchPlaylistData = async () => {
@@ -39,7 +37,6 @@ const PlaylistDetail = () => {
         }
         
         setPlaylistData(response.result || { post: {} });
-        setIsLiked(response.result?.isLiked || false);
 
         // Cập nhật playlist vào Redux store
         if (response.result?.post?.content?.songIds) {
@@ -96,61 +93,7 @@ const PlaylistDetail = () => {
     });
   };
 
-  const handleLike = async () => {
-    try {
-      const response = await fetch(`http://localhost:8484/posts/${playlistId}/like`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
 
-      if (response.ok) {
-        setIsLiked(!isLiked);
-        setPlaylistData(prev => ({
-          ...prev!,
-          post: {
-            ...prev!.post,
-            like_count: (prev!.post.like_count || 0) + (isLiked ? -1 : 1)
-          }
-        }));
-      }
-    } catch (err) {
-      console.error('Lỗi khi like:', err);
-    }
-  };
-
-  const handleCommentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newComment.trim()) return;
-
-    try {
-      const response = await fetch(`http://localhost:8484/posts/${playlistId}/comment`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: newComment }),
-      });
-
-      if (response.ok) {
-        setPlaylistData(prev => ({
-          ...prev!,
-          comments: [
-            ...(prev?.comments || []),
-            {
-              user: { username: 'Bạn', avatar: '/assets/images/default/avatar.jpg' },
-              created_at: new Date().toISOString(),
-              content: newComment
-            }
-          ],
-          post: {
-            ...prev!.post,
-            comment_count: (prev!.post.comment_count || 0) + 1
-          }
-        }));
-        setNewComment('');
-      }
-    } catch (err) {
-      console.error('Lỗi khi bình luận:', err);
-    }
-  };
 
   if (loading) return (
     <div className="loading-container">
@@ -239,16 +182,6 @@ const PlaylistDetail = () => {
               )}
             </div>
             
-            <div className="playlist-actions">
-              <button 
-                className={`like-button ${isLiked ? 'liked' : ''}`}
-                onClick={handleLike}
-              >
-                {isLiked ? <FaHeart /> : <FaRegHeart />}
-                {isLiked ? 'Đã thích' : 'Thích'}
-              </button>
-            </div>
-
             {post.content?.tags?.length ? (
               <div className="playlist-tags">
                 <h3>Thể loại</h3>
@@ -311,54 +244,7 @@ const PlaylistDetail = () => {
             )}
           </div>
         </div>
-
-        {/* Comments section */}
-        <div className="comments-section">
-          <h2>Bình luận ({post.comment_count || 0})</h2>
-          
-          {playlistData.comments?.length ? (
-            <div className="comments-list">
-              {playlistData.comments.map((comment, index) => (
-                <div key={index} className="comment-item">
-                  <img 
-                    src={comment.user?.avatar || '/assets/images/default/avatar.jpg'} 
-                    alt={comment.user?.username} 
-                    className="comment-avatar"
-                  />
-                  <div className="comment-content">
-                    <div className="comment-header">
-                      <span className="comment-username">{comment.user?.username || 'Ẩn danh'}</span>
-                      <span className="comment-date">{formatDate(comment.created_at)}</span>
-                    </div>
-                    <div className="comment-text">{comment.content || ''}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="no-comments">Chưa có bình luận nào. Hãy là người đầu tiên!</div>
-          )}
-          
-          <form onSubmit={handleCommentSubmit} className="add-comment">
-            <textarea 
-              placeholder="Viết bình luận..." 
-              className="comment-input"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-            />
-            <button 
-              type="submit" 
-              className="comment-submit"
-              disabled={!newComment.trim()}
-            >
-              Đăng
-            </button>
-          </form>
-        </div>
       </div>
-
-      {/* Player bar */}
-      <StreamingPlaybackBar />
     </div>
   );
 };

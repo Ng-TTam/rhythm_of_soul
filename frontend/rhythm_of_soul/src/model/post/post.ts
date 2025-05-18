@@ -40,6 +40,7 @@ export interface PostResponse {
   created_at: string;
   updated_at: string;
   _public: boolean;
+  _liked: boolean;
 }
 export interface PostRequest {
   account_id: string;
@@ -78,8 +79,15 @@ export interface SongPostCardProps {
 export interface CollectionPostCardProps {
   post: PostWithUserInfo;
   playingTrackId: string | null;
-  likedTracks: { [key: string]: boolean };
   onPlayTrack: (songId: string) => void;
+  onLike: () => void;
+  onComment: () => void;
+}
+export interface PlaylistPostCardProps {
+  post: PostWithUserInfo;
+  playingTrackId: string | null;
+  onPlayTrack: (songId: string) => void;
+  isLiked: boolean;
   onLike: () => void;
   onComment: () => void;
 }
@@ -126,19 +134,20 @@ export interface Post {
   updated_at: string;
   _public: boolean;
   username?: string;
+  _liked: boolean;
   userAvatar?: string;
 }
 
 export interface Comment {
   id: string;
   account_id: string;
-  post_id: string;
   content: string;
   created_at: string;
   updated_at: string;
   username?: string;
   userAvatar?: string;
   likes?: number;
+  child_comments? : Comment[];
 }
 
 export interface PostDetailResponse {

@@ -13,7 +13,6 @@ import classNames from 'classnames/bind';
 const CollectionPostCard: React.FC<CollectionPostCardProps> = ({ 
   post, 
   playingTrackId, 
-  likedTracks, 
   onPlayTrack, 
   onLike, 
   onComment 
@@ -25,11 +24,7 @@ const CollectionPostCard: React.FC<CollectionPostCardProps> = ({
   
   const imageUrl = post.content.imageUrl || '/assets/images/default/avatar.jpg';
   const handlePostDetail = (postId: string, postType: string) => {
-    if (postType === 'ALBUM') {
-      navigate(`/albums/${postId}`);
-    } else {
-      navigate(`/playlist/${postId}`);
-    }
+    navigate(`/post/${postId}`);  
   }
   return (
     <Card className={cx('collection-post-card',classNames)}>
@@ -142,10 +137,10 @@ const CollectionPostCard: React.FC<CollectionPostCardProps> = ({
         <div className="collection-actions">
           <Button 
             variant="link" 
-            className={`action-btn like-btn ${likedTracks[post.id] ? 'liked' : ''}`}
+            className={`action-btn like-btn ${post._liked ? 'liked' : ''}`}
             onClick={onLike}
           >
-            <FaHeart className="action-icon" />
+            <FaHeart className="action-icon" /> 
             <span className="action-count">{post.like_count}</span>
           </Button>
           <Button 

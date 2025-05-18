@@ -4,14 +4,9 @@ import { APIResponse } from '../model/APIResponse';
 import { Album, DetailPostResponse, Track } from '../model/post/Album';
 import { PlaylistData } from '../model/post/Playlist';
 import { Song,SongEditForm,SongDetail } from '../model/post/Song';
-
+import { CommentCreationRequest } from '../model/post/Comment';
 const API_BASE_URL = 'http://localhost:8484';
 
-interface CommentCreationRequest { 
-  postId: string;
-  content: string;
-  parentId: string | null;
-}
 
 export const fetchPostDetail = async (postId: string): Promise<PostDetailResponse> => {
   const response = await axios.get<PostDetailResponse>(
@@ -40,8 +35,9 @@ export const repost = async (postId: string) => {
   await axios.post(`${API_BASE_URL}/posts/${postId}/repost`);
 };
 
-export const addComment = async ( content: CommentCreationRequest) => {
-  await axios.post(`${API_BASE_URL}/comments`, content );
+export const addComment = async ( content: CommentCreationRequest) :Promise<APIResponse<any>> => {
+  const response = await axios.post(`${API_BASE_URL}/comments`, content );
+  return response.data;
 };
 
 export const editComment = async ( commentId: string, content: string) => {
@@ -53,7 +49,8 @@ export const deleteComment = async ( commentId: string ) => {
 };
 
 export const getTopLevelComment = async ( postId: string ) => {
-  await axios.get(`${API_BASE_URL}/comments/top-level/${postId}`);
+  const response = await axios.get(`${API_BASE_URL}/posts/${postId}/comments`);
+  return response.data;
 };
 
 export const getReplies = async ( parentCommentId: string ) => {

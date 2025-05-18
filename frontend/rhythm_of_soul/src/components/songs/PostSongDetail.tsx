@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import { 
   Container, 
   Row, 
@@ -7,33 +7,27 @@ import {
   Button, 
   Image, 
   Badge, 
-  Form, 
-  InputGroup,
   Alert
 } from 'react-bootstrap';
 import { BsPlayFill } from '@react-icons/all-files/bs/BsPlayFill';
 import { BsPauseFill } from '@react-icons/all-files/bs/BsPauseFill';
-import { BsHeart } from '@react-icons/all-files/bs/BsHeart';
-import { BsHeartFill } from '@react-icons/all-files/bs/BsHeartFill';
-import { BsChat } from '@react-icons/all-files/bs/BsChat';
 import { BsEyeFill } from '@react-icons/all-files/bs/BsEyeFill';
 import { BsClock } from '@react-icons/all-files/bs/BsClock';
-import { MdRepeat } from '@react-icons/all-files/md/MdRepeat';
-import { BsReply } from '@react-icons/all-files/bs/BsReply';
+
 import { MdPublic } from '@react-icons/all-files/md/MdPublic';
 import {MdLock} from '@react-icons/all-files/md/MdLock';
-import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hook';
 import { toggleePlay, setAudio } from '../../reducers/audioReducer';
 import  {SongDetail} from '../../model/post/Song';
 import { getSongDetail } from '../../services/postService';
-export default function PostSongDetail() {
+
+
+interface PostSongDetailProps {
+  postId: string;
+}
+
+const PostSongDetail: React.FC<PostSongDetailProps> = ({ postId }) =>{
   const [songDetail, setSongDetail] = useState<SongDetail | null>(null);
-  const [isLiked, setIsLiked] = useState(false);
-  const [newComment, setNewComment] = useState('');
-  const [showAllComments, setShowAllComments] = useState(false);
-  const [showComment, setShowComment] = useState(false);
-  const postId = useParams<{ songId: string }>();
   
   const dispatch = useAppDispatch();
   const audioState = useAppSelector(state => state.audio);
@@ -41,7 +35,7 @@ export default function PostSongDetail() {
   useEffect(() => {
     const fetchSongDetail = async () => {
       try {
-        const response = await getSongDetail(postId.songId ?? '');
+        const response = await getSongDetail(postId ?? '');
         
         if (response.code !== 200) {
           throw new Error( response.message );
@@ -49,8 +43,6 @@ export default function PostSongDetail() {
         
         setSongDetail(response.result);
         
-        // Reset like state when a new song is loaded
-        setIsLiked(false);
       } catch (err) {
         console.error(err);
         setSongDetail(null);
@@ -77,45 +69,6 @@ export default function PostSongDetail() {
       }));
     }
   };
-  
-  const toggleLike = () => {
-    setIsLiked(!isLiked);
-    // In a real app, you would call an API to like/unlike the post
-  };
-  
-  const handleCommentSubmit = () => {
-    if (!newComment.trim()) return;
-    
-    // Mock adding a comment locally
-    if (songDetail) {
-      const updatedDetail = {
-        ...(songDetail ?? {}),
-        comments: [
-          {
-            id: `temp-${Date.now()}`,
-            account_id: "current-user",
-            content: newComment,
-            created_at: new Date().toISOString(),
-            user: { name: "Current User", avatar: "/api/placeholder/40/40" }
-          },
-          ...(songDetail.comments || [])
-        ],
-        post: {
-          ...songDetail.post,
-          comment_count: songDetail.post.comment_count + 1
-        }
-      };
-      setSongDetail(updatedDetail);
-    }
-    
-    setNewComment('');
-  };
-  
-  const handleOpenCommemtt = () => {
-    setShowComment(!showComment);
-  };
-  
-  // No song detail
   if (!songDetail) {
     return (
       <Container>
@@ -124,13 +77,11 @@ export default function PostSongDetail() {
     );
   }
   
-  const { post, comments } = songDetail;
-  const displayComments = showAllComments 
-    ? (comments ?? []) 
-    : (comments ?? []).slice(0, 3);
-  
+  const { post } = songDetail;
   // Check if current song is playing
   const isCurrentSongPlaying = audioState.mediaUrlSong === post.content.mediaUrl && audioState.play;
+
+ 
   
   return (
     <Container className="py-4">
@@ -192,112 +143,10 @@ export default function PostSongDetail() {
                   <Badge bg="primary" className="me-1" key={idx}>{tag}</Badge>
                 ))}
               </div>
-              
-              {/* Action buttons */}
-              <div className="mt-4 d-flex">
-                <Button 
-                  variant={isLiked ? 'danger' : 'outline-danger'} 
-                  className="me-2"
-                  onClick={toggleLike}
-                >
-                  {isLiked ? <BsHeartFill /> : <BsHeart />}
-                  <span className="ms-1">
-                    {post.like_count + (isLiked ? 1 : 0)}
-                  </span>
-                </Button>
-                
-                <Button variant="outline-primary" className="me-2"
-                onClick={handleOpenCommemtt}>
-                  <BsChat />
-                  <span className="ms-1">{post.comment_count}</span>
-                </Button>
-                
-                <Button variant="outline-secondary" className="me-2" >
-                  <MdRepeat/>
-                </Button>
-              </div>
+        
             </Card.Body>
           </Card>
-          
-          { showComment &&
-            <Card className="mt-4 shadow-sm">
-              <Card.Header>
-                <Card.Title as="h5">Comments ({post.comment_count})</Card.Title>
-              </Card.Header>
-              
-              <Card.Body>
-                {/* Comment input */}
-                <div className="mb-4">
-                  <InputGroup>
-                    <Form.Control 
-                      type="text" 
-                      placeholder="Add a comment..." 
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          handleCommentSubmit();
-                        }
-                      }}
-                    />
-                    <Button 
-                      variant="primary"
-                      onClick={handleCommentSubmit}
-                      disabled={!newComment.trim()}
-                    >
-                      Comment
-                    </Button>
-                  </InputGroup>
-                </div>
-                
-                {/* Comments list */}
-                {displayComments.length > 0 ? (
-                  <div>
-                    {displayComments.map((comment) => (
-                      <div key={comment.id} className="mb-3 p-3 border-bottom">
-                        <div className="d-flex">
-                          <Image 
-                            src={comment.user?.avatar || "/api/placeholder/40/40"} 
-                            alt="User" 
-                            roundedCircle
-                            className="me-2"
-                            width={40} 
-                            height={40} 
-                          />
-                          <div>
-                            <div className="d-flex align-items-center">
-                              <strong className="me-2">{comment.user?.name || 'Anonymous'}</strong>
-                              <small className="text-muted">
-                                {new Date(comment.created_at).toLocaleDateString()}
-                              </small>
-                            </div>
-                            <p className="mb-1">{comment.content}</p>
-                            <Button variant="link" size="sm" className="text-muted p-0">
-                              <BsReply /> Reply
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                    
-                    {(comments ?? []).length > 3 && (
-                      <Button 
-                        variant="link" 
-                        className="p-0" 
-                        onClick={() => setShowAllComments(!showAllComments)}
-                      >
-                        {showAllComments 
-                          ? 'Show less comments' 
-                          : `Show all ${comments?.length || 0} comments`}
-                      </Button>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-muted text-center">No comments yet. Be the first to comment!</p>
-                )}
-              </Card.Body>
-            </Card>
-          }
+           {/* Comment section */}
         </Col>
         
         {/* Right column: Likes and related info */}
@@ -344,3 +193,4 @@ export default function PostSongDetail() {
     </Container>
   );
 }
+export default PostSongDetail;

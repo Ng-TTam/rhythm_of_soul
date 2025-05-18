@@ -92,6 +92,7 @@ public class PostServiceImpl implements  PostService {
         contentResponse.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
         contentResponse.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
         postResponse.setContent(contentResponse);
+        postResponse.set_liked(false);
         return postResponse;
     }
 
@@ -144,6 +145,7 @@ public class PostServiceImpl implements  PostService {
               if(post.getContent().getSongIds() != null)  postResponse.getContent().setSongIds(getSongs(postRequest.getContent().getSongIds()));
 
             }
+            postResponse.set_liked(false);
             return postResponse;
         }catch (Exception e){
             log.error("Error while creating post", e);
@@ -209,6 +211,7 @@ public class PostServiceImpl implements  PostService {
 
                 postResponse.setContent(content);
             }
+            postResponse.set_liked(likeRepository.existsByAccountIdAndPostId(accountId, post.getId()));
             postResponses.add(postResponse);
 
         }
@@ -228,6 +231,7 @@ public class PostServiceImpl implements  PostService {
                 if (post.getContent().getSongIds() != null) postResponse.getContent().setSongIds(getSongs(post.getContent().getSongIds()));
                 postResponse.setContent(content);
             }
+            postResponse.set_liked(likeRepository.existsByAccountIdAndPostId(accountId, post.getId()));
             postResponses.add(postResponse);
 
         }
@@ -252,6 +256,7 @@ public class PostServiceImpl implements  PostService {
                     .isPublic(post.isPublic())
                     .accountId(post.getAccountId())
                     .viewCount(post.getViewCount())
+                    .isLiked(likeRepository.existsByAccountIdAndPostId(accountId, post.getId()))
                     .likeCount(post.getLikeCount())
                     .commentCount(post.getCommentCount())
                     .scheduledAt(post.getScheduledAt() != null ? post.getScheduledAt() : null)
@@ -426,6 +431,7 @@ public class PostServiceImpl implements  PostService {
                     .accountId(post.getAccountId())
                     .viewCount(post.getViewCount())
                     .likeCount(post.getLikeCount())
+                    .isLiked(false)
                     .commentCount(post.getCommentCount())
                     .scheduledAt(post.getScheduledAt() != null ? post.getScheduledAt() : null)
                     .build();
@@ -461,6 +467,7 @@ public class PostServiceImpl implements  PostService {
             content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
             content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
             postResponse.setContent(content);
+            postResponse.set_liked(false);
             return postResponse;
         }catch (Exception e){
             log.error("Error while creating playlist", e);
@@ -553,7 +560,7 @@ public class PostServiceImpl implements  PostService {
 //        return new PageImpl<>(results.getMappedResults(), pageable, total);
 //    }
 
-    private List<CommentResponse> getComments(String postId) {
+    public List<CommentResponse> getComments(String postId) {
         List<Comment> comments = commentRepository.findAllByPostId(postId);
         CommentManager manager = new CommentManager();
         for(Comment comment : comments){

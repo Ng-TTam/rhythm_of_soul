@@ -9,6 +9,9 @@ import PostActions from './postDetail/PostActions';
 import { Post, Comment,currentUser } from '../../model/post/post';
 import '../../style/PostDetail.css';
 import classNames from 'classnames/bind';
+import PostSongDetail  from '../../components/songs/PostSongDetail';
+import AlbumDetailView from '../../components/album/AlbumPage';
+import PlaylistDetail from '../../components/playlist/PlayListDetail';
 const PostDetail: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
@@ -26,7 +29,7 @@ const PostDetail: React.FC = () => {
     likedComments: {} as { [key: string]: boolean }
   });
   const cx = classNames.bind(require('../../style/PostDetail.css'));
-
+  
   const fetchPostData = useCallback(async () => {
     try {
       if (!postId) {
@@ -59,6 +62,7 @@ const PostDetail: React.FC = () => {
       setState(prev => ({
         ...prev,
         post: postData,
+        isLiked : postData._liked,
         comments: formattedComments,
         likesCount: postData.like_count,
         loading: false,
@@ -79,18 +83,32 @@ const PostDetail: React.FC = () => {
   }, [fetchPostData]);
 
   const handleLike = useCallback(async () => {
+    if (!postId) return;
+    
     try {
-      // await likePost(postId!);
-      state.isLiked ? unlikePost(postId!) : likePost(postId!);
+      setState(prev => {
+        const newLikedState = !prev.isLiked;
+        return {
+          ...prev,
+          isLiked: newLikedState,
+          likesCount: newLikedState ? prev.likesCount + 1 : prev.likesCount - 1
+        };
+      });
+  
+      // Sử dụng giá trị mới nhất từ functional update
+      const currentIsLiked = !state.isLiked;
+      currentIsLiked ? await likePost(postId) : await unlikePost(postId);
+      
+    } catch (err) {
+      // Rollback nếu có lỗi
       setState(prev => ({
         ...prev,
-        isLiked: !prev.isLiked,
-        likesCount: prev.isLiked ? prev.likesCount - 1 : prev.likesCount + 1
+        isLiked: prev.isLiked,
+        likesCount: prev.likesCount
       }));
-    } catch (err) {
       console.error('Error liking post:', err);
     }
-  }, [postId]);
+  }, [postId, state.isLiked]); // Thêm state.isLiked vào dependencies
 
   const handleRepost = useCallback(async () => {
     try {
@@ -114,7 +132,6 @@ const PostDetail: React.FC = () => {
       const newComment: Comment = {
         id: `temp-${Date.now()}`,
         account_id: currentUser.id,
-        post_id: postId,
         content,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -172,8 +189,15 @@ const PostDetail: React.FC = () => {
     switch (state.post.type) {
       case 'TEXT':
         return <TextPostContent caption={state.post.caption} />;
+      case 'SONG' :
+        return postId ? <PostSongDetail postId={postId} /> : null;
+      case 'ALBUM':
+        return postId ? <AlbumDetailView albumId={postId} /> : null;
+      case 'PLAYLIST':
+        return postId ? <PlaylistDetail playlistId={postId} /> : null;  
       default:
         return null;
+      
     }
   };
 
@@ -242,13 +266,6 @@ const PostDetail: React.FC = () => {
       {openComment && (
         <div id="comment-section">
           <CommentSection
-            comments={state.comments}
-            currentUser={currentUser}
-            onSubmit={handleCommentSubmit}
-            onLike={handleCommentLike}
-            likedComments={state.likedComments}
-            showAll={state.showAllComments}
-            onToggleShowAll={toggleShowAllComments}
           />
         </div>
       )

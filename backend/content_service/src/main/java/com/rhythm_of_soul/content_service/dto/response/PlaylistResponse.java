@@ -18,6 +18,7 @@ public class PlaylistResponse {
     String id;
     String title;
     String imageUrl;
+    Boolean isLiked;
     List<Tag> tags;
     int tracks;
 }

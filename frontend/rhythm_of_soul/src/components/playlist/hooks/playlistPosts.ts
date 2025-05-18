@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { PostWithUserInfo, CurrentUser } from '../../../model/post/post';
 import axios from 'axios';
-import { fetchPlaylists,uploadFile,createPlaylist } from '../../../services/postService';
+import { fetchPlaylists,uploadFile,createPlaylist,unlikePost,likePost } from '../../../services/postService';
 const usePlaylistPosts = (currentUser: CurrentUser) => {
   const [posts, setPosts] = useState<PostWithUserInfo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -30,6 +30,12 @@ const usePlaylistPosts = (currentUser: CurrentUser) => {
         }));
         
         setPosts(postsWithUserInfo);
+        postsWithUserInfo.forEach((post: PostWithUserInfo) => {
+          setLikedPosts(prev => ({
+            ...prev,
+            [post.id]: post._liked
+          }));
+        });
       } else {
         throw new Error('Invalid data format');
       }
@@ -125,9 +131,11 @@ const usePlaylistPosts = (currentUser: CurrentUser) => {
     setPosts(prev =>
       prev.map(post => {
         if (post.id === postId) {
+          alreadyLiked ? unlikePost(post.id) : likePost(post.id);
           return { 
             ...post, 
-            like_count: post.like_count + (alreadyLiked ? -1 : 1) 
+            like_count: post.like_count + (alreadyLiked ? -1 : 1), 
+            _liked : !alreadyLiked
           };
         }
         return post;
@@ -135,7 +143,9 @@ const usePlaylistPosts = (currentUser: CurrentUser) => {
     );
     
     setLikedPosts(prev => ({ ...prev, [postId]: !alreadyLiked }));
+
   }, [likedPosts]);
+
 
   const toggleComment = useCallback((postId: string) => {
     setCommentOpen(prev => ({

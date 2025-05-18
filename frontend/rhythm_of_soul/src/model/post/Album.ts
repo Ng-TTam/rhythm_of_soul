@@ -10,6 +10,7 @@ export interface Album {
   imageUrl: string;
   tags?: string[];
   createdAt: string;
+  isLiked: boolean;
 }
 export interface AddAlbumModalProps {
   show: boolean;

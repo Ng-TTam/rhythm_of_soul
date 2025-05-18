@@ -16,9 +16,8 @@ import {
 } from 'react-bootstrap';
 import { FaPlus} from '@react-icons/all-files/fa/FaPlus';
 import AddAlbumModal from './AddAlbumForm';
-import axios from 'axios';
 import { Album } from '../../model/post/Album';
-import {getAlbumOfUser,uploadFile,createALbum} from '../../services/postService';
+import {getAlbumOfUser,uploadFile,createALbum, unlikePost,likePost} from '../../services/postService';
 
 
 const AlbumPost = () => {
@@ -30,16 +29,24 @@ const AlbumPost = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [showAddModal, setShowAddModal] = useState(false);
 
+
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAlbums = async () => {
       try {
-        const accountId = "1234";
+        const accountId = "326e6645-aa0f-4f89-b885-019c05b1a970";
         const response = await getAlbumOfUser(accountId);
 
         if (response.code === 200 && Array.isArray(response.result)) {
           setAlbums(response.result);
+          const albums = response.result as Album[];
+          albums.forEach(album => {
+            setLikedAlbums(prev => ({
+              ...prev,
+              [album.id]: album.isLiked
+            }));
+          })          
 
         } else {
           throw new Error('Invalid data format');
@@ -55,26 +62,28 @@ const AlbumPost = () => {
   }, []);
 
   const handleClickPost = (albumId: string) => {
-    navigate(`/albums/${albumId}`);
+    navigate(`/post/${albumId}`);
   };
 
   const handleLike = (albumId: string) => {
-    setLikedAlbums(prev => {
-      const isCurrentlyLiked = prev[albumId];
-      const newLikedState = { ...prev, [albumId]: !isCurrentlyLiked };
+    const alreadyLiked = likedAlbums[albumId];
 
-      setAlbums(albums.map(album => {
+    setAlbums(prev =>
+      prev.map(album => {
         if (album.id === albumId) {
+          alreadyLiked ? unlikePost(album.id) : likePost(album.id);
           return {
             ...album,
-            likeCount: album.likeCount + (isCurrentlyLiked ? -1 : 1)
+            likeCount: album.likeCount + (alreadyLiked ? -1 : 1),
+            isLiked: !alreadyLiked
           };
         }
         return album;
       }));
-
-      return newLikedState;
-    });
+    setLikedAlbums(prev => ({
+      ...prev,
+      [albumId]: !alreadyLiked
+    }));
   };
 
   const handleAddAlbum = async (newAlbumData: {
@@ -113,7 +122,7 @@ const AlbumPost = () => {
         tags: newAlbumData.tags,
         cover,
         image,
-        accountId: '1234', // Replace with actual user ID
+        accountId: '326e6645-aa0f-4f89-b885-019c05b1a970', // Replace with actual user ID
         scheduleAt: newAlbumData.scheduleAt?.toISOString(),
         songIds: newAlbumData.tracks
       };
