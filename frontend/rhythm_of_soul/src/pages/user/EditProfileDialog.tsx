@@ -2,13 +2,20 @@ import React, { useEffect, useState } from "react";
 import { FaUpload } from "@react-icons/all-files/fa/FaUpload";
 import { FaUser } from "@react-icons/all-files/fa/FaUser";
 import { User } from "../../model/profile/UserProfile";
-import { updateUser } from "../../services/api/userService";
+import { updateUser, getPresignedUrl } from "../../services/api/userService";
+import { Toast } from 'primereact/toast';
+import { useRef } from 'react';
+import '../../styles/toast.css';
+import { useDispatch } from "react-redux";
+import { setUserSlice } from "../../reducers/userReducer";
+
 
 interface EditProfileProps {
   visible: boolean;
   onClose: () => void;
   onSave: (data: User) => void;
   initialData: User | null;
+  // toastRef: React.RefObject<Toast | null>;
 }
 
 export default function EditProfileDialog({
@@ -40,14 +47,19 @@ export default function EditProfileDialog({
     createdAt: null,
     updatedAt: null,
     artist: false,
+    followerCount: 0,
+    followedCount: 0,
   });
 
   useEffect(() => {
-    if(initialData)
+    if (initialData)
       setFormData(initialData);
   }, [initialData]);
 
   const isArtist = formData.artist;
+  const token = sessionStorage.getItem("accessToken") || "";
+  const toast = useRef<Toast>(null);
+  const dispatch = useDispatch();
 
   // Xử lý thay đổi thông tin user
   const handleUserChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -114,213 +126,265 @@ export default function EditProfileDialog({
   // Xử lý lưu profile
   const handleSave = async () => {
     try {
-      // console.log('Sending update data:', formData);
-      const response = await updateUser(formData.id, formData);
+      const updatedData = { ...formData };
+
+      // Kiểm tra nếu avatar là base64 (ảnh mới được chọn)
+      if (formData.avatar && formData.avatar.startsWith('data:image/')) {
+        const file = dataURLtoBlob(formData.avatar);
+        const objectName = `avatars/${formData.id}_${Date.now()}.jpg`;
+        const { url, objectUrl } = await getPresignedUrl(objectName, file.type, token);
+        await fetch(url, {
+          method: 'PUT',
+          headers: { 'Content-Type': file.type },
+          body: file,
+        });
+        updatedData.avatar = objectUrl;
+      }
+
+
+      // Kiểm tra nếu cover là base64 (ảnh mới được chọn)
+      if (formData.cover && formData.cover.startsWith('data:image/')) {
+        const file = dataURLtoBlob(formData.cover);
+        const objectName = `covers/${formData.id}_${Date.now()}.jpg`;
+        const { url, objectUrl } = await getPresignedUrl(objectName, file.type, token);
+        await fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': file.type,
+          },
+          body: file,
+        });
+        updatedData.cover = objectUrl;
+      }
+
+      // Gọi API cập nhật
+      const response = await updateUser(formData.id, updatedData);
+      console.log("Toast ref:", toast.current);
+
+      console.log("response", response);
+      toast.current?.show({ severity: "success", summary: "Success", detail: "Profile updated!", life: 3000, className: 'custom-success-toast' });
+
       console.log('Profile updated successfully', response);
-      onSave(formData);
+
+      dispatch(setUserSlice(updatedData))
+      onSave(updatedData);
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update profile', error);
+      const errorMessage = error.response?.data?.message || "Update failed!";
+      toast.current?.show({ severity: "error", summary: "Error", detail: `${errorMessage}`, life: 3000, className: 'custom-error-toast' });
     }
   };
+
 
   if (!visible) return null;
 
   return (
-    <div className="modal-backdrop" style={backdropStyle}>
-      <div className="modal-content" style={modalStyle}>
-        <h4 className="mb-4">Edit Profile</h4>
-        <div className="row">
-          {/* Left Column - Images */}
-          <div className="col-md-4">
-            {/* Avatar */}
-            <div className="mb-4 text-center">
-              <div className="position-relative d-inline-block">
-                <img
-                  src={formData.avatar || '/assets/images/default/avatar.jpg'}
-                  alt="Profile Avatar"
-                  className="rounded-circle img-thumbnail shadow"
-                  style={{ width: 150, height: 150, objectFit: 'cover' }}
-                />
+    <>
+      <Toast ref={toast} />
+      <div className="modal-backdrop" style={backdropStyle}>
+        <div className="modal-content" style={modalStyle}>
+          <h4 className="mb-4">Edit Profile</h4>
+
+          <div className="row">
+            {/* Left Column - Images */}
+            <div className="col-md-4">
+              {/* Avatar */}
+              <div className="mb-4 text-center">
+                <div className="position-relative d-inline-block">
+                  <img
+                    src={formData.avatar || '/assets/images/default/avatar.jpg'}
+                    alt="Profile Avatar"
+                    className="rounded-circle img-thumbnail shadow"
+                    style={{ width: 150, height: 150, objectFit: 'cover' }}
+                  />
+                </div>
+                <div className="mt-3">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    style={{ display: 'none' }}
+                    id="avatarUpload"
+                  />
+                  <label htmlFor="avatarUpload" className="btn btn-outline-light btn-sm">
+                    <FaUpload className="me-2" /> Change Avatar
+                  </label>
+                </div>
               </div>
-              <div className="mt-3">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarUpload}
-                  style={{ display: 'none' }}
-                  id="avatarUpload"
+
+              {/* Cover Image */}
+              <div className="mb-4">
+                <h6 className="mb-2">Cover Image</h6>
+                <div
+                  className="rounded mb-2 position-relative"
+                  style={{
+                    height: '100px',
+                    backgroundImage: `url(${formData.cover || '/assets/images/default/cover.png'})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
                 />
-                <label htmlFor="avatarUpload" className="btn btn-outline-light btn-sm">
-                  <FaUpload className="me-2" /> Change Avatar
-                </label>
+                <div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleCoverUpload}
+                    style={{ display: 'none' }}
+                    id="coverUpload"
+                  />
+                  <label htmlFor="coverUpload" className="btn btn-outline-light btn-sm">
+                    <FaUpload className="me-2" /> Change Cover
+                  </label>
+                </div>
               </div>
             </div>
 
-            {/* Cover Image */}
-            <div className="mb-4">
-              <h6 className="mb-2">Cover Image</h6>
-              <div
-                className="rounded mb-2 position-relative"
-                style={{
-                  height: '100px',
-                  backgroundImage: `url(${formData.cover || '/assets/images/default/cover.png'})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              />
-              <div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleCoverUpload}
-                  style={{ display: 'none' }}
-                  id="coverUpload"
-                />
-                <label htmlFor="coverUpload" className="btn btn-outline-light btn-sm">
-                  <FaUpload className="me-2" /> Change Cover
-                </label>
-              </div>
-            </div>
-          </div>
-        
-          {/* Right Column - Form Fields */}
-          <div className="col-md-8">
-            <div className="row">
-              {/* Basic Information */}
-              <div className="col-12 mb-4">
-                <h5 className="border-bottom pb-2 mb-3">Basic Information</h5>
-                <div className="mb-3">
-                  <label className="form-label">
-                    <FaUser className="me-2" /> First Name *
-                  </label>
-                  <input
-                    className="form-control"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleUserChange}
-                    required
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <label className="form-label">
-                    <FaUser className="me-2" /> Last Name *
-                  </label>
-                  <input
-                    className="form-control"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleUserChange}
-                    required
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <label className="form-label">Phone Number</label>
-                  <input
-                    className="form-control"
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleUserChange}
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <label className="form-label">Date of Birth</label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    name="dateOfBirth"
-                    value={formData.dateOfBirth || ''}
-                    onChange={handleUserChange}
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <label className="form-label">Gender</label>
-                  <select
-                    className="form-select"
-                    value={formData.gender || 'OTHER'}
-                    onChange={handleGenderChange}
-                  >
-                    <option value="MALE">Male</option>
-                    <option value="FEMALE">Female</option>
-                    <option value="OTHER">Other</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Artist Information - Only show if user is an artist */}
-              {isArtist && formData.artistProfile && (
+            {/* Right Column - Form Fields */}
+            <div className="col-md-8">
+              <div className="row">
+                {/* Basic Information */}
                 <div className="col-12 mb-4">
-                  <h5 className="border-bottom pb-2 mb-3">Artist Information</h5>
+                  <h5 className="border-bottom pb-2 mb-3">Basic Information</h5>
+
                   <div className="mb-3">
-                    <label className="form-label">Stage Name *</label>
+                    <label className="form-label">
+                      <FaUser className="me-2" /> First Name *
+                    </label>
                     <input
                       className="form-control"
-                      name="stageName"
-                      value={formData.artistProfile.stageName}
-                      onChange={handleArtistChange}
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleUserChange}
                       required
                     />
                   </div>
+
                   <div className="mb-3">
-                    <label className="form-label">Bio</label>
-                    <textarea
-                      className="form-control"
-                      name="bio"
-                      value={formData.artistProfile.bio}
-                      onChange={handleArtistChange}
-                      rows={3}
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">Facebook URL</label>
+                    <label className="form-label">
+                      <FaUser className="me-2" /> Last Name *
+                    </label>
                     <input
                       className="form-control"
-                      name="facebookUrl"
-                      value={formData.artistProfile.facebookUrl}
-                      onChange={handleArtistChange}
-                      placeholder="https://facebook.com/..."
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleUserChange}
+                      required
                     />
                   </div>
+
                   <div className="mb-3">
-                    <label className="form-label">Instagram URL</label>
+                    <label className="form-label">Phone Number</label>
                     <input
                       className="form-control"
-                      name="instagramUrl"
-                      value={formData.artistProfile.instagramUrl}
-                      onChange={handleArtistChange}
-                      placeholder="https://instagram.com/..."
+                      name="phoneNumber"
+                      value={formData.phoneNumber}
+                      onChange={handleUserChange}
                     />
                   </div>
+
                   <div className="mb-3">
-                    <label className="form-label">YouTube URL</label>
+                    <label className="form-label">Date of Birth</label>
                     <input
+                      type="date"
                       className="form-control"
-                      name="youtubeUrl"
-                      value={formData.artistProfile.youtubeUrl}
-                      onChange={handleArtistChange}
-                      placeholder="https://youtube.com/..."
+                      name="dateOfBirth"
+                      value={formData.dateOfBirth || ''}
+                      onChange={handleUserChange}
                     />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label">Gender</label>
+                    <select
+                      className="form-select"
+                      value={formData.gender || 'OTHER'}
+                      onChange={handleGenderChange}
+                    >
+                      <option value="MALE">Male</option>
+                      <option value="FEMALE">Female</option>
+                      <option value="OTHER">Other</option>
+                    </select>
                   </div>
                 </div>
-              )}
-            </div>
-            {/* Action Buttons */}
-            <div className="d-flex justify-content-end gap-2 mt-4">
-              <button className="btn btn-outline-light" onClick={onClose}>
-                Cancel
-              </button>
-              <button className="btn btn-primary" onClick={handleSave}>
-                Save Changes
-              </button>
+
+                {/* Artist Information - Only show if user is an artist */}
+                {isArtist && formData.artistProfile && (
+                  <div className="col-12 mb-4">
+                    <h5 className="border-bottom pb-2 mb-3">Artist Information</h5>
+
+                    <div className="mb-3">
+                      <label className="form-label">Stage Name *</label>
+                      <input
+                        className="form-control"
+                        name="stageName"
+                        value={formData.artistProfile.stageName}
+                        onChange={handleArtistChange}
+                        required
+                      />
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="form-label">Bio</label>
+                      <textarea
+                        className="form-control"
+                        name="bio"
+                        value={formData.artistProfile.bio}
+                        onChange={handleArtistChange}
+                        rows={3}
+                      />
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="form-label">Facebook URL</label>
+                      <input
+                        className="form-control"
+                        name="facebookUrl"
+                        value={formData.artistProfile.facebookUrl}
+                        onChange={handleArtistChange}
+                        placeholder="https://facebook.com/..."
+                      />
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="form-label">Instagram URL</label>
+                      <input
+                        className="form-control"
+                        name="instagramUrl"
+                        value={formData.artistProfile.instagramUrl}
+                        onChange={handleArtistChange}
+                        placeholder="https://instagram.com/..."
+                      />
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="form-label">YouTube URL</label>
+                      <input
+                        className="form-control"
+                        name="youtubeUrl"
+                        value={formData.artistProfile.youtubeUrl}
+                        onChange={handleArtistChange}
+                        placeholder="https://youtube.com/..."
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="d-flex justify-content-end gap-2 mt-4">
+                <button className="btn btn-outline-light" onClick={onClose}>
+                  Cancel
+                </button>
+                <button className="btn btn-primary" onClick={handleSave}>
+                  Save Changes
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -346,3 +410,13 @@ const modalStyle: React.CSSProperties = {
   maxHeight: "90vh",
   overflowY: "auto"
 };
+
+function dataURLtoBlob(dataUrl: string): Blob {
+  const arr = dataUrl.split(',');
+  const mime = arr[0].match(/:(.*?);/)?.[1] || '';
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) u8arr[n] = bstr.charCodeAt(n);
+  return new Blob([u8arr], { type: mime });
+}

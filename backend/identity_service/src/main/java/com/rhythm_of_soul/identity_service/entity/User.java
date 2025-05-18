@@ -65,4 +65,8 @@ public class User {
     @Column(nullable = false)
     @Builder.Default
     int followerCount = 0;
+
+    @Column(nullable = false)
+    @Builder.Default
+    int followedCount = 0;
 }

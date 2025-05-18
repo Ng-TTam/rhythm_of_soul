@@ -13,4 +13,7 @@ export interface User {
   createdAt: string | null;
   updatedAt: string | null;
   artist: boolean;
+  followerCount: number;
+  followedCount: number;
+  isFollowed?: boolean; // thêm thuộc tính này để theo dõi trạng thái follow
 }

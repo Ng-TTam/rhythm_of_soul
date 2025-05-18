@@ -24,3 +24,7 @@
   padding: 16px 24px !important;
   font-size: 14px;
 }
+
+.p-toast {
+  z-index: 99999 !important;
+}

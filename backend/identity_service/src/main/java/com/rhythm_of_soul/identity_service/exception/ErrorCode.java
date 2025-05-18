@@ -51,6 +51,7 @@ public enum ErrorCode {
     // follow - 3xxx
     ALREADY_FOLLOWING(3000, "Follow already exists", HttpStatus.CONFLICT),
     FOLLOW_NOT_FOUND(3001, "Follow not found", HttpStatus.BAD_REQUEST),
+    FOLLOW_NOT_PUSH(3002, "Follow push to redis failed", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
