@@ -1,227 +1,252 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import {  useNavigate } from 'react-router-dom';
+import { FaHeart } from '@react-icons/all-files/fa/FaHeart';
+import { FaComment } from '@react-icons/all-files/fa/FaComment';
 import { FaEye } from '@react-icons/all-files/fa/FaEye';
-import { FaEllipsisH } from '@react-icons/all-files/fa/FaEllipsisH'; 
-import { FaTrash } from '@react-icons/all-files/fa/FaTrash'; 
-import {  FaDownload } from '@react-icons/all-files/fa/FaDownload';
-import {  FaPlay } from '@react-icons/all-files/fa/FaPlay';  // React Icons// React Icons
+import { FaMusic } from '@react-icons/all-files/fa/FaMusic';
+import { FaArrowLeft } from '@react-icons/all-files/fa/FaArrowLeft';
+import { FaPlay } from '@react-icons/all-files/fa/FaPlay';
+import '../../style/PlaylistDetail.css';
+import StreamingPlaybackBar from '../songs/PlaybackBar';
+import { useAppDispatch, useAppSelector } from '../../store/hook';
+import { playSingleSong, setPlaylist } from '../../reducers/audioReducer';
+import classNames from 'classnames/bind';
+import { Song,PlaylistData } from '../../model/post/Playlist';
 
-interface Song {
-    id: string;
-    title: string;
-    artist: string;
-    album: string;
-    time: string;
-    img: string;
+import { getPlaylistDetail } from '../../services/postService';
+interface PlaylistDetailProps {
+  playlistId: string;
 }
-export default function PlayListDetail() {
-  // Quản lý danh sách bài hát bằng useState
-  const [songs, setSongs] = useState<Song[]>([
-    {
-      id: '01',
-      title: 'The Girl',
-      artist: 'Snoods Smith Jonas',
-      album: 'Heart Is Beating',
-      time: '4:21',
-      img: '../assets/images/dashboard/05.png',
-    },
-    {
-      id: '02',
-      title: 'Infinity',
-      artist: 'Edyta Gorniak',
-      album: 'My Crying Eyes',
-      time: '3:21',
-      img: '../assets/images/dashboard/06.png',
-    },
-    {
-      id: '03',
-      title: 'Everything I Want',
-      artist: 'Edyta Gorniak',
-      album: 'My Lovely Dad',
-      time: '2:21',
-      img: '../assets/images/dashboard/07.png',
-    },
-    {
-      id: '04',
-      title: 'The Silent One',
-      artist: 'Edyta Gorniak',
-      album: 'Travel Mix',
-      time: '3:21',
-      img: '../assets/images/dashboard/08.png',
-    },
-    {
-      id: '05',
-      title: 'Just Perfect',
-      artist: 'Nil Ana Meet Nagak',
-      album: 'Way Of Right',
-      time: '4:21',
-      img: '../assets/images/dashboard/10.png',
-    },
-  ]);
+const PlaylistDetail : React.FC<PlaylistDetailProps> = ({ playlistId }) => {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { currentSong } = useAppSelector(state => state.audio);
+  
+  const [playlistData, setPlaylistData] = useState<PlaylistData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const cx = classNames.bind(require('../../style/PlaylistDetail.css'));
+  useEffect(() => {
+    const fetchPlaylistData = async () => {
+      try {
+        setLoading(true);
+        const response = await getPlaylistDetail(playlistId || '');
+        
+        if (response.code !== 200) {
+          throw new Error('Không thể tải dữ liệu playlist');
+        }
+        
+        setPlaylistData(response.result || { post: {} });
 
-  // Hàm xóa bài hát
-  const handleDelete = (id :string) => {
-    setSongs(songs.filter((song) => song.id !== id));
+        // Cập nhật playlist vào Redux store
+        if (response.result?.post?.content?.songIds) {
+          const validSongs = response.result.post.content.songIds
+            .filter((song: Song) => song.mediaUrl)
+            .map((song: Song) => ({
+              id: song.id || Math.random().toString(36).substr(2, 9),
+              title: song.title || 'Không có tiêu đề',
+              artist: song.artist || 'Nghệ sĩ không xác định',
+              imageUrl: song.imageUrl || '/assets/images/default/track-thumbnail.jpg',
+              mediaUrl: song.mediaUrl || '/assets/images/default/track-thumbnail.jpg',
+            }));
+          
+          dispatch(setPlaylist(validSongs));
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Lỗi không xác định');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlaylistData();
+
+    return () => {
+      // Reset playlist khi rời khỏi trang
+      dispatch(setPlaylist([]));
+    };
+  }, [playlistId, dispatch]);
+
+  const handleBackClick = () => navigate(-1);
+
+  const handlePlayTrack = (song: Song) => {
+    if (!song.mediaUrl) {
+      setError('Bài hát không khả dụng');
+      return;
+    }
+
+    dispatch(playSingleSong({
+      id: song.id || Math.random().toString(36).substr(2, 9),
+      title: song.title || 'Không có tiêu đề',
+      artist: song.artist || 'Nghệ sĩ không xác định',
+      imageUrl: song.imageUrl || '/assets/images/default/track-thumbnail.jpg',
+      mediaUrl: song.mediaUrl || '/assets/images/default/track-thumbnail.jpg',
+    }));
   };
 
-  // Hàm xử lý phát nhạc (giả lập)
-  const handlePlay = (song : Song) => {
-    console.log(`Playing: ${song.title} by ${song.artist}`);
-    // Thêm logic phát nhạc thực tế ở đây, ví dụ: sử dụng HTML5 Audio
-    // const audio = new Audio(song.audioUrl);
-    // audio.play();
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Không rõ ngày tạo';
+    return new Date(dateString).toLocaleDateString('vi-VN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
+
+
+
+  if (loading) return (
+    <div className="loading-container">
+      <div className="loader"></div>
+    </div>
+  );
+
+  if (error) return (
+    <div className="error-container">
+      <div className="error-message">{error}</div>
+      <button onClick={handleBackClick} className="back-button">
+        <FaArrowLeft /> Quay lại
+      </button>
+    </div>
+  );
+
+  if (!playlistData?.post) return (
+    <div className="error-container">
+      <div className="error-message">Không tìm thấy playlist</div>
+      <button onClick={handleBackClick} className="back-button">
+        <FaArrowLeft /> Quay lại
+      </button>
+    </div>
+  );
+
+  const { post } = playlistData;
+  const songs = post.content?.songIds || [];
+  const hasSongs = songs.length > 0;
 
   return (
-    <div className="container-fluid py-4 bg-light min-vh-100">
-      <div className="row g-4">
-        {/* Playlist Info */}
-        <div className="col-lg-4">
-          <div className="card shadow-sm border-0">
-            <img
-              src="../assets/images/dashboard/01.png"
-              alt="Playlist Cover"
-              className="card-img-top img-fluid"
-              style={{ height: '250px', objectFit: 'cover' }}
-            />
-            <div className="card-body">
-              <h3 className="card-title mb-3 fw-bold">OK Playlist</h3>
-              <div className="d-flex align-items-center mb-4">
-                <span className="fw-semibold me-3">Phong Do</span>
-                <span className="fw-semibold ps-3 border-start">Công khai</span>
-              </div>
-              <button className="btn btn-primary w-100">Play Music</button>
-            </div>
-          </div>
-        </div>
-
-        {/* Playlist Songs */}
-        <div className="col-lg-8">
-          <div className="card shadow-sm border-0">
-            <div className="card-body p-0">
-              <h4 className="card-title p-4 mb-0 fw-semibold">Songs</h4>
-              <div className="table-responsive">
-                <table className="table table-hover mb-0">
-                  <thead className="table-light">
-                    <tr>
-                      <th scope="col" className="ps-4">No.</th>
-                      <th scope="col">Title</th>
-                      <th scope="col">Album</th>
-                      <th scope="col">Time</th>
-                      <th scope="col">Play</th>
-                      <th scope="col">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {songs.map((song, index) => (
-                      <tr key={index}>
-                        <td className="ps-4">{song.id}</td>
-                        <td>
-                          <div className="d-flex align-items-center">
-                            <img
-                              src={song.img}
-                              alt={song.title}
-                              className="rounded-circle me-3"
-                              style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                            />
-                            <div>
-                              <p className="mb-0 fw-medium">{song.title}</p>
-                              <small className="text-muted">{song.artist}</small>
-                            </div>
-                          </div>
-                        </td>
-                        <td>{song.album}</td>
-                        <td>{song.time}</td>
-                        <td>
-                          <button
-                            className="btn-outline-success"
-                            onClick={() => handlePlay(song)}
-                            title="Play"
-                            
-                          >
-                            <FaPlay size={14} />
-                          </button>
-                        </td>
-                        <td>
-                          <div className="dropdown">
-                            <button
-                              className="btn btn-link text-muted p-0"
-                              type="button"
-                              id={`dropdownMenuButton${index}`}
-                              data-bs-toggle="dropdown"
-                              aria-expanded="false"
-                            >
-                              <FaEllipsisH size={20} />
-                            </button>
-                            <ul
-                              className="dropdown-menu dropdown-menu-end shadow-sm"
-                              aria-labelledby={`dropdownMenuButton${index}`}
-                            >
-                              <li>
-                                <a className="dropdown-item d-flex align-items-center" href="#">
-                                  <FaEye className="me-2" /> View
-                                </a>
-                              </li>
-                              <li>
-                                <button
-                                  className="dropdown-item d-flex align-items-center"
-                                  onClick={() => handleDelete(song.id)}
-                                >
-                                  <FaTrash className="me-2" /> Delete
-                                </button>
-                              </li>
-                              <li>
-                                <a className="dropdown-item d-flex align-items-center" href="#">
-                                  <FaDownload className="me-2" /> Download
-                                </a>
-                              </li>
-                            </ul>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+    <div className={cx("playlist-detail-container",classNames)}>
+      {/* Header */}
+      <div 
+        className="playlist-header" 
+        style={{ backgroundImage: `url(${post.content?.coverUrl || '/assets/images/default/cover.jpg'})` }}
+      >
+        <div className="header-overlay">
+          <button onClick={handleBackClick} className="back-button">
+            <FaArrowLeft />
+          </button>
+          
+          <div className="playlist-header-content">
+            <div className="playlist-type-badge">{post.type || 'Playlist'}</div>
+            <h1 className="playlist-title">{post.content?.title || 'Không có tiêu đề'}</h1>
+            
+            {post.content?.description && (
+              <p className="playlist-description">{post.content.description}</p>
+            )}
+            
+            <div className="playlist-info">
+              <span>{songs.length} bài hát</span>
+              <span>Tạo ngày {formatDate(post.created_at)}</span>
+              <div className="playlist-stats">
+                <span><FaEye /> {post.view_count || 0}</span>
+                <span><FaHeart /> {post.like_count || 0}</span>
+                <span><FaComment /> {post.comment_count || 0}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Custom CSS để tinh chỉnh giao diện */}
-      <style >{`
-        .card {
-          transition: transform 0.2s;
-        }
-        .card:hover {
-          transform: translateY(-5px);
-        }
-        .btn-primary {
-          background-color: #007bff;
-          border-color: #007bff;
-        }
-        .btn-primary:hover {
-          background-color: #0056b3;
-          border-color: #0056b3;
-        }
-        .btn-outline-success {
-          border:none;
-          color: black;
-            background-color: transparent;
-        }
-        .table-hover tbody tr:hover {
-          background-color: #f8f9fa;
-        }
-        .dropdown-menu {
-          min-width: 150px;
-        }
-        .dropdown-item {
-          font-size: 0.9rem;
-          padding: 0.5rem 1rem;
-        }
-        .dropdown-item:hover {
-          background-color: #e9ecef;
-        }
-      `}</style>
+      {/* Main content */}
+      <div className="playlist-content">
+        <div className="playlist-main">
+          <div className="playlist-cover-section">
+            <div className="playlist-cover-wrapper">
+              <img 
+                src={post.content?.imageUrl || '/assets/images/default/cover.jpg'} 
+                alt={post.content?.title} 
+                className="playlist-cover"
+              />
+              
+              {hasSongs ? (
+                <button 
+                  className="play-all-button"
+                  onClick={() => handlePlayTrack(songs[0])}
+                >
+                  Phát tất cả
+                </button>
+              ) : (
+                <div className="empty-playlist-notice">
+                  <FaMusic />
+                  <span>Playlist trống</span>
+                </div>
+              )}
+            </div>
+            
+            {post.content?.tags?.length ? (
+              <div className="playlist-tags">
+                <h3>Thể loại</h3>
+                <div className="tags-list">
+                  {post.content.tags.map((tag, index) => (
+                    <span key={index} className="tag">#{tag}</span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
+
+          {/* Track list */}
+          <div className="tracks-section">
+            <h2>Danh sách bài hát</h2>
+            
+            {hasSongs ? (
+              <div className="tracks-list">
+                {songs.map((song, index) => (
+                  <div 
+                    key={index} 
+                    className={`track-item ${currentSong?.id === song.id ? 'playing' : ''}`}
+                  >
+                    <div className="track-number">{index + 1}</div>
+                    <img 
+                      src={song.imageUrl || '/assets/images/default/track-thumbnail.jpg'} 
+                      alt={song.title || `Bài hát ${index + 1}`}
+                      className="track-thumbnail"
+                    />
+                    <div className="track-info">
+                      <div className="track-title">{song.title || `Bài hát ${index + 1}`}</div>
+                      {song.artist && <div className="track-artist">{song.artist}</div>}
+                      {song.tags?.length ? (
+                        <div className="track-tags">
+                          {song.tags.map((tag, tagIndex) => (
+                            <span key={tagIndex} className="track-tag">#{tag}</span>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                    {song.mediaUrl ? (
+                      <button 
+                        className="track-play-button"
+                        onClick={() => handlePlayTrack(song)}
+                      >
+                        <FaPlay />
+                      </button>
+                    ) : (
+                      <div className="track-unavailable">Không khả dụng</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="empty-tracks-message">
+                <FaMusic className="empty-icon" />
+                <p>Playlist chưa có bài hát nào</p>
+                <small>Thêm bài hát để bắt đầu nghe</small>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default PlaylistDetail;

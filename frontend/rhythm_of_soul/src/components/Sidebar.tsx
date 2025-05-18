@@ -1,5 +1,4 @@
-import path from "path";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 export default function Sidebar() {
@@ -76,6 +75,7 @@ export default function Sidebar() {
                 <a className="nav-link static-item disabled text-start" href="#" tabIndex={-1}>
                   <span className="custom-icon default-icon text-uppercase">Main</span>
                   <span className="mini-icon" data-bs-toggle="tooltip" title="Home" data-bs-placement="right">
+
                     -
                   </span>
                 </a>

@@ -1,0 +1,870 @@
+Index: identity_service/src/main/java/com/rhythm_of_soul/identity_service/entity/User.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.rhythm_of_soul.identity_service.entity;\n\nimport com.rhythm_of_soul.identity_service.constant.Role;\nimport jakarta.persistence.*;\nimport lombok.*;\nimport lombok.experimental.FieldDefaults;\nimport org.springframework.data.annotation.CreatedDate;\nimport org.springframework.data.annotation.LastModifiedDate;\nimport org.springframework.security.core.GrantedAuthority;\nimport org.springframework.security.core.authority.SimpleGrantedAuthority;\nimport org.springframework.security.core.userdetails.UserDetails;\n\nimport java.time.Instant;\nimport java.util.Collection;\nimport java.util.Collections;\nimport java.util.List;\n\n@Getter\n@Setter\n@Builder\n@NoArgsConstructor\n@AllArgsConstructor\n@FieldDefaults(level = AccessLevel.PRIVATE)\n@Entity\npublic class User implements UserDetails {\n\n    @Id\n    @GeneratedValue(strategy = GenerationType.UUID)\n    String id;\n\n    String firstName;\n    String lastName;\n    String email;\n    String password;\n\n    @Enumerated(EnumType.STRING)\n    Role role;\n    boolean isVerify;\n\n    @OneToOne(mappedBy = \"user\", cascade = CascadeType.ALL)\n    RefreshToken refreshToken;\n\n    @CreatedDate\n    Instant createdAt;\n\n    @LastModifiedDate\n    Instant updatedAt;\n\n    @Override\n    public Collection<? extends GrantedAuthority> getAuthorities() {\n        return Collections.singletonList(new SimpleGrantedAuthority(\"ROLE_\" + role.name()));\n    }\n\n    @Override\n    public String getUsername() {\n        return email;\n    }\n\n    @Override\n    public boolean isAccountNonExpired() { return true; }\n    @Override\n    public boolean isAccountNonLocked() { return true; }\n    @Override\n    public boolean isCredentialsNonExpired() { return true; }\n    @Override\n    public boolean isEnabled() { return isVerify; }\n}\n
+===================================================================
+diff --git a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/entity/User.java b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/entity/User.java
+--- a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/entity/User.java	
++++ b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/entity/User.java	
+@@ -1,19 +1,21 @@
+ package com.rhythm_of_soul.identity_service.entity;
+ 
+-import com.rhythm_of_soul.identity_service.constant.Role;
++import java.time.Instant;
++import java.util.Collection;
++import java.util.Collections;
++
+ import jakarta.persistence.*;
+-import lombok.*;
+-import lombok.experimental.FieldDefaults;
++
+ import org.springframework.data.annotation.CreatedDate;
+ import org.springframework.data.annotation.LastModifiedDate;
+ import org.springframework.security.core.GrantedAuthority;
+ import org.springframework.security.core.authority.SimpleGrantedAuthority;
+ import org.springframework.security.core.userdetails.UserDetails;
+ 
+-import java.time.Instant;
+-import java.util.Collection;
+-import java.util.Collections;
+-import java.util.List;
++import com.rhythm_of_soul.identity_service.constant.Role;
++
++import lombok.*;
++import lombok.experimental.FieldDefaults;
+ 
+ @Getter
+ @Setter
+@@ -35,6 +37,7 @@
+ 
+     @Enumerated(EnumType.STRING)
+     Role role;
++
+     boolean isVerify;
+ 
+     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+@@ -57,11 +60,22 @@
+     }
+ 
+     @Override
+-    public boolean isAccountNonExpired() { return true; }
++    public boolean isAccountNonExpired() {
++        return true;
++    }
++
+     @Override
+-    public boolean isAccountNonLocked() { return true; }
++    public boolean isAccountNonLocked() {
++        return true;
++    }
++
+     @Override
+-    public boolean isCredentialsNonExpired() { return true; }
++    public boolean isCredentialsNonExpired() {
++        return true;
++    }
++
+     @Override
+-    public boolean isEnabled() { return isVerify; }
++    public boolean isEnabled() {
++        return isVerify;
++    }
+ }
+Index: identity_service/src/main/java/com/rhythm_of_soul/identity_service/config/SecurityConfig.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.rhythm_of_soul.identity_service.config;\n\nimport com.rhythm_of_soul.identity_service.config.jwt.CustomJwtDecoder;\nimport com.rhythm_of_soul.identity_service.config.jwt.JwtAuthenticationEntryPoint;\nimport com.rhythm_of_soul.identity_service.repository.UserRepository;\nimport com.rhythm_of_soul.identity_service.service.AuthenticationService;\nimport lombok.RequiredArgsConstructor;\nimport org.springframework.beans.factory.annotation.Value;\nimport org.springframework.context.annotation.Bean;\nimport org.springframework.context.annotation.Configuration;\nimport org.springframework.http.HttpMethod;\nimport org.springframework.security.config.Customizer;\nimport org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;\nimport org.springframework.security.config.annotation.web.builders.HttpSecurity;\nimport org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;\nimport org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;\nimport org.springframework.security.core.userdetails.UserDetailsService;\nimport org.springframework.security.core.userdetails.UsernameNotFoundException;\nimport org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;\nimport org.springframework.security.crypto.password.PasswordEncoder;\nimport org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;\nimport org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;\nimport org.springframework.security.web.SecurityFilterChain;\nimport org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;\nimport org.springframework.web.cors.CorsConfiguration;\nimport org.springframework.web.cors.CorsConfigurationSource;\nimport org.springframework.web.cors.UrlBasedCorsConfigurationSource;\nimport org.springframework.web.filter.CorsFilter;\nimport org.springframework.web.servlet.mvc.support.RedirectAttributes;\nimport org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;\n\nimport java.util.List;\n\n@Configuration\n@EnableWebSecurity\n@EnableMethodSecurity\n@RequiredArgsConstructor\npublic class SecurityConfig {\n\n\n    private static final String[] PUBLIC_ENDPOINTS = {\n        \"/users\", \"/auth/login\", \"/auth/introspect\", \"/auth/logout\", \"/auth/refresh\",\"/api/auth/**\",\n            \"/auth/log\",\n            \"/lib/**\",\n    };\n\n    @Value(\"${jwt.signerKey}\")\n    private String signerKey;\n\n    private final CustomJwtDecoder customJwtDecoder;\n    private final UserRepository userRepository;\n\n    @Bean\n    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {\n        httpSecurity\n                .cors(Customizer.withDefaults())\n                .authorizeHttpRequests(request -> request\n                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()\n                        .requestMatchers(\"/sign-in\", \"/sign-up\",\"/css/**\", \"/images/**\", \"/auth/introspect\")\n                        .permitAll()\n                        .anyRequest()\n                        .authenticated()\n                )\n                .formLogin(form -> form\n                        .loginPage(\"/sign-in\")\n                        .loginProcessingUrl(\"/sign-in\")\n                        .successHandler((request, response, authentication) -> {\n                            // Chuyển hướng sau khi đăng nhập thành công\n                            response.sendRedirect(\"/home\");\n                        })\n                        .failureHandler((request, response, exception) -> {\n                            RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();\n                            redirectAttributes.addFlashAttribute(\"error\", \"Email hoặc mật khẩu không đúng\");\n                            response.sendRedirect(request.getContextPath() + \"/sign-in\");\n                        })\n                        .permitAll()\n                )\n                .rememberMe(remember -> remember\n                        .rememberMeParameter(\"remember\")\n                        .tokenValiditySeconds(30 * 24 * 60 * 60) // 30 days\n                        .rememberMeServices(tokenBasedRememberMeServices())\n                )\n                .logout(logout -> logout\n                        .permitAll()\n                        .logoutSuccessUrl(\"/login?logout=true\")\n                );\n\n        httpSecurity\n                .oauth2ResourceServer(oauth2 -> oauth2\n                        .jwt(jwtConfigurer -> jwtConfigurer\n                                .decoder(customJwtDecoder)\n                                .jwtAuthenticationConverter(jwtAuthenticationConverter()))\n                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())\n                );\n\n        httpSecurity.csrf(AbstractHttpConfigurer::disable);\n\n        return httpSecurity.build();\n    }\n\n\n    @Bean\n    public CorsConfigurationSource corsConfigurationSource() {\n        CorsConfiguration configuration = new CorsConfiguration();\n        configuration.setAllowedOrigins(List.of(\"http://localhost:3000\")); // Nguồn gốc được phép\n        configuration.setAllowedMethods(List.of(\"GET\", \"POST\", \"PUT\", \"DELETE\", \"OPTIONS\"));\n        configuration.setAllowedHeaders(List.of(\"Authorization\", \"Content-Type\"));\n        configuration.setAllowCredentials(true);\n\n        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();\n        source.registerCorsConfiguration(\"/**\", configuration);\n        return source;\n    }\n\n    @Bean\n    public CorsFilter corsFilter() {\n        return new CorsFilter(corsConfigurationSource());\n    }\n\n    @Bean\n    JwtAuthenticationConverter jwtAuthenticationConverter() {\n        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();\n        jwtGrantedAuthoritiesConverter.setAuthorityPrefix(\"\");\n\n        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();\n        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);\n\n        return jwtAuthenticationConverter;\n    }\n\n    @Bean\n    PasswordEncoder passwordEncoder() {\n        return new BCryptPasswordEncoder(10);\n    }\n\n    @Bean\n    public UserDetailsService userDetailsService() {\n        return username ->  userRepository.findByEmail(username)\n                .orElseThrow(() -> new UsernameNotFoundException(\"User not found: \" + username));\n    }\n\n    @Bean\n    public TokenBasedRememberMeServices tokenBasedRememberMeServices() {\n        TokenBasedRememberMeServices services = new TokenBasedRememberMeServices(\n                signerKey,\n                userDetailsService()\n        );\n        services.setTokenValiditySeconds(30 * 24 * 60 * 60);\n        services.setParameter(\"remember\");\n        return services;\n    }\n}\n
+===================================================================
+diff --git a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/config/SecurityConfig.java b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/config/SecurityConfig.java
+--- a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/config/SecurityConfig.java	
++++ b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/config/SecurityConfig.java	
+@@ -1,10 +1,7 @@
+ package com.rhythm_of_soul.identity_service.config;
+ 
+-import com.rhythm_of_soul.identity_service.config.jwt.CustomJwtDecoder;
+-import com.rhythm_of_soul.identity_service.config.jwt.JwtAuthenticationEntryPoint;
+-import com.rhythm_of_soul.identity_service.repository.UserRepository;
+-import com.rhythm_of_soul.identity_service.service.AuthenticationService;
+-import lombok.RequiredArgsConstructor;
++import java.util.List;
++
+ import org.springframework.beans.factory.annotation.Value;
+ import org.springframework.context.annotation.Bean;
+ import org.springframework.context.annotation.Configuration;
+@@ -29,7 +26,11 @@
+ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+ import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
+ 
+-import java.util.List;
++import com.rhythm_of_soul.identity_service.config.jwt.CustomJwtDecoder;
++import com.rhythm_of_soul.identity_service.config.jwt.JwtAuthenticationEntryPoint;
++import com.rhythm_of_soul.identity_service.repository.UserRepository;
++
++import lombok.RequiredArgsConstructor;
+ 
+ @Configuration
+ @EnableWebSecurity
+@@ -37,11 +38,15 @@
+ @RequiredArgsConstructor
+ public class SecurityConfig {
+ 
+-
+     private static final String[] PUBLIC_ENDPOINTS = {
+-        "/users", "/auth/login", "/auth/introspect", "/auth/logout", "/auth/refresh","/api/auth/**",
+-            "/auth/log",
+-            "/lib/**",
++        "/users",
++        "/auth/login",
++        "/auth/introspect",
++        "/auth/logout",
++        "/auth/refresh",
++        "/api/auth/**",
++        "/auth/log",
++        "/lib/**",
+     };
+ 
+     @Value("${jwt.signerKey}")
+@@ -54,15 +59,13 @@
+     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+         httpSecurity
+                 .cors(Customizer.withDefaults())
+-                .authorizeHttpRequests(request -> request
+-                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+-                        .requestMatchers("/sign-in", "/sign-up","/css/**", "/images/**", "/auth/introspect")
++                .authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
++                        .permitAll()
++                        .requestMatchers("/sign-in", "/sign-up", "/css/**", "/images/**", "/auth/introspect")
+                         .permitAll()
+                         .anyRequest()
+-                        .authenticated()
+-                )
+-                .formLogin(form -> form
+-                        .loginPage("/sign-in")
++                        .authenticated())
++                .formLogin(form -> form.loginPage("/sign-in")
+                         .loginProcessingUrl("/sign-in")
+                         .successHandler((request, response, authentication) -> {
+                             // Chuyển hướng sau khi đăng nhập thành công
+@@ -73,32 +76,22 @@
+                             redirectAttributes.addFlashAttribute("error", "Email hoặc mật khẩu không đúng");
+                             response.sendRedirect(request.getContextPath() + "/sign-in");
+                         })
+-                        .permitAll()
+-                )
+-                .rememberMe(remember -> remember
+-                        .rememberMeParameter("remember")
++                        .permitAll())
++                .rememberMe(remember -> remember.rememberMeParameter("remember")
+                         .tokenValiditySeconds(30 * 24 * 60 * 60) // 30 days
+-                        .rememberMeServices(tokenBasedRememberMeServices())
+-                )
+-                .logout(logout -> logout
+-                        .permitAll()
+-                        .logoutSuccessUrl("/login?logout=true")
+-                );
++                        .rememberMeServices(tokenBasedRememberMeServices()))
++                .logout(logout -> logout.permitAll().logoutSuccessUrl("/login?logout=true"));
+ 
+-        httpSecurity
+-                .oauth2ResourceServer(oauth2 -> oauth2
+-                        .jwt(jwtConfigurer -> jwtConfigurer
+-                                .decoder(customJwtDecoder)
+-                                .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+-                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+-                );
++        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
++                        .decoder(customJwtDecoder)
++                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
++                .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
+ 
+         httpSecurity.csrf(AbstractHttpConfigurer::disable);
+ 
+         return httpSecurity.build();
+     }
+ 
+-
+     @Bean
+     public CorsConfigurationSource corsConfigurationSource() {
+         CorsConfiguration configuration = new CorsConfiguration();
+@@ -135,16 +128,14 @@
+ 
+     @Bean
+     public UserDetailsService userDetailsService() {
+-        return username ->  userRepository.findByEmail(username)
++        return username -> userRepository
++                .findByEmail(username)
+                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+     }
+ 
+     @Bean
+     public TokenBasedRememberMeServices tokenBasedRememberMeServices() {
+-        TokenBasedRememberMeServices services = new TokenBasedRememberMeServices(
+-                signerKey,
+-                userDetailsService()
+-        );
++        TokenBasedRememberMeServices services = new TokenBasedRememberMeServices(signerKey, userDetailsService());
+         services.setTokenValiditySeconds(30 * 24 * 60 * 60);
+         services.setParameter("remember");
+         return services;
+Index: identity_service/src/main/java/com/rhythm_of_soul/identity_service/entity/RefreshToken.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.rhythm_of_soul.identity_service.entity;\n\nimport jakarta.persistence.*;\nimport lombok.*;\nimport lombok.experimental.FieldDefaults;\n\nimport java.time.Instant;\n\n@Getter\n@Setter\n@Builder\n@NoArgsConstructor\n@AllArgsConstructor\n@FieldDefaults(level = AccessLevel.PRIVATE)\n@Entity\npublic class RefreshToken {\n\n    @Id\n    @GeneratedValue(strategy = GenerationType.UUID)\n    String id;\n\n    @OneToOne\n    @JoinColumn(name = \"user_id\", referencedColumnName = \"id\")\n    User user;\n\n    @Column(nullable = false, unique = true)\n    String token;\n\n    @Column(nullable = false)\n    Instant expiryTime;\n}\n
+===================================================================
+diff --git a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/entity/RefreshToken.java b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/entity/RefreshToken.java
+--- a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/entity/RefreshToken.java	
++++ b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/entity/RefreshToken.java	
+@@ -1,11 +1,12 @@
+ package com.rhythm_of_soul.identity_service.entity;
+ 
++import java.time.Instant;
++
+ import jakarta.persistence.*;
++
+ import lombok.*;
+ import lombok.experimental.FieldDefaults;
+ 
+-import java.time.Instant;
+-
+ @Getter
+ @Setter
+ @Builder
+Index: identity_service/src/main/java/com/rhythm_of_soul/identity_service/api/AuthenticationController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.rhythm_of_soul.identity_service.api;\n\nimport com.nimbusds.jose.JOSEException;\nimport com.rhythm_of_soul.identity_service.constant.SecurityConstants;\nimport com.rhythm_of_soul.identity_service.dto.request.*;\nimport com.rhythm_of_soul.identity_service.dto.response.AuthenticationResponse;\nimport com.rhythm_of_soul.identity_service.dto.response.IntrospectResponse;\nimport com.rhythm_of_soul.identity_service.service.AuthenticationService;\nimport com.rhythm_of_soul.identity_service.utils.CookieUtil;\nimport jakarta.servlet.http.HttpServletRequest;\nimport jakarta.servlet.http.HttpServletResponse;\nimport jakarta.validation.Valid;\nimport lombok.AccessLevel;\nimport lombok.RequiredArgsConstructor;\nimport lombok.experimental.FieldDefaults;\nimport org.springframework.web.bind.annotation.*;\n\nimport java.text.ParseException;\n\n@RestController\n@RequestMapping(\"/auth\")\n@RequiredArgsConstructor\n@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)\npublic class AuthenticationController {\n    AuthenticationService authenticationService;\n\n    @PostMapping(\"/login\")\n    ApiResponse<AuthenticationResponse> authenticate(@Valid @RequestBody AuthenticationRequest request,\n                                                     HttpServletRequest httpRequest,\n                                                     HttpServletResponse httpResponse) {\n        var result = authenticationService.authenticate(request);\n        CookieUtil.addCookie(httpResponse, SecurityConstants.ACCESS_TOKEN, result.getToken());\n        if(Boolean.TRUE.equals(request.getRemember())) {\n            CookieUtil.addCookieRemember(httpResponse, SecurityConstants.REFRESH_TOKEN, result.getRefreshToken(), 30 * 24 * 60 * 60);\n        } else {\n            result.setRefreshToken(null);\n            CookieUtil.deleteCookieByName(SecurityConstants.REFRESH_TOKEN, httpRequest, httpResponse);\n        }\n\n        return ApiResponse.<AuthenticationResponse>builder().result(result).build();\n    }\n\n    @GetMapping(\"/introspect\")\n    ApiResponse<IntrospectResponse> authenticate(@CookieValue(\"access_token\") String token) {\n        IntrospectRequest request = IntrospectRequest.builder().token(token).build();\n        var result = authenticationService.introspect(request);\n        return ApiResponse.<IntrospectResponse>builder().result(result).build();\n    }\n\n\n    @PostMapping(\"/refresh\")\n    ApiResponse<AuthenticationResponse> authenticate(@RequestBody RefreshRequest request,\n                                                     HttpServletResponse httpResponse)\n            throws ParseException, JOSEException {\n        var result = authenticationService.refreshToken(request);\n        CookieUtil.addCookie(httpResponse, SecurityConstants.ACCESS_TOKEN, result.getToken());\n        CookieUtil.addCookieRemember(httpResponse, SecurityConstants.REFRESH_TOKEN, result.getRefreshToken(), 30 * 24 * 60 * 60);\n        return ApiResponse.<AuthenticationResponse>builder().result(result).build();\n    }\n\n    @PostMapping(\"/logout\")\n    ApiResponse<Void> logout(@CookieValue(\"access_token\") String accessToken,\n                             @CookieValue(value = \"refresh_token\",required = false) String refreshToken,\n                             HttpServletResponse httpResponse,\n                             HttpServletRequest httpRequest) throws ParseException, JOSEException {\n\n        CookieUtil.deleteCookieByName(SecurityConstants.ACCESS_TOKEN, httpRequest, httpResponse);\n        if(refreshToken != null) {\n            LogoutRequest request = LogoutRequest.builder()\n                    .token(refreshToken)\n                    .build();\n            authenticationService.logout(request);\n            CookieUtil.deleteCookieByName(SecurityConstants.REFRESH_TOKEN, httpRequest, httpResponse);\n        }\n\n        return ApiResponse.<Void>builder().build();\n    }\n\n}\n
+===================================================================
+diff --git a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/api/AuthenticationController.java b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/api/AuthenticationController.java
+--- a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/api/AuthenticationController.java	
++++ b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/api/AuthenticationController.java	
+@@ -1,5 +1,13 @@
+ package com.rhythm_of_soul.identity_service.api;
+ 
++import java.text.ParseException;
++
++import jakarta.servlet.http.HttpServletRequest;
++import jakarta.servlet.http.HttpServletResponse;
++import jakarta.validation.Valid;
++
++import org.springframework.web.bind.annotation.*;
++
+ import com.nimbusds.jose.JOSEException;
+ import com.rhythm_of_soul.identity_service.constant.SecurityConstants;
+ import com.rhythm_of_soul.identity_service.dto.request.*;
+@@ -7,15 +15,10 @@
+ import com.rhythm_of_soul.identity_service.dto.response.IntrospectResponse;
+ import com.rhythm_of_soul.identity_service.service.AuthenticationService;
+ import com.rhythm_of_soul.identity_service.utils.CookieUtil;
+-import jakarta.servlet.http.HttpServletRequest;
+-import jakarta.servlet.http.HttpServletResponse;
+-import jakarta.validation.Valid;
++
+ import lombok.AccessLevel;
+ import lombok.RequiredArgsConstructor;
+ import lombok.experimental.FieldDefaults;
+-import org.springframework.web.bind.annotation.*;
+-
+-import java.text.ParseException;
+ 
+ @RestController
+ @RequestMapping("/auth")
+@@ -25,13 +28,15 @@
+     AuthenticationService authenticationService;
+ 
+     @PostMapping("/login")
+-    ApiResponse<AuthenticationResponse> authenticate(@Valid @RequestBody AuthenticationRequest request,
+-                                                     HttpServletRequest httpRequest,
+-                                                     HttpServletResponse httpResponse) {
++    ApiResponse<AuthenticationResponse> authenticate(
++            @Valid @RequestBody AuthenticationRequest request,
++            HttpServletRequest httpRequest,
++            HttpServletResponse httpResponse) {
+         var result = authenticationService.authenticate(request);
+         CookieUtil.addCookie(httpResponse, SecurityConstants.ACCESS_TOKEN, result.getToken());
+-        if(Boolean.TRUE.equals(request.getRemember())) {
+-            CookieUtil.addCookieRemember(httpResponse, SecurityConstants.REFRESH_TOKEN, result.getRefreshToken(), 30 * 24 * 60 * 60);
++        if (Boolean.TRUE.equals(request.getRemember())) {
++            CookieUtil.addCookieRemember(
++                    httpResponse, SecurityConstants.REFRESH_TOKEN, result.getRefreshToken(), 30 * 24 * 60 * 60);
+         } else {
+             result.setRefreshToken(null);
+             CookieUtil.deleteCookieByName(SecurityConstants.REFRESH_TOKEN, httpRequest, httpResponse);
+@@ -47,33 +52,32 @@
+         return ApiResponse.<IntrospectResponse>builder().result(result).build();
+     }
+ 
+-
+     @PostMapping("/refresh")
+-    ApiResponse<AuthenticationResponse> authenticate(@RequestBody RefreshRequest request,
+-                                                     HttpServletResponse httpResponse)
++    ApiResponse<AuthenticationResponse> authenticate(
++            @RequestBody RefreshRequest request, HttpServletResponse httpResponse)
+             throws ParseException, JOSEException {
+         var result = authenticationService.refreshToken(request);
+         CookieUtil.addCookie(httpResponse, SecurityConstants.ACCESS_TOKEN, result.getToken());
+-        CookieUtil.addCookieRemember(httpResponse, SecurityConstants.REFRESH_TOKEN, result.getRefreshToken(), 30 * 24 * 60 * 60);
++        CookieUtil.addCookieRemember(
++                httpResponse, SecurityConstants.REFRESH_TOKEN, result.getRefreshToken(), 30 * 24 * 60 * 60);
+         return ApiResponse.<AuthenticationResponse>builder().result(result).build();
+     }
+ 
+     @PostMapping("/logout")
+-    ApiResponse<Void> logout(@CookieValue("access_token") String accessToken,
+-                             @CookieValue(value = "refresh_token",required = false) String refreshToken,
+-                             HttpServletResponse httpResponse,
+-                             HttpServletRequest httpRequest) throws ParseException, JOSEException {
++    ApiResponse<Void> logout(
++            @CookieValue("access_token") String accessToken,
++            @CookieValue(value = "refresh_token", required = false) String refreshToken,
++            HttpServletResponse httpResponse,
++            HttpServletRequest httpRequest)
++            throws ParseException, JOSEException {
+ 
+         CookieUtil.deleteCookieByName(SecurityConstants.ACCESS_TOKEN, httpRequest, httpResponse);
+-        if(refreshToken != null) {
+-            LogoutRequest request = LogoutRequest.builder()
+-                    .token(refreshToken)
+-                    .build();
++        if (refreshToken != null) {
++            LogoutRequest request = LogoutRequest.builder().token(refreshToken).build();
+             authenticationService.logout(request);
+             CookieUtil.deleteCookieByName(SecurityConstants.REFRESH_TOKEN, httpRequest, httpResponse);
+         }
+ 
+         return ApiResponse.<Void>builder().build();
+     }
+-
+ }
+Index: identity_service/src/main/java/com/rhythm_of_soul/identity_service/config/ApplicationInitConfig.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.rhythm_of_soul.identity_service.config;\n\nimport org.springframework.boot.ApplicationRunner;\nimport org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;\nimport org.springframework.context.annotation.Bean;\nimport org.springframework.context.annotation.Configuration;\nimport org.springframework.security.crypto.password.PasswordEncoder;\n\nimport com.rhythm_of_soul.identity_service.constant.Role;\nimport com.rhythm_of_soul.identity_service.entity.User;\nimport com.rhythm_of_soul.identity_service.repository.UserRepository;\n\nimport lombok.AccessLevel;\nimport lombok.RequiredArgsConstructor;\nimport lombok.experimental.FieldDefaults;\nimport lombok.experimental.NonFinal;\nimport lombok.extern.slf4j.Slf4j;\n\n@Configuration\n@RequiredArgsConstructor\n@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)\n@Slf4j\npublic class ApplicationInitConfig {\n\n    PasswordEncoder passwordEncoder;\n\n    @NonFinal\n    static final String ADMIN_EMAIL= \"admin@gmail.com\";\n\n    @NonFinal\n    static final String ADMIN_PASSWORD = \"admin\";\n\n    @Bean\n    @ConditionalOnProperty(\n            prefix = \"spring\",\n            value = \"datasource.driverClassName\",\n            havingValue = \"org.mariadb.jdbc.Driver\")\n    ApplicationRunner applicationRunner(UserRepository userRepository) {\n        log.info(\"Initializing application...\");\n        return args -> {\n            if (userRepository.findByEmail(ADMIN_EMAIL).isEmpty()) {\n\n\n                User user = User.builder()\n                        .firstName(\"Admin\")\n                        .lastName(\"Admin\")\n                        .email(ADMIN_EMAIL)\n                        .password(passwordEncoder.encode(ADMIN_PASSWORD))\n                        .role(Role.ADMIN)\n                        .isVerify(true)\n                        .build();\n                userRepository.save(user);\n                log.warn(\"Admin user and account created with default password '{}'\", ADMIN_PASSWORD);\n            }\n\n            log.info(\"Application initialization completed.\");\n        };\n    }\n}\n
+===================================================================
+diff --git a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/config/ApplicationInitConfig.java b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/config/ApplicationInitConfig.java
+--- a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/config/ApplicationInitConfig.java	
++++ b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/config/ApplicationInitConfig.java	
+@@ -25,7 +25,7 @@
+     PasswordEncoder passwordEncoder;
+ 
+     @NonFinal
+-    static final String ADMIN_EMAIL= "admin@gmail.com";
++    static final String ADMIN_EMAIL = "admin@gmail.com";
+ 
+     @NonFinal
+     static final String ADMIN_PASSWORD = "admin";
+@@ -40,7 +40,6 @@
+         return args -> {
+             if (userRepository.findByEmail(ADMIN_EMAIL).isEmpty()) {
+ 
+-
+                 User user = User.builder()
+                         .firstName("Admin")
+                         .lastName("Admin")
+Index: identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/Impl/AuthenticationServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.rhythm_of_soul.identity_service.service.Impl;\n\nimport com.nimbusds.jose.*;\nimport com.nimbusds.jose.crypto.MACSigner;\nimport com.nimbusds.jose.crypto.MACVerifier;\nimport com.nimbusds.jwt.JWTClaimsSet;\nimport com.nimbusds.jwt.SignedJWT;\nimport com.rhythm_of_soul.identity_service.dto.request.AuthenticationRequest;\nimport com.rhythm_of_soul.identity_service.dto.request.IntrospectRequest;\nimport com.rhythm_of_soul.identity_service.dto.request.LogoutRequest;\nimport com.rhythm_of_soul.identity_service.dto.request.RefreshRequest;\nimport com.rhythm_of_soul.identity_service.dto.response.AuthenticationResponse;\nimport com.rhythm_of_soul.identity_service.dto.response.IntrospectResponse;\nimport com.rhythm_of_soul.identity_service.entity.RefreshToken;\nimport com.rhythm_of_soul.identity_service.entity.User;\nimport com.rhythm_of_soul.identity_service.exception.AppException;\nimport com.rhythm_of_soul.identity_service.exception.ErrorCode;\nimport com.rhythm_of_soul.identity_service.repository.RefreshTokenRepository;\nimport com.rhythm_of_soul.identity_service.repository.UserRepository;\nimport com.rhythm_of_soul.identity_service.service.AuthenticationService;\nimport lombok.AccessLevel;\nimport lombok.RequiredArgsConstructor;\nimport lombok.experimental.FieldDefaults;\nimport lombok.experimental.NonFinal;\nimport lombok.extern.slf4j.Slf4j;\nimport org.springframework.beans.factory.annotation.Value;\nimport org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;\nimport org.springframework.security.crypto.password.PasswordEncoder;\nimport org.springframework.stereotype.Service;\n\nimport java.text.ParseException;\nimport java.time.Instant;\nimport java.time.temporal.ChronoUnit;\nimport java.util.Date;\nimport java.util.UUID;\n\n@Service\n@Slf4j\n@RequiredArgsConstructor\n@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)\npublic class AuthenticationServiceImpl implements AuthenticationService {\n\n    UserRepository userRepository;\n    RefreshTokenRepository refreshTokenRepository;\n\n    @NonFinal\n    @Value(\"${jwt.signerKey}\")\n    protected String SIGNER_KEY;\n\n    @NonFinal\n    @Value(\"${jwt.valid-duration}\")\n    protected long VALID_DURATION;\n\n    @NonFinal\n    @Value(\"${jwt.refreshable-duration}\")\n    protected long REFRESHABLE_DURATION;\n\n    public IntrospectResponse introspect(IntrospectRequest request) {\n        var token = request.getToken();\n        boolean isValid = true;\n\n        try {\n            verifyToken(token, false);\n        } catch (AppException | JOSEException | ParseException e) {\n            isValid = false;\n        }\n\n        return IntrospectResponse.builder().valid(isValid).build();\n    }\n\n    public AuthenticationResponse authenticate(AuthenticationRequest request) {\n        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);\n        User user = userRepository\n                .findByEmail(request.getEmail())\n                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));\n\n        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());\n\n        if (!authenticated) throw new AppException(ErrorCode.UNAUTHENTICATED);\n\n\n        var accessToken = generateToken(user, false);\n        if(Boolean.FALSE.equals(request.getRemember())) {\n            return AuthenticationResponse.builder()\n                    .token(accessToken)\n                    .build();\n        }\n        var refreshToken = generateToken(user, true);\n\n        return AuthenticationResponse.builder()\n                .token(accessToken)\n                .refreshToken(refreshToken)\n                .build();\n    }\n\n    public void logout(LogoutRequest request) throws ParseException {\n        var token = request.getToken();\n        var signedJWT = SignedJWT.parse(token);\n        var email = signedJWT.getJWTClaimsSet().getSubject();\n\n        var user = userRepository.findByEmail(email)\n                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));\n\n        refreshTokenRepository.deleteByUser(user);\n    }\n\n\n    public AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {\n        var token = request.getToken();\n        var signedJWT = verifyToken(token, true);\n\n        var email = signedJWT.getJWTClaimsSet().getSubject();\n        var user = userRepository.findByEmail(email)\n                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));\n\n        var storedToken = refreshTokenRepository.findByUser(user)\n                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));\n\n        if (!storedToken.getToken().equals(token)) {\n            throw new AppException(ErrorCode.UNAUTHENTICATED);\n        }\n\n        var accessToken = generateToken(user, false);\n        var newRefreshToken = generateToken(user, true);\n\n        saveRefreshToken(user, newRefreshToken);\n\n        return AuthenticationResponse.builder()\n                .token(accessToken)\n                .refreshToken(newRefreshToken)\n                .build();\n    }\n    private void saveRefreshToken(User user, String token) {\n        Instant expiry = Instant.now().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS);\n\n        RefreshToken refreshToken = refreshTokenRepository.findByUser(user)\n                .map(existingToken -> {\n                    existingToken.setToken(token);\n                    existingToken.setExpiryTime(expiry);\n                    return existingToken;\n                })\n                .orElse(\n                        RefreshToken.builder()\n                                .user(user)\n                                .token(token)\n                                .expiryTime(expiry)\n                                .build()\n                );\n\n        refreshTokenRepository.save(refreshToken);\n    }\n\n\n    private String generateToken(User user, boolean isRefresh) {\n        long duration = isRefresh ? REFRESHABLE_DURATION : VALID_DURATION;\n\n        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()\n                .subject(user.getEmail())\n                .issuer(\"rhythm_of_soul.com\")\n                .issueTime(new Date())\n                .expirationTime(new Date(Instant.now().plus(duration, ChronoUnit.SECONDS).toEpochMilli()))\n                .jwtID(UUID.randomUUID().toString())\n                .claim(\"scope\", buildScope(user))\n                .claim(\"userId\", user.getId())\n                .build();\n\n        JWSObject jwsObject = new JWSObject(new JWSHeader(JWSAlgorithm.HS512), new Payload(jwtClaimsSet.toJSONObject()));\n\n        try {\n            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));\n            return jwsObject.serialize();\n        } catch (JOSEException e) {\n            throw new RuntimeException(\"Error signing JWT\", e);\n        }\n    }\n\n\n    private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {\n        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());\n\n        SignedJWT signedJWT = SignedJWT.parse(token);\n\n        Date expiryTime = (isRefresh)\n                ? new Date(signedJWT\n                        .getJWTClaimsSet()\n                        .getIssueTime()\n                        .toInstant()\n                        .plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS)\n                        .toEpochMilli())\n                : signedJWT.getJWTClaimsSet().getExpirationTime();\n\n        var verified = signedJWT.verify(verifier);\n\n        if (!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.UNAUTHENTICATED);\n\n        return signedJWT;\n    }\n\n    private String buildScope(User user) {\n        return \"ROLE_\" + user.getRole().name();\n    }\n\n}\n
+===================================================================
+diff --git a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/Impl/AuthenticationServiceImpl.java b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/Impl/AuthenticationServiceImpl.java
+--- a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/Impl/AuthenticationServiceImpl.java	
++++ b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/Impl/AuthenticationServiceImpl.java	
+@@ -1,5 +1,16 @@
+ package com.rhythm_of_soul.identity_service.service.Impl;
+ 
++import java.text.ParseException;
++import java.time.Instant;
++import java.time.temporal.ChronoUnit;
++import java.util.Date;
++import java.util.UUID;
++
++import org.springframework.beans.factory.annotation.Value;
++import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
++import org.springframework.security.crypto.password.PasswordEncoder;
++import org.springframework.stereotype.Service;
++
+ import com.nimbusds.jose.*;
+ import com.nimbusds.jose.crypto.MACSigner;
+ import com.nimbusds.jose.crypto.MACVerifier;
+@@ -18,21 +29,12 @@
+ import com.rhythm_of_soul.identity_service.repository.RefreshTokenRepository;
+ import com.rhythm_of_soul.identity_service.repository.UserRepository;
+ import com.rhythm_of_soul.identity_service.service.AuthenticationService;
++
+ import lombok.AccessLevel;
+ import lombok.RequiredArgsConstructor;
+ import lombok.experimental.FieldDefaults;
+ import lombok.experimental.NonFinal;
+ import lombok.extern.slf4j.Slf4j;
+-import org.springframework.beans.factory.annotation.Value;
+-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+-import org.springframework.security.crypto.password.PasswordEncoder;
+-import org.springframework.stereotype.Service;
+-
+-import java.text.ParseException;
+-import java.time.Instant;
+-import java.time.temporal.ChronoUnit;
+-import java.util.Date;
+-import java.util.UUID;
+ 
+ @Service
+ @Slf4j
+@@ -78,12 +80,9 @@
+ 
+         if (!authenticated) throw new AppException(ErrorCode.UNAUTHENTICATED);
+ 
+-
+         var accessToken = generateToken(user, false);
+-        if(Boolean.FALSE.equals(request.getRemember())) {
+-            return AuthenticationResponse.builder()
+-                    .token(accessToken)
+-                    .build();
++        if (Boolean.FALSE.equals(request.getRemember())) {
++            return AuthenticationResponse.builder().token(accessToken).build();
+         }
+         var refreshToken = generateToken(user, true);
+ 
+@@ -98,23 +97,20 @@
+         var signedJWT = SignedJWT.parse(token);
+         var email = signedJWT.getJWTClaimsSet().getSubject();
+ 
+-        var user = userRepository.findByEmail(email)
+-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
++        var user = userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+ 
+         refreshTokenRepository.deleteByUser(user);
+     }
+ 
+-
+     public AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {
+         var token = request.getToken();
+         var signedJWT = verifyToken(token, true);
+ 
+         var email = signedJWT.getJWTClaimsSet().getSubject();
+-        var user = userRepository.findByEmail(email)
+-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
++        var user = userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+ 
+-        var storedToken = refreshTokenRepository.findByUser(user)
+-                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
++        var storedToken =
++                refreshTokenRepository.findByUser(user).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+ 
+         if (!storedToken.getToken().equals(token)) {
+             throw new AppException(ErrorCode.UNAUTHENTICATED);
+@@ -130,27 +126,26 @@
+                 .refreshToken(newRefreshToken)
+                 .build();
+     }
++
+     private void saveRefreshToken(User user, String token) {
+         Instant expiry = Instant.now().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS);
+ 
+-        RefreshToken refreshToken = refreshTokenRepository.findByUser(user)
++        RefreshToken refreshToken = refreshTokenRepository
++                .findByUser(user)
+                 .map(existingToken -> {
+                     existingToken.setToken(token);
+                     existingToken.setExpiryTime(expiry);
+                     return existingToken;
+                 })
+-                .orElse(
+-                        RefreshToken.builder()
+-                                .user(user)
+-                                .token(token)
+-                                .expiryTime(expiry)
+-                                .build()
+-                );
++                .orElse(RefreshToken.builder()
++                        .user(user)
++                        .token(token)
++                        .expiryTime(expiry)
++                        .build());
+ 
+         refreshTokenRepository.save(refreshToken);
+     }
+ 
+-
+     private String generateToken(User user, boolean isRefresh) {
+         long duration = isRefresh ? REFRESHABLE_DURATION : VALID_DURATION;
+ 
+@@ -158,13 +153,15 @@
+                 .subject(user.getEmail())
+                 .issuer("rhythm_of_soul.com")
+                 .issueTime(new Date())
+-                .expirationTime(new Date(Instant.now().plus(duration, ChronoUnit.SECONDS).toEpochMilli()))
++                .expirationTime(new Date(
++                        Instant.now().plus(duration, ChronoUnit.SECONDS).toEpochMilli()))
+                 .jwtID(UUID.randomUUID().toString())
+                 .claim("scope", buildScope(user))
+                 .claim("userId", user.getId())
+                 .build();
+ 
+-        JWSObject jwsObject = new JWSObject(new JWSHeader(JWSAlgorithm.HS512), new Payload(jwtClaimsSet.toJSONObject()));
++        JWSObject jwsObject =
++                new JWSObject(new JWSHeader(JWSAlgorithm.HS512), new Payload(jwtClaimsSet.toJSONObject()));
+ 
+         try {
+             jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
+@@ -174,7 +171,6 @@
+         }
+     }
+ 
+-
+     private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
+         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+ 
+@@ -199,5 +195,4 @@
+     private String buildScope(User user) {
+         return "ROLE_" + user.getRole().name();
+     }
+-
+ }
+Index: identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/Impl/EmailServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.rhythm_of_soul.identity_service.service.Impl;\n\nimport com.rhythm_of_soul.identity_service.service.EmailService;\nimport lombok.RequiredArgsConstructor;\nimport lombok.extern.slf4j.Slf4j;\nimport org.springframework.mail.SimpleMailMessage;\nimport org.springframework.mail.javamail.JavaMailSender;\nimport org.springframework.stereotype.Service;\n\n@Service\n@RequiredArgsConstructor\n@Slf4j\npublic class EmailServiceImpl implements EmailService {\n    private final JavaMailSender mailSender;\n    @Override\n    public boolean sendEmail(String email, String subject, String body) {\n        try{\n            SimpleMailMessage message = new SimpleMailMessage();\n            message.setTo(email);\n            message.setSubject(subject);\n            message.setText(body);\n            mailSender.send(message);\n            log.info(\"Email sent to {}: {}\", email, subject);\n            return true;\n        }catch (Exception e){\n            log.error(\"Failed to send email to {}: {}\", email, e.getMessage());\n            return false;\n        }\n    }\n}\n
+===================================================================
+diff --git a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/Impl/EmailServiceImpl.java b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/Impl/EmailServiceImpl.java
+--- a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/Impl/EmailServiceImpl.java	
++++ b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/Impl/EmailServiceImpl.java	
+@@ -1,20 +1,23 @@
+ package com.rhythm_of_soul.identity_service.service.Impl;
+ 
+-import com.rhythm_of_soul.identity_service.service.EmailService;
+-import lombok.RequiredArgsConstructor;
+-import lombok.extern.slf4j.Slf4j;
+ import org.springframework.mail.SimpleMailMessage;
+ import org.springframework.mail.javamail.JavaMailSender;
+ import org.springframework.stereotype.Service;
+ 
++import com.rhythm_of_soul.identity_service.service.EmailService;
++
++import lombok.RequiredArgsConstructor;
++import lombok.extern.slf4j.Slf4j;
++
+ @Service
+ @RequiredArgsConstructor
+ @Slf4j
+ public class EmailServiceImpl implements EmailService {
+     private final JavaMailSender mailSender;
++
+     @Override
+     public boolean sendEmail(String email, String subject, String body) {
+-        try{
++        try {
+             SimpleMailMessage message = new SimpleMailMessage();
+             message.setTo(email);
+             message.setSubject(subject);
+@@ -22,7 +25,7 @@
+             mailSender.send(message);
+             log.info("Email sent to {}: {}", email, subject);
+             return true;
+-        }catch (Exception e){
++        } catch (Exception e) {
+             log.error("Failed to send email to {}: {}", email, e.getMessage());
+             return false;
+         }
+Index: identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/Impl/UserServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.rhythm_of_soul.identity_service.service.Impl;\n\nimport org.springframework.stereotype.Service;\n\nimport com.rhythm_of_soul.identity_service.dto.request.UserCreatedRequest;\nimport com.rhythm_of_soul.identity_service.dto.response.UserResponse;\nimport com.rhythm_of_soul.identity_service.entity.User;\nimport com.rhythm_of_soul.identity_service.exception.AppException;\nimport com.rhythm_of_soul.identity_service.exception.ErrorCode;\nimport com.rhythm_of_soul.identity_service.repository.UserRepository;\nimport com.rhythm_of_soul.identity_service.service.UserService;\nimport com.rhythm_of_soul.identity_service.mapper.UserMapper;\nimport lombok.AccessLevel;\nimport lombok.RequiredArgsConstructor;\nimport lombok.experimental.FieldDefaults;\nimport lombok.extern.slf4j.Slf4j;\n\n@Service\n@Slf4j\n@RequiredArgsConstructor\n@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)\npublic class UserServiceImpl implements UserService {\n    UserMapper userMapper;\n    UserRepository userRepository;\n\n    @Override\n    public UserResponse createUser(UserCreatedRequest request) {\n        if (userRepository.existsByEmail(request.getEmail())) throw new AppException(ErrorCode.EMAIL_EXISTED);\n        User user = userMapper.toUser(request);\n        userRepository.save(user);\n        return userMapper.toUserResponse(user);\n    }\n\n    @Override\n    public Object forgetPassword(String email) {\n        return null;\n    }\n}\n
+===================================================================
+diff --git a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/Impl/UserServiceImpl.java b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/Impl/UserServiceImpl.java
+--- a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/Impl/UserServiceImpl.java	
++++ b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/Impl/UserServiceImpl.java	
+@@ -7,9 +7,10 @@
+ import com.rhythm_of_soul.identity_service.entity.User;
+ import com.rhythm_of_soul.identity_service.exception.AppException;
+ import com.rhythm_of_soul.identity_service.exception.ErrorCode;
++import com.rhythm_of_soul.identity_service.mapper.UserMapper;
+ import com.rhythm_of_soul.identity_service.repository.UserRepository;
+ import com.rhythm_of_soul.identity_service.service.UserService;
+-import com.rhythm_of_soul.identity_service.mapper.UserMapper;
++
+ import lombok.AccessLevel;
+ import lombok.RequiredArgsConstructor;
+ import lombok.experimental.FieldDefaults;
+Index: identity_service/src/main/java/com/rhythm_of_soul/identity_service/utils/CookieUtil.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.rhythm_of_soul.identity_service.utils;\n\n\nimport org.springframework.util.SerializationUtils;\n\nimport jakarta.servlet.http.Cookie;\nimport jakarta.servlet.http.HttpServletRequest;\nimport jakarta.servlet.http.HttpServletResponse;\nimport java.util.Base64;\nimport java.util.Optional;\n\n/**\n * @author tiennd\n * Created date 2024-12-03\n */\npublic class CookieUtil {\n    private static final int MAX_AGE = 8 * 3600;\n\n    public static void addCookie(HttpServletResponse response, String name, String value) {\n        Cookie cookie = new Cookie(name, value);\n        cookie.setHttpOnly(true);\n        cookie.setMaxAge(MAX_AGE);\n        cookie.setPath(\"/\");\n        response.addCookie(cookie);\n    }\n\n    public static void addCookieRemember(HttpServletResponse response, String name, String value, int maxAge) {\n        Cookie cookie = new Cookie(name, value);\n        cookie.setHttpOnly(true);\n        cookie.setMaxAge(maxAge);\n        cookie.setPath(\"/\");\n        response.addCookie(cookie);\n    }\n\n    public static String getCookieByName(String name, HttpServletRequest request) {\n        Cookie[] cookies = request.getCookies();\n        if (cookies == null) {\n            return null;\n        }\n        for (int i = 0; i < cookies.length; i++) {\n            Cookie cookie = cookies[i];\n            if (name.equals(cookie.getName())) {\n                return cookie.getValue();\n            }\n        }\n        return null;\n    }\n\n    public static Cookie deleteCookieByName(String name, HttpServletRequest request, HttpServletResponse resp) {\n        Cookie[] cookies = request.getCookies();\n        if (cookies == null) {\n            return null;\n        }\n        for (int i = 0; i < cookies.length; i++) {\n            Cookie cookie = cookies[i];\n            if (name.equals(cookie.getName())) {\n                cookie.setMaxAge(0);\n                cookie.setPath(\"/\");\n                resp.addCookie(cookie);\n                return cookie;\n            }\n        }\n        return null;\n    }\n\n    public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {\n        Cookie[] cookies = request.getCookies();\n\n        if (cookies != null && cookies.length > 0) {\n            for (Cookie cookie : cookies) {\n                if (cookie.getName().equals(name)) {\n                    return Optional.of(cookie);\n                }\n            }\n        }\n\n        return Optional.empty();\n    }\n\n    public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {\n        Cookie cookie = new Cookie(name, value);\n        cookie.setPath(\"/\");\n        cookie.setHttpOnly(true);\n        cookie.setMaxAge(maxAge);\n        response.addCookie(cookie);\n    }\n\n    public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name) {\n        Cookie[] cookies = request.getCookies();\n        if (cookies != null && cookies.length > 0) {\n            for (Cookie cookie : cookies) {\n                if (cookie.getName().equals(name)) {\n                    cookie.setValue(\"\");\n                    cookie.setPath(\"/\");\n                    cookie.setMaxAge(0);\n                    response.addCookie(cookie);\n                }\n            }\n        }\n    }\n\n    public static String serialize(Object object) {\n        return Base64.getUrlEncoder()\n                .encodeToString(SerializationUtils.serialize(object));\n    }\n\n    public static <T> T deserialize(Cookie cookie, Class<T> cls) {\n        return cls.cast(SerializationUtils.deserialize(\n                Base64.getUrlDecoder().decode(cookie.getValue())));\n    }\n}\n\n
+===================================================================
+diff --git a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/utils/CookieUtil.java b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/utils/CookieUtil.java
+--- a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/utils/CookieUtil.java	
++++ b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/utils/CookieUtil.java	
+@@ -1,13 +1,13 @@
+ package com.rhythm_of_soul.identity_service.utils;
+ 
+-
+-import org.springframework.util.SerializationUtils;
++import java.util.Base64;
++import java.util.Optional;
+ 
+ import jakarta.servlet.http.Cookie;
+ import jakarta.servlet.http.HttpServletRequest;
+ import jakarta.servlet.http.HttpServletResponse;
+-import java.util.Base64;
+-import java.util.Optional;
++
++import org.springframework.util.SerializationUtils;
+ 
+ /**
+  * @author tiennd
+@@ -100,13 +100,10 @@
+     }
+ 
+     public static String serialize(Object object) {
+-        return Base64.getUrlEncoder()
+-                .encodeToString(SerializationUtils.serialize(object));
++        return Base64.getUrlEncoder().encodeToString(SerializationUtils.serialize(object));
+     }
+ 
+     public static <T> T deserialize(Cookie cookie, Class<T> cls) {
+-        return cls.cast(SerializationUtils.deserialize(
+-                Base64.getUrlDecoder().decode(cookie.getValue())));
++        return cls.cast(SerializationUtils.deserialize(Base64.getUrlDecoder().decode(cookie.getValue())));
+     }
+ }
+-
+Index: identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/UserService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.rhythm_of_soul.identity_service.service;\n\nimport com.rhythm_of_soul.identity_service.dto.request.UserCreatedRequest;\nimport com.rhythm_of_soul.identity_service.dto.response.UserResponse;\n\npublic interface UserService {\n    UserResponse createUser(UserCreatedRequest request);\n    Object forgetPassword(String email);\n}\n
+===================================================================
+diff --git a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/UserService.java b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/UserService.java
+--- a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/UserService.java	
++++ b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/UserService.java	
+@@ -5,5 +5,6 @@
+ 
+ public interface UserService {
+     UserResponse createUser(UserCreatedRequest request);
++
+     Object forgetPassword(String email);
+ }
+Index: identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/SecurityConstants.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.rhythm_of_soul.identity_service.constant;\n\npublic class SecurityConstants {\n    public static final String TOKEN_PREFIX = \"Bearer \";\n    public static final String HEADER_STRING = \"Authorization\";\n    public static final String ACCESS_TOKEN = \"access_token\";\n    public static final String ACCESS_TOKEN_SSO = \"access_token_sso\";\n    public static final String REFRESH_TOKEN = \"refresh_token\";\n    public static final String USERNAME = \"username\";\n    public static final String PASSWORD = \"password\";\n    public static final String REDIRECT_URI_KEY = \"redirect_uri\";\n    public static final String VERIFY_KEY = \"verify_key\";\n}\n\n
+===================================================================
+diff --git a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/SecurityConstants.java b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/SecurityConstants.java
+--- a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/SecurityConstants.java	
++++ b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/SecurityConstants.java	
+@@ -11,4 +11,3 @@
+     public static final String REDIRECT_URI_KEY = "redirect_uri";
+     public static final String VERIFY_KEY = "verify_key";
+ }
+-
+Index: identity_service/src/main/java/com/rhythm_of_soul/identity_service/mapper/UserMapper.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.rhythm_of_soul.identity_service.mapper;\n\nimport com.rhythm_of_soul.identity_service.constant.Role;\nimport org.mapstruct.Mapper;\n\nimport com.rhythm_of_soul.identity_service.dto.request.UserCreatedRequest;\nimport com.rhythm_of_soul.identity_service.dto.response.UserResponse;\nimport com.rhythm_of_soul.identity_service.entity.User;\nimport org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;\nimport org.springframework.security.crypto.password.PasswordEncoder;\n\n@Mapper(componentModel = \"spring\")\npublic interface UserMapper {\n    default UserResponse toUserResponse(User user) {\n\n        return UserResponse.builder()\n                .firstName(user.getFirstName())\n                .lastName(user.getLastName())\n                .email(user.getEmail())\n                .verify_email(user.isVerify())\n                .role(user.getRole())\n                .build();\n    }\n\n    default User toUser(UserCreatedRequest userRequest) {\n        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);\n        return User.builder()\n                .firstName(userRequest.getFirstName())\n                .lastName(userRequest.getLastName())\n                .email(userRequest.getEmail())\n                .password(passwordEncoder.encode(userRequest.getPassword()))\n                .role(Role.USER)\n                .isVerify(false)\n                .build();\n    }\n}\n
+===================================================================
+diff --git a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/mapper/UserMapper.java b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/mapper/UserMapper.java
+--- a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/mapper/UserMapper.java	
++++ b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/mapper/UserMapper.java	
+@@ -1,13 +1,13 @@
+ package com.rhythm_of_soul.identity_service.mapper;
+ 
+-import com.rhythm_of_soul.identity_service.constant.Role;
+ import org.mapstruct.Mapper;
++import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
++import org.springframework.security.crypto.password.PasswordEncoder;
+ 
++import com.rhythm_of_soul.identity_service.constant.Role;
+ import com.rhythm_of_soul.identity_service.dto.request.UserCreatedRequest;
+ import com.rhythm_of_soul.identity_service.dto.response.UserResponse;
+ import com.rhythm_of_soul.identity_service.entity.User;
+-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+-import org.springframework.security.crypto.password.PasswordEncoder;
+ 
+ @Mapper(componentModel = "spring")
+ public interface UserMapper {
+Index: identity_service/src/main/java/com/rhythm_of_soul/identity_service/repository/RefreshTokenRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.rhythm_of_soul.identity_service.repository;\n\nimport com.rhythm_of_soul.identity_service.entity.RefreshToken;\nimport com.rhythm_of_soul.identity_service.entity.User;\nimport org.springframework.data.jpa.repository.JpaRepository;\n\nimport java.util.Optional;\n\npublic interface RefreshTokenRepository extends JpaRepository<RefreshToken, String> {\n    Optional<RefreshToken> findByUser(User user);\n    void deleteByUser(User user);\n}\n
+===================================================================
+diff --git a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/repository/RefreshTokenRepository.java b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/repository/RefreshTokenRepository.java
+--- a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/repository/RefreshTokenRepository.java	
++++ b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/repository/RefreshTokenRepository.java	
+@@ -1,12 +1,14 @@
+ package com.rhythm_of_soul.identity_service.repository;
+ 
++import java.util.Optional;
++
++import org.springframework.data.jpa.repository.JpaRepository;
++
+ import com.rhythm_of_soul.identity_service.entity.RefreshToken;
+ import com.rhythm_of_soul.identity_service.entity.User;
+-import org.springframework.data.jpa.repository.JpaRepository;
+-
+-import java.util.Optional;
+ 
+ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, String> {
+     Optional<RefreshToken> findByUser(User user);
++
+     void deleteByUser(User user);
+ }
+Index: identity_service/src/main/java/com/rhythm_of_soul/identity_service/repository/UserRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.rhythm_of_soul.identity_service.repository;\n\nimport java.util.Optional;\n\nimport org.springframework.data.jpa.repository.JpaRepository;\nimport org.springframework.stereotype.Repository;\n\nimport com.rhythm_of_soul.identity_service.entity.User;\n\n@Repository\npublic interface UserRepository extends JpaRepository<User, String> {\n    Optional<User> findByEmail(String email);\n    boolean existsByEmail(String email);\n    // Define custom query methods if needed\n    // For example, findByUsername(String username) or findByEmail(String email)\n}\n
+===================================================================
+diff --git a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/repository/UserRepository.java b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/repository/UserRepository.java
+--- a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/repository/UserRepository.java	
++++ b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/repository/UserRepository.java	
+@@ -10,6 +10,7 @@
+ @Repository
+ public interface UserRepository extends JpaRepository<User, String> {
+     Optional<User> findByEmail(String email);
++
+     boolean existsByEmail(String email);
+     // Define custom query methods if needed
+     // For example, findByUsername(String username) or findByEmail(String email)
+Index: identity_service/src/main/java/com/rhythm_of_soul/identity_service/exception/ViewExceptionHandler.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.rhythm_of_soul.identity_service.exception;\n\nimport com.rhythm_of_soul.identity_service.dto.request.AuthenticationRequest;\nimport lombok.extern.slf4j.Slf4j;\nimport org.springframework.web.bind.MethodArgumentNotValidException;\nimport org.springframework.web.bind.annotation.ControllerAdvice;\nimport org.springframework.web.bind.annotation.ExceptionHandler;\nimport org.springframework.web.servlet.mvc.support.RedirectAttributes;\n\nimport java.nio.file.AccessDeniedException;\n\n@Slf4j\n@ControllerAdvice(basePackages = \"com.rhythm_of_soul.identity_service.controller\")\npublic class ViewExceptionHandler {\n    @ExceptionHandler(value = Exception.class)\n    public String handlingRuntimeException(Exception exception, RedirectAttributes redirectAttributes) {\n        log.error(\"Exception: \", exception);\n        redirectAttributes.addFlashAttribute(\"error\", exception.getMessage());\n        return \"redirect:/sign-in\";\n    }\n\n    @ExceptionHandler(value = AppException.class)\n    public String handlingAppException(AppException exception, RedirectAttributes redirectAttributes) {\n        ErrorCode errorCode = exception.getErrorCode();\n        redirectAttributes.addFlashAttribute(\"error\", errorCode.getMessage());\n        String redirectUrl = errorCode == ErrorCode.USER_EXISTED ? \"/sign-up\" : \"/sign-in\";\n        return \"redirect:\" + redirectUrl;\n    }\n\n    @ExceptionHandler(value = AccessDeniedException.class)\n    public String handlingAccessDeniedException(AccessDeniedException exception, RedirectAttributes redirectAttributes) {\n        redirectAttributes.addFlashAttribute(\"error\", ErrorCode.UNAUTHORIZED.getMessage());\n        return \"redirect:/sign-in\";\n    }\n\n    @ExceptionHandler(value = MethodArgumentNotValidException.class)\n    public String handlingValidation(MethodArgumentNotValidException exception, RedirectAttributes redirectAttributes) {\n        String errorMessage = exception.getFieldError().getDefaultMessage();\n        redirectAttributes.addFlashAttribute(\"error\", errorMessage);\n        String redirectUrl = exception.getBindingResult().getTarget() instanceof AuthenticationRequest ? \"/sign-in\" : \"/sign-up\";\n        return \"redirect:\" + redirectUrl;\n    }\n}\n
+===================================================================
+diff --git a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/exception/ViewExceptionHandler.java b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/exception/ViewExceptionHandler.java
+--- a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/exception/ViewExceptionHandler.java	
++++ b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/exception/ViewExceptionHandler.java	
+@@ -1,13 +1,15 @@
+ package com.rhythm_of_soul.identity_service.exception;
+ 
+-import com.rhythm_of_soul.identity_service.dto.request.AuthenticationRequest;
+-import lombok.extern.slf4j.Slf4j;
++import java.nio.file.AccessDeniedException;
++
+ import org.springframework.web.bind.MethodArgumentNotValidException;
+ import org.springframework.web.bind.annotation.ControllerAdvice;
+ import org.springframework.web.bind.annotation.ExceptionHandler;
+ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+ 
+-import java.nio.file.AccessDeniedException;
++import com.rhythm_of_soul.identity_service.dto.request.AuthenticationRequest;
++
++import lombok.extern.slf4j.Slf4j;
+ 
+ @Slf4j
+ @ControllerAdvice(basePackages = "com.rhythm_of_soul.identity_service.controller")
+@@ -28,7 +30,8 @@
+     }
+ 
+     @ExceptionHandler(value = AccessDeniedException.class)
+-    public String handlingAccessDeniedException(AccessDeniedException exception, RedirectAttributes redirectAttributes) {
++    public String handlingAccessDeniedException(
++            AccessDeniedException exception, RedirectAttributes redirectAttributes) {
+         redirectAttributes.addFlashAttribute("error", ErrorCode.UNAUTHORIZED.getMessage());
+         return "redirect:/sign-in";
+     }
+@@ -37,7 +40,8 @@
+     public String handlingValidation(MethodArgumentNotValidException exception, RedirectAttributes redirectAttributes) {
+         String errorMessage = exception.getFieldError().getDefaultMessage();
+         redirectAttributes.addFlashAttribute("error", errorMessage);
+-        String redirectUrl = exception.getBindingResult().getTarget() instanceof AuthenticationRequest ? "/sign-in" : "/sign-up";
++        String redirectUrl =
++                exception.getBindingResult().getTarget() instanceof AuthenticationRequest ? "/sign-in" : "/sign-up";
+         return "redirect:" + redirectUrl;
+     }
+ }
+Index: identity_service/src/main/java/com/rhythm_of_soul/identity_service/dto/response/AuthenticationResponse.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.rhythm_of_soul.identity_service.dto.response;\n\nimport com.fasterxml.jackson.annotation.JsonInclude;\nimport lombok.*;\nimport lombok.experimental.FieldDefaults;\n\n@Data\n@NoArgsConstructor\n@AllArgsConstructor\n@Builder\n@FieldDefaults(level = AccessLevel.PRIVATE)\n@JsonInclude(JsonInclude.Include.NON_NULL)\npublic class AuthenticationResponse {\n    String token;\n    String refreshToken;\n}\n
+===================================================================
+diff --git a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/dto/response/AuthenticationResponse.java b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/dto/response/AuthenticationResponse.java
+--- a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/dto/response/AuthenticationResponse.java	
++++ b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/dto/response/AuthenticationResponse.java	
+@@ -1,6 +1,7 @@
+ package com.rhythm_of_soul.identity_service.dto.response;
+ 
+ import com.fasterxml.jackson.annotation.JsonInclude;
++
+ import lombok.*;
+ import lombok.experimental.FieldDefaults;
+ 
+Index: identity_service/src/main/java/com/rhythm_of_soul/identity_service/controller/ServerAuthController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.rhythm_of_soul.identity_service.controller;\n\nimport com.rhythm_of_soul.identity_service.dto.request.AuthenticationRequest;\nimport com.rhythm_of_soul.identity_service.dto.request.UserCreatedRequest;\nimport com.rhythm_of_soul.identity_service.dto.response.AuthenticationResponse;\nimport com.rhythm_of_soul.identity_service.service.AuthenticationService;\nimport lombok.AccessLevel;\nimport lombok.RequiredArgsConstructor;\nimport lombok.experimental.FieldDefaults;\nimport org.springframework.security.core.context.SecurityContextHolder;\nimport org.springframework.stereotype.Controller;\nimport org.springframework.ui.Model;\nimport org.springframework.web.bind.annotation.GetMapping;\nimport org.springframework.web.bind.annotation.ModelAttribute;\nimport org.springframework.web.bind.annotation.PostMapping;\nimport org.springframework.web.servlet.mvc.support.RedirectAttributes;\n\n@Controller\n@RequiredArgsConstructor\n@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)\npublic class ServerAuthController {\n    AuthenticationService authenticationService;\n\n    @GetMapping(\"/sign-in\")\n    public String showSignInForm(Model model) {\n        model.addAttribute(\"authRequest\", new AuthenticationRequest());\n        return \"sign-in\";\n    }\n\n    @PostMapping(\"/sign-in\")\n    public String login(@ModelAttribute(\"authRequest\") AuthenticationRequest authRequest,\n                        RedirectAttributes redirectAttributes) {\n        try {\n            AuthenticationResponse response = authenticationService.authenticate(authRequest);\n            redirectAttributes.addFlashAttribute(\"message\", \"Đăng nhập thành công\");\n            return \"redirect:/home\";\n        } catch (RuntimeException e) {\n            redirectAttributes.addFlashAttribute(\"error\", e.getMessage());\n            return \"redirect:/sign-in\";\n        }\n    }\n\n    @GetMapping(\"/sign-up\")\n    public String showSignUpForm(Model model) {\n        model.addAttribute(\"signUpRequest\", new UserCreatedRequest());\n        return \"sign-up\";\n    }\n\n    @GetMapping(\"/home\")\n    public String home(Model model) {\n        model.addAttribute(\"user\", SecurityContextHolder.getContext().getAuthentication().getName());\n        return \"home\";\n    }\n}\n
+===================================================================
+diff --git a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/controller/ServerAuthController.java b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/controller/ServerAuthController.java
+--- a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/controller/ServerAuthController.java	
++++ b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/controller/ServerAuthController.java	
+@@ -1,12 +1,5 @@
+ package com.rhythm_of_soul.identity_service.controller;
+ 
+-import com.rhythm_of_soul.identity_service.dto.request.AuthenticationRequest;
+-import com.rhythm_of_soul.identity_service.dto.request.UserCreatedRequest;
+-import com.rhythm_of_soul.identity_service.dto.response.AuthenticationResponse;
+-import com.rhythm_of_soul.identity_service.service.AuthenticationService;
+-import lombok.AccessLevel;
+-import lombok.RequiredArgsConstructor;
+-import lombok.experimental.FieldDefaults;
+ import org.springframework.security.core.context.SecurityContextHolder;
+ import org.springframework.stereotype.Controller;
+ import org.springframework.ui.Model;
+@@ -15,6 +8,15 @@
+ import org.springframework.web.bind.annotation.PostMapping;
+ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+ 
++import com.rhythm_of_soul.identity_service.dto.request.AuthenticationRequest;
++import com.rhythm_of_soul.identity_service.dto.request.UserCreatedRequest;
++import com.rhythm_of_soul.identity_service.dto.response.AuthenticationResponse;
++import com.rhythm_of_soul.identity_service.service.AuthenticationService;
++
++import lombok.AccessLevel;
++import lombok.RequiredArgsConstructor;
++import lombok.experimental.FieldDefaults;
++
+ @Controller
+ @RequiredArgsConstructor
+ @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@@ -28,8 +30,8 @@
+     }
+ 
+     @PostMapping("/sign-in")
+-    public String login(@ModelAttribute("authRequest") AuthenticationRequest authRequest,
+-                        RedirectAttributes redirectAttributes) {
++    public String login(
++            @ModelAttribute("authRequest") AuthenticationRequest authRequest, RedirectAttributes redirectAttributes) {
+         try {
+             AuthenticationResponse response = authenticationService.authenticate(authRequest);
+             redirectAttributes.addFlashAttribute("message", "Đăng nhập thành công");
+@@ -48,7 +50,8 @@
+ 
+     @GetMapping("/home")
+     public String home(Model model) {
+-        model.addAttribute("user", SecurityContextHolder.getContext().getAuthentication().getName());
++        model.addAttribute(
++                "user", SecurityContextHolder.getContext().getAuthentication().getName());
+         return "home";
+     }
+ }
+Index: identity_service/src/main/java/com/rhythm_of_soul/identity_service/dto/request/AuthenticationRequest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.rhythm_of_soul.identity_service.dto.request;\n\nimport jakarta.validation.constraints.NotEmpty;\nimport lombok.*;\nimport lombok.experimental.FieldDefaults;\n\n@Data\n@NoArgsConstructor\n@AllArgsConstructor\n@Builder\n@FieldDefaults(level = AccessLevel.PRIVATE)\npublic class AuthenticationRequest {\n    @NotEmpty\n    String email;\n    @NotEmpty\n    String password;\n    Boolean remember;\n}\n
+===================================================================
+diff --git a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/dto/request/AuthenticationRequest.java b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/dto/request/AuthenticationRequest.java
+--- a/identity_service/src/main/java/com/rhythm_of_soul/identity_service/dto/request/AuthenticationRequest.java	
++++ b/identity_service/src/main/java/com/rhythm_of_soul/identity_service/dto/request/AuthenticationRequest.java	
+@@ -1,6 +1,7 @@
+ package com.rhythm_of_soul.identity_service.dto.request;
+ 
+ import jakarta.validation.constraints.NotEmpty;
++
+ import lombok.*;
+ import lombok.experimental.FieldDefaults;
+ 
+@@ -12,7 +13,9 @@
+ public class AuthenticationRequest {
+     @NotEmpty
+     String email;
++
+     @NotEmpty
+     String password;
++
+     Boolean remember;
+ }

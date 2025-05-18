@@ -1,4 +1,3 @@
-import { Account } from "../model/account";
 import axios from "axios";
 import { APIResponse } from "../model/APIResponse";
 import { Introspect } from "../model/Introspect";
@@ -30,7 +29,6 @@ class LoginService {
     );
     return response.data;
   }
-
 }
 export default new LoginService();
 

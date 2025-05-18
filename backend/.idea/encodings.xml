@@ -2,10 +2,18 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/admin_service/src/main/java" charset="UTF-8" />
+<<<<<<< HEAD
+=======
+    <file url="file://$PROJECT_DIR$/analytics_service/src/main/java" charset="UTF-8" />
+>>>>>>> content
     <file url="file://$PROJECT_DIR$/api_gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/artist_service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/content_service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/identity_service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/notification_service/src/main/java" charset="UTF-8" />
+<<<<<<< HEAD
+=======
+    <file url="file://$PROJECT_DIR$/user_service/src/main/java" charset="UTF-8" />
+>>>>>>> content
   </component>
 </project>

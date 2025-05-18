@@ -130,7 +130,6 @@ export default function EditProfileDialog({
     <div className="modal-backdrop" style={backdropStyle}>
       <div className="modal-content" style={modalStyle}>
         <h4 className="mb-4">Edit Profile</h4>
-
         <div className="row">
           {/* Left Column - Images */}
           <div className="col-md-4">
@@ -184,14 +183,13 @@ export default function EditProfileDialog({
               </div>
             </div>
           </div>
-
+        
           {/* Right Column - Form Fields */}
           <div className="col-md-8">
             <div className="row">
               {/* Basic Information */}
               <div className="col-12 mb-4">
                 <h5 className="border-bottom pb-2 mb-3">Basic Information</h5>
-
                 <div className="mb-3">
                   <label className="form-label">
                     <FaUser className="me-2" /> First Name *
@@ -257,7 +255,6 @@ export default function EditProfileDialog({
               {isArtist && formData.artistProfile && (
                 <div className="col-12 mb-4">
                   <h5 className="border-bottom pb-2 mb-3">Artist Information</h5>
-
                   <div className="mb-3">
                     <label className="form-label">Stage Name *</label>
                     <input
@@ -268,7 +265,6 @@ export default function EditProfileDialog({
                       required
                     />
                   </div>
-
                   <div className="mb-3">
                     <label className="form-label">Bio</label>
                     <textarea
@@ -279,7 +275,6 @@ export default function EditProfileDialog({
                       rows={3}
                     />
                   </div>
-
                   <div className="mb-3">
                     <label className="form-label">Facebook URL</label>
                     <input
@@ -290,7 +285,6 @@ export default function EditProfileDialog({
                       placeholder="https://facebook.com/..."
                     />
                   </div>
-
                   <div className="mb-3">
                     <label className="form-label">Instagram URL</label>
                     <input
@@ -301,7 +295,6 @@ export default function EditProfileDialog({
                       placeholder="https://instagram.com/..."
                     />
                   </div>
-
                   <div className="mb-3">
                     <label className="form-label">YouTube URL</label>
                     <input
@@ -315,7 +308,6 @@ export default function EditProfileDialog({
                 </div>
               )}
             </div>
-
             {/* Action Buttons */}
             <div className="d-flex justify-content-end gap-2 mt-4">
               <button className="btn btn-outline-light" onClick={onClose}>
