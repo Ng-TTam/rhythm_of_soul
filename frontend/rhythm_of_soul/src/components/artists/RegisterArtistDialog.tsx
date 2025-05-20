@@ -63,7 +63,7 @@ const ArtistRegisterModal: React.FC<ArtistRegisterModalProps> = ({ show, onHide 
    return (
     <Modal show={show} onHide={onHide} centered>
       <Modal.Header closeButton>
-        <Modal.Title>Đăng ký nghệ sĩ</Modal.Title>
+        <Modal.Title className='text-center'>Artist registration</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {error && <Alert variant="danger">{error}</Alert>}

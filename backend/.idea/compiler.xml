@@ -21,7 +21,7 @@
         </processorPath>
         <module name="notification_service" />
       </profile>
-      <profile name="Annotation profile for content_service" enabled="true">
+      <profile name="Annotation profile for identity_service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />

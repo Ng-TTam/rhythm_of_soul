@@ -1,34 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Account } from "../../model/account";
 import { Tooltip } from 'bootstrap';
-import { useAppDispatch } from '../../store/hook';
 import Swal from 'sweetalert2'; 
 import { login } from "../../services/api/authService";
+import { LoginRequest } from "../../model/auth/LoginRequest";
 
 const LoginForm: React.FC = () => {
-  const [form, setForm] = useState<Account>({
+  const [form, setForm] = useState<LoginRequest>({
     email: "",
     password: "",
     remember: false,
   });
-  const dispatch = useAppDispatch();
-  
-  // useEffect(() => {
-  //   const checkAuth = async () => {
-  //     try {
-  //       const res = await LoginService.verifyToken();
-  //       if (res.result.valid) {
-  //         dispatch(setToken({ accessToken: res.result.token }));
-  //         navigate("/");// đã đăng nhập, chuyển hướng sang trang chính
-  //       }
-  //     } catch (err) {
-  //       // Token không hợp lệ hoặc không tồn tại
-  //       console.log("Token không hợp lệ hoặc không tồn tại");
-  //     }
-  //   };
-  //   checkAuth();
-  // }, []);
 
   const [errors, setErrors] = useState({
     email: "",
@@ -83,9 +65,9 @@ const LoginForm: React.FC = () => {
         
         Swal.fire({
           icon: 'success',
-          title: 'Đăng nhập thành công',
+          title: 'Login successful',
           showConfirmButton: false,
-          timer: 1000,
+          timer: 700,
           timerProgressBar: true,
         }).then((result) => {
           if (result.dismiss === Swal.DismissReason.timer) {

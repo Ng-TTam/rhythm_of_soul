@@ -1,5 +1,4 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import LoginService from "../services/service";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { getProfile } from "../services/api/userService";
@@ -11,6 +10,7 @@ import { Collapse } from "bootstrap";
 import SearchBox from "./SearchBox";
 import Notification from "./Notification";
 import { Spinner } from "react-bootstrap";
+import useLogout from "../pages/auth/hooks/useLogout";
 
 const ArtistRegisterModal = lazy(() => import("./artists/RegisterArtistDialog"));
 
@@ -23,10 +23,11 @@ export default function Nav() {
   const handleOpen = () => setShowModal(true);
   const handleClose = () => setShowModal(false);
 
-  const handleLogout = () => {
-    const response = LoginService.logout();
-    console.log(response);
+  const logout = useLogout();
+  const handleLogout = async () => {
+    await logout();
   };
+
   const navigate = useNavigate();
   const redirectPath = (url: string) => {
     navigate(url);
@@ -223,7 +224,7 @@ export default function Nav() {
                   </ul>
                 </li>
                 <li>
-                  {user?.artist && <button className="btn btn-soft-primary rounded-pill mb-1" onClick={handleOpen}>Upgrade Artist</button>}
+                  {user?.artist === false && <button className="btn btn-soft-primary rounded-pill mb-1" onClick={handleOpen}>Upgrade Artist</button>}
 
                   {user?.artistProfile?.status === 'PENDING' && <div className="btn btn-outline-warning rounded-pill mt-2">Upgrade Pending</div>}
 
@@ -260,7 +261,7 @@ export default function Nav() {
                       <hr className="dropdown-divider" />
                     </li>
                     <li>
-                      <a className="dropdown-item" href="/login" onClick={handleLogout}>
+                      <a className="dropdown-item" onClick={handleLogout}>
                         Logout
                       </a>
                     </li>

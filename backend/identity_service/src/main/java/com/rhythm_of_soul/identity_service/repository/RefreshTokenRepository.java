@@ -10,5 +10,5 @@ import com.rhythm_of_soul.identity_service.entity.RefreshToken;
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, String> {
     Optional<RefreshToken> findByAccount(Account account);
 
-    void deleteByAccount(Account account);
+    void deleteByToken(String token);
 }

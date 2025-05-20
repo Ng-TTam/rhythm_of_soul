@@ -2,34 +2,18 @@ import apiClient from './index';
 import { apiConfig } from '../../config';
 import { setAccessToken } from '../../utils/tokenManager';
 import { APIResponse } from '../../model/APIResponse';
-
-interface LoginRequest {
-  email: string;
-  password: string;
-  remember: boolean;
-}
+import { RegisterRequest } from '../../model/auth/RegisterRequest';
+import { ResetPasswordRequest } from '../../model/auth/ResetPasswordRequest';
+import { LoginRequest } from '../../model/auth/LoginRequest';
 
 interface LoginResponse {
   token: string;
-}
-
-interface RegisterRequest {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  password: string;
 }
 
 interface RegisterResponse {
   token: string;
 }
 
-interface ResetPasswordRequest {
-	email: string;
-	otp: string;
-	newPassword: string;
-}
 
 export const login = async (data: LoginRequest): Promise<APIResponse<LoginResponse>> => {
   const response = await apiClient.post<APIResponse<LoginResponse>>(

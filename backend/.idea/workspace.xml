@@ -6,26 +6,26 @@
   <component name="ChangeListManager">
     <list default="true" id="921e2377-3bac-41a8-8a5b-4617bf254b16" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api_gateway/src/main/java/com/rhythm_of_soul/api_gateway/repository/IdentityClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/src/main/java/com/rhythm_of_soul/api_gateway/repository/IdentityClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/configuration/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/configuration/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/configuration/jwt/JwtAuthenticationEntryPoint.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/configuration/jwt/JwtAuthenticationEntryPoint.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/CommentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/CommentController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/PostController.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/PostController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/request/AlbumCreationRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/request/AlbumCreationRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/request/PlaylistCreationRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/request/PlaylistCreationRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/CommentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/CommentServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/LikeServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/LikeServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/PostServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/PostServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/utils/CommentSecurity.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/utils/CommentSecurity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content_service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/api/AuthenticationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/api/AuthenticationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/ArtistProfileStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/ArtistProfileStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/Gender.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/Gender.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/Role.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/Role.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/Status.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/Status.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/repository/RefreshTokenRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/repository/RefreshTokenRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/impl/AuthenticationServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/impl/AuthenticationServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/utils/CookieUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/utils/CookieUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/Nav.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/Nav.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/config/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/config/api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/model/User.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/model/account.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/login/ResetPassword.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/login/ResetPasswordVerify.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/login/login.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/login/sign-up.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/router/authRouter.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/router/authRouter.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/services/api/authService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/services/api/authService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/services/service.ts" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,10 +86,10 @@
     "RunOnceActivity.git.unshallow": "true",
     "Spring Boot.ApiGatewayApplication.executor": "Debug",
     "Spring Boot.ContentServiceApplication.executor": "Debug",
-    "Spring Boot.IdentityServiceApplication.executor": "Run",
+    "Spring Boot.IdentityServiceApplication.executor": "Debug",
     "git-widget-placeholder": "dev",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/RhythmOfSoul/backend/api_gateway",
+    "last_opened_file_path": "D:/RhythmOfSoul/backend/identity_service",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -98,8 +98,15 @@
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
+    "run.code.analysis.last.selected.profile": "pProject Default",
     "run.configurations.included.in.services": "true",
     "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql_aurora",
+      "mariadb"
+    ]
   }
 }]]></component>
   <component name="ReactorSettings">
@@ -202,6 +209,11 @@
       <workItem from="1747625052616" duration="673000" />
       <workItem from="1747625754545" duration="1292000" />
       <workItem from="1747633160048" duration="7017000" />
+      <workItem from="1747706605932" duration="26000" />
+      <workItem from="1747713156069" duration="1100000" />
+      <workItem from="1747714344375" duration="192000" />
+      <workItem from="1747723644627" duration="370000" />
+      <workItem from="1747724098441" duration="2661000" />
     </task>
     <servers />
   </component>

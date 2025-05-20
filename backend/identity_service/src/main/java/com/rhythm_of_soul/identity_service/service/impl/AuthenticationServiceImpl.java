@@ -4,9 +4,9 @@ import java.text.ParseException;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jwt.SignedJWT;
 import com.rhythm_of_soul.identity_service.dto.request.AuthenticationRequest;
 import com.rhythm_of_soul.identity_service.dto.request.IntrospectRequest;
 import com.rhythm_of_soul.identity_service.dto.request.LogoutRequest;
@@ -76,15 +76,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void logout(LogoutRequest request) throws ParseException {
+    @Transactional
+    public void logout(LogoutRequest request) {
         var token = request.getToken();
-        var signedJWT = SignedJWT.parse(token);
-        var email = signedJWT.getJWTClaimsSet().getSubject();
-
-        var account =
-                accountRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
-        refreshTokenRepository.deleteByAccount(account);
+        refreshTokenRepository.deleteByToken(token);
     }
 
     @Override

@@ -95,7 +95,7 @@ public class AuthenticationController {
             CookieUtils.deleteCookieByName(SecurityConstants.REFRESH_TOKEN, request, response);
         }
 
-        return ApiResponse.<Void>builder().build();
+        return ApiResponse.<Void>builder().message("Successfully logged out.").build();
     }
 
     // lấy token từ Bearer
