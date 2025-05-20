@@ -4,18 +4,16 @@ import com.rhythm_of_soul.content_service.common.Tag;
 import com.rhythm_of_soul.content_service.common.Type;
 import com.rhythm_of_soul.content_service.dto.ApiResponse;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
-import com.rhythm_of_soul.content_service.dto.request.PostRequest;
-import com.rhythm_of_soul.content_service.dto.response.*;
-import com.rhythm_of_soul.content_service.service.ListeningHistoryService;
 import com.rhythm_of_soul.content_service.dto.request.AlbumCreationRequest;
 import com.rhythm_of_soul.content_service.dto.request.PlaylistCreationRequest;
 import com.rhythm_of_soul.content_service.dto.request.PostRequest;
 import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
+import com.rhythm_of_soul.content_service.dto.response.CommentResponse;
 import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
-import com.rhythm_of_soul.content_service.dto.request.PostRequest;
 import com.rhythm_of_soul.content_service.dto.response.SongResponse;
 import com.rhythm_of_soul.content_service.service.ListeningHistoryService;
 import com.rhythm_of_soul.content_service.service.PostService;
+import com.rhythm_of_soul.content_service.utils.SecurityUtils;
 import io.minio.errors.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +46,7 @@ public class PostController {
                 .result(postService.storeFile(song,cover,image, account_id, tags, title, caption, isPublic))
                 .build();
     }
+
     @PostMapping("/uploadFile")
     ApiResponse<String> uploadFile(@RequestParam("file") MultipartFile file ,
                                    @RequestParam("type") String type) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
@@ -56,13 +55,14 @@ public class PostController {
                 .result(postService.createFile(file,type))
                 .build();
     }
+
     @PostMapping
     ApiResponse<PostResponse> createPost(@Valid @RequestBody PostRequest postRequest) {
         // get accountId in token
-//        String accountId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String accountId = SecurityUtils.getCurrentAccountId();
         return ApiResponse.<PostResponse>builder()
                 .message("Post created successfully")
-                .result(postService.createPost("326e6645-aa0f-4f89-b885-019c05b1a970" ,postRequest))
+                .result(postService.createPost(accountId ,postRequest))
                 .build();
 
     }
@@ -114,10 +114,9 @@ public class PostController {
 
     @GetMapping("/detailPost/{postId}")
     ApiResponse<PostDetailResponse> getPostDetail(@PathVariable String postId) {
-        // get accountId in token
-//        String accountId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String accountId = SecurityUtils.getCurrentAccountId();
         return ApiResponse.<PostDetailResponse>builder()
-                .result(postService.getPostDetail("326e6645-aa0f-4f89-b885-019c05b1a970", postId))
+                .result(postService.getPostDetail(accountId, postId))
                 .build();
     }
     @GetMapping("/{postId}/comments")
@@ -142,9 +141,14 @@ public class PostController {
 
     @GetMapping("/songs/recently")
     public ApiResponse<List<PostResponse>> getSongPostsListened(
-            @RequestParam(required = false) String accountId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
+        String accountId = SecurityUtils.getCurrentAccountId();
+        if (accountId == null){
+            return ApiResponse.<List<PostResponse>>builder()
+                    .result(List.of())
+                    .build();
+        }
         return ApiResponse.<List<PostResponse>>builder()
                 .message("Get history listened successfully")
                 .result(listeningHistoryService.getSongPostsListened(accountId, page, size))
@@ -163,18 +167,20 @@ public class PostController {
 
     @PostMapping("/listen")
     public ApiResponse<Void> recordListen(
-            @RequestParam(required = false) String accountId,
             @RequestParam String sessionId,
             @RequestParam String postId) {
+        String accountId = SecurityUtils.getCurrentAccountId();
         listeningHistoryService.recordListen(accountId, sessionId, postId);
         return ApiResponse.<Void>builder().build();
     }
+
    @GetMapping("/{postId}/post")
     ApiResponse<PostResponse> getPost(@PathVariable String postId) {
         return ApiResponse.<PostResponse>builder()
                 .result(postService.getPost(postId))
                 .build();
     }
+
     @GetMapping("/songs")
     ApiResponse<List<SongResponse>> getListSongs() {
         return ApiResponse.<List<SongResponse>>builder()

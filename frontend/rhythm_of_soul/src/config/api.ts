@@ -1,5 +1,6 @@
 import { config } from './environment';
 
+const contentURL = 'http://localhost:8484'
 // Định nghĩa kiểu cho endpoints
 interface AuthEndpoints {
   login: string;
@@ -22,11 +23,17 @@ interface UserEndpoints {
   getFollowingIds: (userId: string) => string;
   getFollowers: (userId: string) => string;
   getFollowing: (userId: string) => string;
-  
+  createPlaylist: string;
+  editSong: (songId: string) => string;
+  likePost: (postId: string) => string;
+  unlikePost: (postId: string) => string;
+  addComment: string;
+  editComment: (commentId: string) => string;
+  deleteComment: (commentId: string) => string;
 }
 
 interface ArtistEndpoints {
-  //add endpoint
+  createAlbum: string;
 }
 
 interface AdminEndpoints {
@@ -76,8 +83,16 @@ export const apiConfig = {
       getFollowingIds: (userId: string) => `${config.apiBaseUrl}/identity/${userId}/followingIds`,
       getFollowers: (userId: string) => `${config.apiBaseUrl}/identity/${userId}/followers`,
       getFollowing: (userId: string) => `${config.apiBaseUrl}/identity/${userId}/following`,
+      createPlaylist: `${contentURL}/content/posts/playlist`,
+      editSong: (songId: string) => `${contentURL}/content/posts/${songId}`,
+      likePost: (postId: string) => `${contentURL}/content/likes?postId=${postId}`,
+      unlikePost: (postId: string) => `${contentURL}/content/likes?postId=${postId}`,
+      addComment: `${contentURL}/content/comments`,
+      editComment: (commentId: string, content: string) => `${contentURL}/content/comments?commentId=${commentId}`,
+      deleteComment: (commentId: string) => `${contentURL}/content/comments?commentId=${commentId}`,
     },
     artist: {
+      createAlbum: `${contentURL}/content/posts/album`,
     },
     admin: {
       lock_user: (userId: string) => `/identity/account/lock/${userId}`,

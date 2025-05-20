@@ -20,7 +20,6 @@ public class AlbumCreationRequest {
     String cover;
     Boolean isPublic;
     List<Tag> tags;
-    String accountId;
     Instant sheduleAt;
     List<String> songIds;
 

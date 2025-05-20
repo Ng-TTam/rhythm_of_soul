@@ -1,23 +1,25 @@
-import { useEffect, useState } from "react";
-import { Card, Container, Row, Col, Button, Badge } from "react-bootstrap";
+import { useEffect, useState, useRef, Suspense, lazy } from "react";
+import { Card, Container, Row, Col, Button, Badge, Spinner } from "react-bootstrap";
 import { FaFacebook } from "@react-icons/all-files/fa/FaFacebook";
 import { FaInstagram } from "@react-icons/all-files/fa/FaInstagram";
 import { FaYoutube } from "@react-icons/all-files/fa/FaYoutube";
 import { FaPencilAlt } from "@react-icons/all-files/fa/FaPencilAlt";
 import { FaMusic } from "@react-icons/all-files/fa/FaMusic";
 import { User } from "../../model/profile/UserProfile";
-import EditProfileDialog from "./EditProfileDialog";
 import { ArtistStatus } from "../../config/constants";
-import { CalendarIcon, JoystickIcon, LucidePhone } from "lucide-react";
+import { FaUserClock } from '@react-icons/all-files/fa/FaUserClock';
+import { FaCalendarAlt } from '@react-icons/all-files/fa/FaCalendarAlt';
+import { FaPhoneAlt } from '@react-icons/all-files/fa/FaPhoneAlt';
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { useDispatch } from "react-redux";
-import { setUserSlice, updateUser } from "../../reducers/userReducer";
-import { getProfile } from "../../services/api/userService";
+import { updateUser } from "../../reducers/userReducer";
 import { Link } from "react-router-dom";
 import { Toast } from 'primereact/toast';
-import { useRef } from 'react';
 import '../../styles/toast.css';
+
+
+const EditProfileDialog = lazy(() => import("./EditProfileDialog"));
 
 export default function UserProfile() {
   const [isEditVisible, setEditVisible] = useState(false);
@@ -178,7 +180,11 @@ export default function UserProfile() {
                 </div>
               </Card.Body>
             </Card>
-            <EditProfileDialog visible={isEditVisible} onClose={handleEditClose} onSave={handleSave} initialData={user} />
+
+            {isEditVisible && <Suspense fallback={<Spinner animation="border" />}>
+              <EditProfileDialog visible={isEditVisible} onClose={handleEditClose} onSave={handleSave} initialData={user} />
+            </Suspense>}
+            
             {/* Account Info Card */}
             <Card className="border-0 shadow-sm mb-4">
               <Card.Header className="bg-white border-bottom-0 pt-4 pb-0">
@@ -187,7 +193,7 @@ export default function UserProfile() {
               <Card.Body className="pt-2">
                 <div className="d-flex align-items-center mb-3">
                   <div className="bg-light rounded-circle p-2 me-3">
-                    <JoystickIcon className="text-primary" size={21} />
+                    <FaUserClock className="text-primary" size={21} />
                   </div>
                   <div>
                     <small className="text-muted d-block">Member since</small>
@@ -196,7 +202,7 @@ export default function UserProfile() {
                 </div>
                 <div className="d-flex align-items-center mb-3">
                   <div className="bg-light rounded-circle p-2 me-3">
-                    <CalendarIcon className="text-primary" size={21} />
+                    <FaCalendarAlt className="text-primary" size={21} />
                   </div>
                   <div>
                     <small className="text-muted d-block">Date of birth</small>
@@ -205,7 +211,7 @@ export default function UserProfile() {
                 </div>
                 <div className="d-flex align-items-center mb-3">
                   <div className="bg-light rounded-circle p-2 me-3">
-                    <LucidePhone className="text-primary" size={21} />
+                    <FaPhoneAlt className="text-primary" size={21} />
                   </div>
                   <div>
                     <small className="text-muted d-block">Phone number</small>

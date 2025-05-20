@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import notificationService from "../services/api/notificationService";
-import { Bell } from "lucide-react";
+import { FaRegBell } from "@react-icons/all-files/fa/FaRegBell";
 import { RootState } from "../store/store";
 import { useSelector } from "react-redux";
 import dayjs from "dayjs";
@@ -95,7 +95,7 @@ const Notification: React.FC = () => {
         data-bs-toggle="dropdown"
         onClick={handleDropdownHide}
       >
-        <Bell size={20} color="#AAAAAA" />
+        <FaRegBell size={20} color="#AAAAAA" />
         {totalUnread > 0 && (
           <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
             {totalUnread}

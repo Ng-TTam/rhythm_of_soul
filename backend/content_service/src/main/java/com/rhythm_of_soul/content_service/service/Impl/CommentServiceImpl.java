@@ -16,6 +16,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,26 +35,27 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-//    @PreAuthorize("hasRole('USER') or hasRole('ARTIST')")
+    @PreAuthorize("hasRole('USER') or hasRole('ARTIST')")
     public CommentResponse createComment(CommentCreationRequest request) {
-        Post post = postRepository.findById(request.getPostId()).orElseThrow(
-                () ->   new AppException(ErrorCode.POST_NOT_FOUND));
-        if( request.getParentId() != null ) {
-            commentRepository.findById(request.getParentId()).orElseThrow(
-                    () -> new AppException(ErrorCode.COMMENT_NOT_FOUND));
+        Post post = postRepository.findById(request.getPostId())
+                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
+
+        if (request.getParentId() != null) {
+            commentRepository.findById(request.getParentId())
+                    .orElseThrow(() -> new AppException(ErrorCode.COMMENT_NOT_FOUND));
         }
-        // update comment count
+
         post.setCommentCount(post.getCommentCount() + 1);
         postRepository.save(post);
 
         Comment comment = commentMapper.toComment(request);
-        // set accountId using accountId in token
-//        comment.setAccountId(SecurityContextHolder.getContext().getAuthentication().getName());
-        comment.setAccountId("326e6645-aa0f-4f89-b885-019c05b1a970");
-        comment.setCreatedAt(Instant.now());
-        comment.setUpdatedAt(Instant.now());
+        comment.setAccountId(getCurrentAccountId());
+        Instant now = Instant.now();
+        comment.setCreatedAt(now);
+        comment.setUpdatedAt(now);
 
-        return commentMapper.toCommentResponse(commentRepository.save(comment));
+        Comment saved = commentRepository.save(comment);
+        return commentMapper.toCommentResponse(saved);
     }
 
     @Override
@@ -83,7 +86,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-//    @PreAuthorize("commentSecurity.isCommentOwner(commentId)")
+    @PreAuthorize("commentSecurity.isCommentOwner(commentId)")
     public CommentResponse updateComment(String commentId, CommentUpdateRequest request) {
         Comment comment = commentRepository.findById(commentId).orElseThrow();
 
@@ -93,7 +96,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-//    @PreAuthorize("commentSecurity.isCommentOwner(commentId) or hasRole('ADMIN')")
+    @PreAuthorize("commentSecurity.isCommentOwner(commentId) or hasRole('ADMIN')")
     public void deleteComment(String commentId) {
         commentRepository.findById(commentId).orElseThrow(() -> new AppException(ErrorCode.COMMENT_NOT_FOUND));
         commentRepository.deleteById(commentId);
@@ -108,5 +111,9 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void reportComment(String commentId, String accountId, CommentReportRequest request) {
 
+    }
+
+    private String getCurrentAccountId() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 }

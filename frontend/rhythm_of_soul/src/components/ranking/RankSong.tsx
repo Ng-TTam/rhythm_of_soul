@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { ChevronRight, Clock, Play } from 'lucide-react';
+import { FaChevronRight } from "@react-icons/all-files/fa/FaChevronRight";
+import { FaPlay } from "@react-icons/all-files/fa/FaPlay";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 // Define TypeScript interfaces
 interface Song {
@@ -124,7 +125,7 @@ const Chart = () => {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold text-orange-500">#ZingChart</h2>
         <button className="bg-transparent border border-gray-600 rounded-full p-1">
-          <Play size={16} className="text-white" />
+          <FaPlay size={16} className="text-white" />
         </button>
       </div>
       
@@ -184,7 +185,7 @@ const SongRow = ({ song }: { song: Song }) => {
       <div className="relative mr-3">
         <img src={song.cover} alt={song.title} className="w-10 h-10 rounded" />
         <div className="absolute inset-0 bg-black bg-opacity-50 hidden group-hover:flex items-center justify-center rounded">
-          <Play size={16} className="text-white" />
+          <FaPlay size={16} className="text-white" />
         </div>
       </div>
       <div className="flex-1">
@@ -227,7 +228,7 @@ const ChartCategories = ({ categories }: { categories: ChartCategory[] }) => {
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-white">{category.name}</h3>
               <button className="text-gray-400">
-                <Play size={16} />
+                <FaPlay size={16} />
               </button>
             </div>
             
@@ -248,7 +249,7 @@ const ChartCategories = ({ categories }: { categories: ChartCategory[] }) => {
                   <div className="relative mr-2">
                     <img src={song.cover} alt={song.title} className="w-8 h-8 rounded" />
                     <div className="absolute inset-0 bg-black bg-opacity-50 hidden group-hover:flex items-center justify-center rounded">
-                      <Play size={12} className="text-white" />
+                      <FaPlay size={12} className="text-white" />
                     </div>
                   </div>
                   <div className="flex-1">
@@ -314,7 +315,7 @@ export default function ZingChart() {
                 </h2>
                 <button className="text-gray-400 flex items-center">
                   <span>Tất cả</span>
-                  <ChevronRight size={16} />
+                  <FaChevronRight size={16} />
                 </button>
               </div>
               <SongList songs={top100Songs} showViewMore={true} />

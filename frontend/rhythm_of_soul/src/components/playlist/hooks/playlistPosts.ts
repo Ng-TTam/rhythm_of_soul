@@ -1,7 +1,6 @@
 // src/hooks/usePlaylistPosts.ts
 import { useState, useEffect, useCallback } from 'react';
 import { PostWithUserInfo, CurrentUser } from '../../../model/post/post';
-import axios from 'axios';
 import { fetchPlaylists,uploadFile,createPlaylist,unlikePost,likePost } from '../../../services/postService';
 const usePlaylistPosts = (currentUser: CurrentUser) => {
   const [posts, setPosts] = useState<PostWithUserInfo[]>([]);

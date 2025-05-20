@@ -5,7 +5,9 @@ import { getProfile, followUser, unfollowUser } from "../../services/api/userSer
 import { Button, Card, Container, Row, Col, Badge } from "react-bootstrap";
 import { FaMusic } from "@react-icons/all-files/fa/FaMusic";
 import { ArtistStatus } from "../../config/constants";
-import { CalendarIcon, JoystickIcon, LucidePhone } from "lucide-react";
+import { FaUserClock } from '@react-icons/all-files/fa/FaUserClock';
+import { FaCalendarAlt } from '@react-icons/all-files/fa/FaCalendarAlt';
+import { FaPhoneAlt } from '@react-icons/all-files/fa/FaPhoneAlt';
 
 
 export default function PublicUserProfile() {
@@ -124,7 +126,7 @@ export default function PublicUserProfile() {
             <Card.Body className="pt-2">
               <div className="d-flex align-items-center mb-3">
                 <div className="bg-light rounded-circle p-2 me-3">
-                  <JoystickIcon className="text-primary" size={21} />
+                  <FaUserClock className="text-primary" size={21} />
                 </div>
                 <div>
                   <small className="text-muted d-block">Member since</small>
@@ -133,7 +135,7 @@ export default function PublicUserProfile() {
               </div>
               <div className="d-flex align-items-center mb-3">
                 <div className="bg-light rounded-circle p-2 me-3">
-                  <CalendarIcon className="text-primary" size={21} />
+                  <FaCalendarAlt className="text-primary" size={21} />
                 </div>
                 <div>
                   <small className="text-muted d-block">Date of birth</small>
@@ -142,7 +144,7 @@ export default function PublicUserProfile() {
               </div>
               <div className="d-flex align-items-center mb-3">
                 <div className="bg-light rounded-circle p-2 me-3">
-                  <LucidePhone className="text-primary" size={21} />
+                  <FaPhoneAlt className="text-primary" size={21} />
                 </div>
                 <div>
                   <small className="text-muted d-block">Phone number</small>

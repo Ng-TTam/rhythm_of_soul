@@ -26,6 +26,7 @@ import com.rhythm_of_soul.content_service.repository.PostRepository;
 import com.rhythm_of_soul.content_service.service.PostService;
 import com.rhythm_of_soul.content_service.utils.CommentManager;
 import com.rhythm_of_soul.content_service.utils.SaveFileMinio;
+import com.rhythm_of_soul.content_service.utils.SecurityUtils;
 import io.minio.errors.*;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -33,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,6 +100,7 @@ public class PostServiceImpl implements  PostService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('USER') or hasRole('ARTIST')")
     public PostResponse createPost(String accountId, PostRequest postRequest) {
         try{
             Post post = postMapper.toPost(postRequest);
@@ -396,11 +399,13 @@ public class PostServiceImpl implements  PostService {
         return null;
     }
     @Override
+    @PreAuthorize("hasRole('ARTIST')")
     public AlbumResponse createAlbum(AlbumCreationRequest postRequest) {
+        String accountId = SecurityUtils.getCurrentAccountId();
         try {
             Post post = Post.builder()
                     .id(UUID.randomUUID().toString())
-                    .accountId(postRequest.getAccountId())
+                    .accountId(accountId)
                     .createdAt(Instant.now())
                     .updatedAt(null)
                     .likeCount(0)
@@ -442,11 +447,13 @@ public class PostServiceImpl implements  PostService {
     }
 
     @Override
+    @PreAuthorize("hasRole('USER') or hasRole('ARTIST')")
     public PostResponse createPlaylist(PlaylistCreationRequest postRequest) {
+        String accountId = SecurityUtils.getCurrentAccountId();
         try {
             Post post = Post.builder()
                     .id(UUID.randomUUID().toString())
-                    .accountId(postRequest.getAccountId())
+                    .accountId(accountId)
                     .createdAt(Instant.now())
                     .updatedAt(null)
                     .likeCount(0)

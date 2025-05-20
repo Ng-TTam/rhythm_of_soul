@@ -2,32 +2,8 @@ import apiClient from './index';
 import { apiConfig } from '../../config';
 import { User } from '../../model/profile/UserProfile';
 import { APIResponse } from '../../model/APIResponse';
-
-interface UpdateUserRequest {
-  firstName: string;
-  lastName: string;
-  dateOfBirth?: string;
-  gender?: string;
-  phoneNumber: string;
-  avatar?: string ;
-  cover?: string;
-  artistProfile?: {
-    stageName: string;
-    bio: string;
-    facebookUrl?: string;
-    instagramUrl?: string;
-    youtubeUrl?: string;
-  };
-  // artist: boolean; // user is artist can update artist profile
-}
-
-interface AssignArtistRequest {
-    stageName: string;
-    bio: string;
-    facebookUrl?: string;
-    instagramUrl?: string;
-    youtubeUrl?: string;
-}
+import { AssignArtistRequest } from '../../model/profile/AssignArtistRequest';
+import { UpdateUserRequest } from '../../model/profile/UpdateUserRequest';
 
 interface AssignArtistResponse {
 }
@@ -75,7 +51,7 @@ export const searchUsers = async (searchKey: string, token: string, page: number
   );
   console.log("response: ", response);
 
-  return response.data.result; // 🔥 Trả về đúng `result` từ API
+  return response.data.result; 
 };
 
 export const followUser = async (userId: string, token: string): Promise<void> => {

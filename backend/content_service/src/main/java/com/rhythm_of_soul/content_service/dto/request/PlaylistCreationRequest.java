@@ -17,6 +17,5 @@ public class PlaylistCreationRequest {
     String image;
     String cover;
     Boolean isPublic;
-    String accountId;
     List<Tag> tags;
 }

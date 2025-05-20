@@ -7,7 +7,6 @@ import { FaMusic } from '@react-icons/all-files/fa/FaMusic';
 import { FaArrowLeft } from '@react-icons/all-files/fa/FaArrowLeft';
 import { FaPlay } from '@react-icons/all-files/fa/FaPlay';
 import '../../style/PlaylistDetail.css';
-import StreamingPlaybackBar from '../songs/PlaybackBar';
 import { useAppDispatch, useAppSelector } from '../../store/hook';
 import { playSingleSong, setPlaylist } from '../../reducers/audioReducer';
 import classNames from 'classnames/bind';
