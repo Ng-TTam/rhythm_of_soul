@@ -2,6 +2,7 @@ package com.rhythm_of_soul.identity_service.service;
 
 import java.util.List;
 
+import com.rhythm_of_soul.identity_service.dto.response.UserBasicInfoResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -102,4 +103,6 @@ public interface AccountService {
     boolean isAccountLocked(String accountId);
 
     Page<AccountResponse> getFilteredAccounts(List<Role> roles, Status status, String keySearch, Pageable pageable);
+
+    UserBasicInfoResponse getUserInfoByAccountId(String accountId);
 }

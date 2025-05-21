@@ -17,6 +17,7 @@ import com.rhythm_of_soul.content_service.utils.SecurityUtils;
 import io.minio.errors.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +28,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 @RequestMapping("/posts")
 public class PostController {
     private final PostService postService;
@@ -60,6 +62,7 @@ public class PostController {
     ApiResponse<PostResponse> createPost(@Valid @RequestBody PostRequest postRequest) {
         // get accountId in token
         String accountId = SecurityUtils.getCurrentAccountId();
+        log.info("Creating post for accountId: {}", accountId);
         return ApiResponse.<PostResponse>builder()
                 .message("Post created successfully")
                 .result(postService.createPost(accountId ,postRequest))

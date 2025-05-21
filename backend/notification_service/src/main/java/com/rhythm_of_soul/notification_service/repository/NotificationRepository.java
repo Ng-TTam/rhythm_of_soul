@@ -1,6 +1,4 @@
-<<<<<<< HEAD
-package com.rhythm_of_soul.notification_service.repository;public interface NotificationRepository {
-=======
+
 
 package com.rhythm_of_soul.notification_service.repository;
 
@@ -21,5 +19,4 @@ public interface NotificationRepository extends MongoRepository<Notification, St
           NotiType type
   );
 
->>>>>>> identity
 }

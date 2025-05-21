@@ -1,15 +1,19 @@
 package com.rhythm_of_soul.content_service.service.Impl;
 
+import com.rhythm_of_soul.content_service.dto.request.LikeCommentRequest;
 import com.rhythm_of_soul.content_service.entity.Like;
 import com.rhythm_of_soul.content_service.entity.Post;
 import com.rhythm_of_soul.content_service.exception.AppException;
 import com.rhythm_of_soul.content_service.exception.ErrorCode;
 import com.rhythm_of_soul.content_service.repository.LikeRepository;
 import com.rhythm_of_soul.content_service.repository.PostRepository;
+import com.rhythm_of_soul.content_service.service.IdentityClient;
 import com.rhythm_of_soul.content_service.service.LikeService;
+import com.rhythm_of_soul.content_service.service.RedisPublisher;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,10 +28,13 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LikeServiceImpl implements LikeService {
     LikeRepository likeRepository;
     PostRepository postRepository;
+    RedisPublisher redisPublisher;
+    IdentityClient identityClient;
 
     @Override
     @Transactional
@@ -50,6 +57,22 @@ public class LikeServiceImpl implements LikeService {
         postRepository.save(post);
 
         likeRepository.save(like);
+
+        // ✅ Gửi message like
+        try {
+            String postAuthorId = post.getAccountId();
+
+            LikeCommentRequest event = new LikeCommentRequest();
+            event.setAuthorId(identityClient.getUserInfoByAccountId(accountId).getUserId());            // người like
+            event.setPostAuthorId(identityClient.getUserInfoByAccountId(postAuthorId).getUserId());     // chủ bài post
+            event.setReferenceId(post.getId());      // ID của bài post được like
+            event.setAuthorName(identityClient.getUserInfoByAccountId(accountId).getName());         // tên người like
+            event.setType("LIKE");                   // loại sự kiện
+
+            redisPublisher.publishLikeCommentEvent(event);
+        } catch (Exception e) {
+            log.error("Failed to send like event", e);
+        }
         return true;
     }
 

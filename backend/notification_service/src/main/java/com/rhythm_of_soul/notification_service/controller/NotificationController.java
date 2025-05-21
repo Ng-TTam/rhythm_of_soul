@@ -20,7 +20,7 @@ public class NotificationController {
   private final OtpService otpService;
 
   @GetMapping("/listNoti")
-  public ResponseEntity<?> getListNotification(@RequestParam String userId) {
+  public ResponseEntity<?> getListNotification(@RequestParam("userId") String userId) {
     if (userId == null || userId.isEmpty()) {
       return ResponseEntity.badRequest().body("User ID is required");
     }
@@ -37,7 +37,7 @@ public class NotificationController {
   }
 
   @PutMapping("/mark-all-read/{userId}")
-  public ResponseEntity<?> markAllNotificationsAsRead(@PathVariable String userId) {
+  public ResponseEntity<?> markAllNotificationsAsRead(@PathVariable("userId") String userId) {
     try {
       log.info("Marking all notifications as read for user: {}", userId);
       notificationService.markAllAsRead(userId);
@@ -51,7 +51,7 @@ public class NotificationController {
 
   @GetMapping("/latest/{userId}")
   public ResponseEntity<?> getLatestNoti(
-          @PathVariable String userId,
+          @PathVariable("userId") String userId,
           @RequestParam(name = "days", defaultValue = "7") int days
   ) {
     return notificationService.getLatestNotifications(userId, days);

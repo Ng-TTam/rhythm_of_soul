@@ -67,7 +67,7 @@ public class FollowController {
 
     @GetMapping("/{userId}/following")
     @PreAuthorize("hasAnyRole('USER', 'ARTIST')")
-    public ResponseEntity<ApiResponse<List<UserResponse>>> getFollowingUsers(@PathVariable String userId) {
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getFollowingUsers(@PathVariable("userId") String userId) {
         List<User> followingUsers = followService.getFollowingUsers(userId);
         List<UserResponse> response =
                 followingUsers.stream().map(UserResponse::cvFromEntity).collect(Collectors.toList());
@@ -75,6 +75,19 @@ public class FollowController {
         ApiResponse<List<UserResponse>> apiResponse = ApiResponse.<List<UserResponse>>builder()
                 .result(response)
                 .message("Get all followed users successfully")
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @GetMapping("/{accountId}/followersIds")
+    @PreAuthorize("hasAnyRole('USER', 'ARTIST')")
+    public ResponseEntity<ApiResponse<List<String>>> getFollowersUserIds(@PathVariable("accountId") String accountId) {
+        List<String> followersUserIds = followService.getFollowersUserIds(accountId);
+
+        ApiResponse<List<String>> apiResponse = ApiResponse.<List<String>>builder()
+                .result(followersUserIds)
+                .message("Get all following users successfully")
                 .build();
 
         return ResponseEntity.ok(apiResponse);

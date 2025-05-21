@@ -2,6 +2,10 @@ package com.rhythm_of_soul.identity_service.api;
 
 import java.util.List;
 
+import com.rhythm_of_soul.identity_service.dto.response.UserBasicInfoResponse;
+import com.rhythm_of_soul.identity_service.entity.User;
+import com.rhythm_of_soul.identity_service.exception.AppException;
+import com.rhythm_of_soul.identity_service.exception.ErrorCode;
 import jakarta.validation.Valid;
 
 import org.slf4j.Logger;
@@ -110,4 +114,15 @@ public class AccountController {
                 .message(success ? "Password reset successfully." : "Password reset failed.")
                 .build();
     }
+
+    @GetMapping("/{accountId}/userId")
+    public ApiResponse<UserBasicInfoResponse> getUserInfoFromAccountId(@PathVariable String accountId) {
+        UserBasicInfoResponse userInfo = accountService.getUserInfoByAccountId(accountId);
+
+        return ApiResponse.<UserBasicInfoResponse>builder()
+                .result(userInfo)
+                .message("User info fetched successfully")
+                .build();
+    }
+
 }

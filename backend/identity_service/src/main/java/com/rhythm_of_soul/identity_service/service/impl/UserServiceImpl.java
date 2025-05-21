@@ -1,5 +1,6 @@
 package com.rhythm_of_soul.identity_service.service.impl;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
@@ -185,4 +186,13 @@ public class UserServiceImpl implements UserService {
                         .collect(Collectors.toList()))
                 .build();
     }
+
+    @Override
+    public List<UserResponse> getAllArtistRequestUsers() {
+        List<User> users = userRepository.findAllUsersWithPendingArtistRequest();
+        return users.stream()
+                .map(userMapper::toUserResponse)
+                .collect(Collectors.toList());
+    }
+
 }

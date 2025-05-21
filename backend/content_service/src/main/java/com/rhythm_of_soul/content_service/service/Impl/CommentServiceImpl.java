@@ -3,6 +3,7 @@ package com.rhythm_of_soul.content_service.service.Impl;
 import com.rhythm_of_soul.content_service.dto.request.CommentCreationRequest;
 import com.rhythm_of_soul.content_service.dto.request.CommentReportRequest;
 import com.rhythm_of_soul.content_service.dto.request.CommentUpdateRequest;
+import com.rhythm_of_soul.content_service.dto.request.LikeCommentRequest;
 import com.rhythm_of_soul.content_service.dto.response.CommentResponse;
 import com.rhythm_of_soul.content_service.entity.Comment;
 import com.rhythm_of_soul.content_service.entity.Post;
@@ -12,9 +13,12 @@ import com.rhythm_of_soul.content_service.mapper.CommentMapper;
 import com.rhythm_of_soul.content_service.repository.CommentRepository;
 import com.rhythm_of_soul.content_service.repository.PostRepository;
 import com.rhythm_of_soul.content_service.service.CommentService;
+import com.rhythm_of_soul.content_service.service.IdentityClient;
+import com.rhythm_of_soul.content_service.service.RedisPublisher;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,11 +31,14 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class CommentServiceImpl implements CommentService {
     PostRepository postRepository;
     CommentRepository commentRepository;
     CommentMapper commentMapper;
+    RedisPublisher redisPublisher;
+    IdentityClient identityClient;
 
     @Override
     @Transactional
@@ -55,6 +62,23 @@ public class CommentServiceImpl implements CommentService {
         comment.setUpdatedAt(now);
 
         Comment saved = commentRepository.save(comment);
+
+        // ✅ Gửi sự kiện comment vào Redis Stream
+        try {
+            LikeCommentRequest event = new LikeCommentRequest();
+            event.setAuthorId(identityClient.getUserInfoByAccountId(comment.getAccountId()).getUserId());             // người bình luận
+            event.setAuthorName(identityClient.getUserInfoByAccountId(comment.getAccountId()).getName());          // tên người bình luận
+            event.setReferenceId(comment.getPostId());             // ID bài viết
+            event.setPostAuthorId(identityClient.getUserInfoByAccountId(post.getAccountId()).getUserId());            // chủ bài viết
+            event.setType("COMMENT");
+
+            redisPublisher.publishLikeCommentEvent(event);
+            log.info("push message successfully");
+        } catch (Exception e) {
+            // Log lỗi nếu không gửi được
+            e.printStackTrace();
+        }
+
         return commentMapper.toCommentResponse(saved);
     }
 

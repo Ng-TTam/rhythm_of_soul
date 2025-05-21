@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import javax.crypto.SecretKey;
 
+import com.rhythm_of_soul.identity_service.dto.response.UserBasicInfoResponse;
 import jakarta.transaction.Transactional;
 
 import org.springframework.context.ApplicationContext;
@@ -230,4 +231,22 @@ public class AccountServiceImp implements AccountService {
         Page<Account> accounts = accountRepository.findByRoleInAndOptionalStatus(roles, status, keySearch, pageable);
         return accounts.map(accountMapper::toAccountResponse);
     }
+
+    public UserBasicInfoResponse getUserInfoByAccountId(String accountId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+
+        if (account.getUser() == null) {
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        }
+
+        User user = account.getUser();
+
+        return UserBasicInfoResponse.builder()
+                .userId(user.getId())
+                .name(user.getFirstName() + " " + user.getLastName())
+                .build();
+    }
+
+
 }

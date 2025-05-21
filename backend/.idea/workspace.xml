@@ -4,28 +4,50 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="921e2377-3bac-41a8-8a5b-4617bf254b16" name="Changes" comment="">
+    <list default="true" id="24aeb0a6-d9d2-4d5a-a95b-d13cd6b2650c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/config/AESConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/config/RedisConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/config/RestTemplateConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/request/LikeCommentRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/dto/request/NewContentEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/IdentityClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/IdentityClientImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/RedisPublisherImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/RedisPublisher.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/utils/AESUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/api/AuthenticationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/api/AuthenticationController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/ArtistProfileStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/ArtistProfileStatus.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/Gender.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/Gender.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/Role.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/Role.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/Status.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/constant/Status.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/repository/RefreshTokenRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/repository/RefreshTokenRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/impl/AuthenticationServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/impl/AuthenticationServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/utils/CookieUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/utils/CookieUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/ContentServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/ContentServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/LikeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/LikeController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/PostController.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/controller/PostController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/CommentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/CommentServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/LikeServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/LikeServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/PostServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/java/com/rhythm_of_soul/content_service/service/Impl/PostServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content_service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/content_service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/api/AccountController.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/api/AccountController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/api/FollowController.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/api/FollowController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/api/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/api/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/AccountService.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/AccountService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/FollowService.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/FollowService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/impl/AccountServiceImp.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/impl/AccountServiceImp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/impl/FollowServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/impl/FollowServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/java/com/rhythm_of_soul/identity_service/service/impl/UserServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/identity_service/src/main/resources/application-dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/identity_service/src/main/resources/application-dev.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notification_service/src/main/java/com/rhythm_of_soul/notification_service/config/RedisConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/notification_service/src/main/java/com/rhythm_of_soul/notification_service/config/RedisConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notification_service/src/main/java/com/rhythm_of_soul/notification_service/constant/NotiType.java" beforeDir="false" afterPath="$PROJECT_DIR$/notification_service/src/main/java/com/rhythm_of_soul/notification_service/constant/NotiType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notification_service/src/main/java/com/rhythm_of_soul/notification_service/controller/NotificationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/notification_service/src/main/java/com/rhythm_of_soul/notification_service/controller/NotificationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notification_service/src/main/java/com/rhythm_of_soul/notification_service/entity/Notification.java" beforeDir="false" afterPath="$PROJECT_DIR$/notification_service/src/main/java/com/rhythm_of_soul/notification_service/entity/Notification.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notification_service/src/main/java/com/rhythm_of_soul/notification_service/repository/NotificationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/notification_service/src/main/java/com/rhythm_of_soul/notification_service/repository/NotificationRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notification_service/src/main/java/com/rhythm_of_soul/notification_service/service/Impl/NotificationServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/notification_service/src/main/java/com/rhythm_of_soul/notification_service/service/Impl/NotificationServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notification_service/src/main/java/com/rhythm_of_soul/notification_service/service/NotificationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/notification_service/src/main/java/com/rhythm_of_soul/notification_service/service/NotificationService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/Nav.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/components/Nav.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/model/User.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/model/account.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/login/ResetPassword.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/login/ResetPasswordVerify.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/login/login.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/login/sign-up.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/router/authRouter.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/router/authRouter.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/services/api/authService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/services/api/authService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/services/service.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/config/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/config/api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/PostModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/pages/feed/PostModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/router/indexRouter.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/router/indexRouter.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/services/postService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/rhythm_of_soul/src/services/postService.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,25 +64,10 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="KubernetesApiPersistence">{}</component>
-  <component name="KubernetesApiProvider">{
-  &quot;isMigrated&quot;: true
-}</component>
-  <component name="MavenImportPreferences">
-    <option name="generalSettings">
-      <MavenGeneralSettings>
-        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
-      </MavenGeneralSettings>
-    </option>
-  </component>
-  <component name="ProblemsViewState">
-    <option name="selectedTabId" value="DEPENDENCY_CHECKER_PROBLEMS_TAB" />
-  </component>
   <component name="ProjectColorInfo">{
-  &quot;customColor&quot;: &quot;&quot;,
-  &quot;associatedIndex&quot;: 2
+  &quot;associatedIndex&quot;: 3
 }</component>
-  <component name="ProjectId" id="2xH0EGnfWkptp8HKHiQE1gZz0uS" />
+  <component name="ProjectId" id="2xLvOF7cLtQhawacVZWaPmXQEMg" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
   </component>
@@ -68,61 +75,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.ApiGatewayApplication.executor": "Debug",
-    "Maven.api_gateway [clean].executor": "Run",
-    "Maven.api_gateway [install].executor": "Run",
-    "Maven.content_service [clean].executor": "Run",
-    "Maven.content_service [install].executor": "Run",
-    "Maven.identity_service [clean].executor": "Run",
-    "Maven.identity_service [install].executor": "Run",
-    "Maven.identity_service [test].executor": "Run",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "Spring Boot.ApiGatewayApplication.executor": "Debug",
-    "Spring Boot.ContentServiceApplication.executor": "Debug",
-    "Spring Boot.IdentityServiceApplication.executor": "Debug",
-    "git-widget-placeholder": "dev",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/RhythmOfSoul/backend/identity_service",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "run.configurations.included.in.services": "true",
-    "vue.rearranger.settings.migration": "true"
-  },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql_aurora",
-      "mariadb"
-    ]
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.ApiGatewayApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.ContentServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.IdentityServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.NotificationServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dev&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;
   }
-}]]></component>
-  <component name="ReactorSettings">
-    <option name="notificationShown" value="true" />
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.rhythm_of_soul.content_service.dto.response" />
+    </key>
   </component>
-  <component name="RunDashboard">
-    <option name="configurationTypes">
-      <set>
-        <option value="KtorApplicationConfigurationType" />
-        <option value="MicronautRunConfigurationType" />
-        <option value="QuarkusRunConfigurationType" />
-        <option value="SpringBootApplicationConfigurationType" />
-      </set>
-    </option>
-  </component>
-  <component name="RunManager" selected="Spring Boot.IdentityServiceApplication">
+  <component name="RunManager" selected="Application.IdentityServiceApplication">
     <configuration name="ApiGatewayApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.rhythm_of_soul.api_gateway.ApiGatewayApplication" />
       <module name="api_gateway" />
@@ -136,16 +105,9 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ApiGatewayApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="api_gateway" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.rhythm_of_soul.api_gateway.ApiGatewayApplication" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="ContentServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+    <configuration name="ContentServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.rhythm_of_soul.content_service.ContentServiceApplication" />
       <module name="content_service" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.rhythm_of_soul.content_service.ContentServiceApplication" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="com.rhythm_of_soul.content_service.*" />
@@ -156,9 +118,9 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="IdentityServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+    <configuration name="IdentityServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.rhythm_of_soul.identity_service.IdentityServiceApplication" />
       <module name="identity_service" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.rhythm_of_soul.identity_service.IdentityServiceApplication" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="com.rhythm_of_soul.identity_service.*" />
@@ -169,78 +131,37 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="NotificationServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <configuration name="NotificationServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.rhythm_of_soul.notification_service.NotificationServiceApplication" />
       <module name="notification_service" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.rhythm_of_soul.notification_service.NotificationServiceApplication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.rhythm_of_soul.notification_service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Spring Boot.IdentityServiceApplication" />
-        <item itemvalue="Spring Boot.ContentServiceApplication" />
+        <item itemvalue="Application.IdentityServiceApplication" />
+        <item itemvalue="Application.ContentServiceApplication" />
         <item itemvalue="Application.ApiGatewayApplication" />
+        <item itemvalue="Application.NotificationServiceApplication" />
       </list>
     </recent_temporary>
-  </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-jdk-9823dce3aa75-125ca727e0f0-intellij.indexing.shared.core-IU-243.24978.46" />
-        <option value="bundled-js-predefined-d6986cc7102b-76f8388c3a79-JavaScript-IU-243.24978.46" />
-      </set>
-    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="921e2377-3bac-41a8-8a5b-4617bf254b16" name="Changes" comment="" />
-      <created>1747578629947</created>
+      <changelist id="24aeb0a6-d9d2-4d5a-a95b-d13cd6b2650c" name="Changes" comment="" />
+      <created>1747730141776</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1747578629947</updated>
-      <workItem from="1747578631394" duration="897000" />
-      <workItem from="1747579579619" duration="1191000" />
-      <workItem from="1747580791721" duration="64000" />
-      <workItem from="1747580890661" duration="710000" />
-      <workItem from="1747582354474" duration="473000" />
-      <workItem from="1747616562760" duration="1844000" />
-      <workItem from="1747625052616" duration="673000" />
-      <workItem from="1747625754545" duration="1292000" />
-      <workItem from="1747633160048" duration="7017000" />
-      <workItem from="1747706605932" duration="26000" />
-      <workItem from="1747713156069" duration="1100000" />
-      <workItem from="1747714344375" duration="192000" />
-      <workItem from="1747723644627" duration="370000" />
-      <workItem from="1747724098441" duration="2661000" />
+      <updated>1747730141776</updated>
     </task>
     <servers />
-  </component>
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State>
-              <option name="FILTERS">
-                <map>
-                  <entry key="branch">
-                    <value>
-                      <list>
-                        <option value="identity" />
-                      </list>
-                    </value>
-                  </entry>
-                </map>
-              </option>
-            </State>
-          </value>
-        </entry>
-      </map>
-    </option>
   </component>
 </project>

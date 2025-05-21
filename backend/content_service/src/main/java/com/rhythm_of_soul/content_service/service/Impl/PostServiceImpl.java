@@ -6,6 +6,7 @@ import com.rhythm_of_soul.content_service.config.MinioConfig;
 import com.rhythm_of_soul.content_service.dto.ContentResponse;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
 import com.rhythm_of_soul.content_service.dto.request.AlbumCreationRequest;
+import com.rhythm_of_soul.content_service.dto.request.NewContentEvent;
 import com.rhythm_of_soul.content_service.dto.request.PlaylistCreationRequest;
 import com.rhythm_of_soul.content_service.dto.request.PostRequest;
 import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
@@ -23,7 +24,9 @@ import com.rhythm_of_soul.content_service.mapper.PostMapper;
 import com.rhythm_of_soul.content_service.repository.CommentRepository;
 import com.rhythm_of_soul.content_service.repository.LikeRepository;
 import com.rhythm_of_soul.content_service.repository.PostRepository;
+import com.rhythm_of_soul.content_service.service.IdentityClient;
 import com.rhythm_of_soul.content_service.service.PostService;
+import com.rhythm_of_soul.content_service.service.RedisPublisher;
 import com.rhythm_of_soul.content_service.utils.CommentManager;
 import com.rhythm_of_soul.content_service.utils.SaveFileMinio;
 import com.rhythm_of_soul.content_service.utils.SecurityUtils;
@@ -62,6 +65,8 @@ public class PostServiceImpl implements  PostService {
     SaveFileMinio saveFileMinio;
     MinioConfig minioConfig;
     MongoTemplate mongoTemplate;
+    IdentityClient identityClient;
+    RedisPublisher redisPublisher;
 
     @Override
     public PostResponse storeFile(MultipartFile song, MultipartFile cover , MultipartFile image, String account_id, List<Tag> tags, String title,String caption,String isPublic) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
@@ -149,6 +154,20 @@ public class PostServiceImpl implements  PostService {
 
             }
             postResponse.set_liked(false);
+
+            List<String> followerIds = identityClient.getFollowerIds(accountId);
+            log.info("Fetched followerIds: {}", followerIds);
+            for (String followerId : followerIds) {
+                NewContentEvent event = new NewContentEvent(
+                        identityClient.getUserInfoByAccountId(accountId).getUserId(),
+                        identityClient.getUserInfoByAccountId(accountId).getName(),
+                        post.getType().name(),
+                        followerId,
+                        post.getId() // referenceId là id bài post
+                );
+                redisPublisher.publishNewContentEvent(event);
+                log.info("success push to ìd: {}", followerId);
+            }
             return postResponse;
         }catch (Exception e){
             log.error("Error while creating post", e);

@@ -7,6 +7,8 @@ import com.rhythm_of_soul.identity_service.dto.request.UserUpdateRequest;
 import com.rhythm_of_soul.identity_service.dto.response.PageResponse;
 import com.rhythm_of_soul.identity_service.dto.response.UserResponse;
 
+import java.util.List;
+
 public interface UserService {
     UserResponse updateUser(String userId, UserUpdateRequest userUpdateRequest);
 
@@ -47,4 +49,7 @@ public interface UserService {
 
     //    Tìm kiếm người dùng để follow
     PageResponse<UserResponse> getAllUsers(int page, int size, String searchKey);
+
+    List<UserResponse> getAllArtistRequestUsers();
+
 }

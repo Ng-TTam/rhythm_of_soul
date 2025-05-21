@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -109,4 +111,16 @@ public class UserController {
                 .result(result)
                 .build());
     }
+
+    @GetMapping("/artist-requests")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getArtistRequests() {
+        List<UserResponse> result = userService.getAllArtistRequestUsers();
+        return ResponseEntity.ok(ApiResponse.<List<UserResponse>>builder()
+                .code(200)
+                .message("Fetched artist requests successfully")
+                .result(result)
+                .build());
+    }
+
 }

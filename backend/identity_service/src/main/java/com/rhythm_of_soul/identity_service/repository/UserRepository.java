@@ -1,5 +1,6 @@
 package com.rhythm_of_soul.identity_service.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -21,4 +22,8 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     Page<User> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
             String firstName, String lastName, Pageable pageable);
+
+    @Query("SELECT ap.user FROM ArtistProfile ap WHERE ap.status = 'PENDING'")
+    List<User> findAllUsersWithPendingArtistRequest();
+
 }

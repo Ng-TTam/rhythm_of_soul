@@ -2,6 +2,7 @@ package com.rhythm_of_soul.content_service.controller;
 
 import com.rhythm_of_soul.content_service.dto.ApiResponse;
 import com.rhythm_of_soul.content_service.service.LikeService;
+import com.rhythm_of_soul.content_service.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,7 @@ public class LikeController {
     public ApiResponse<Boolean> like(@RequestParam("postId") String postId) {
 
 //        String accountId = SecurityContextHolder.getContext().getAuthentication().getName();
-        String accountId = "326e6645-aa0f-4f89-b885-019c05b1a970";
+        String accountId = SecurityUtils.getCurrentAccountId();
 
         boolean success = likeService.like(accountId, postId);
 
@@ -30,7 +31,7 @@ public class LikeController {
     public ApiResponse<Boolean> unlike(@RequestParam("postId") String postId) {
 
 //        String accountId = SecurityContextHolder.getContext().getAuthentication().getName();
-        String accountId = "326e6645-aa0f-4f89-b885-019c05b1a970";
+        String accountId = SecurityUtils.getCurrentAccountId();
 
         boolean success = likeService.unlike(accountId, postId);
 

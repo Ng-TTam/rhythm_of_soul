@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-package com.rhythm_of_soul.notification_service.service;public interface NotificationService {
-=======
 
 package com.rhythm_of_soul.notification_service.service;
 
@@ -19,6 +16,4 @@ public interface NotificationService {
   void handleComment(LikeCommentRequest request);
   void handleLike(LikeCommentRequest request);
 
-
->>>>>>> identity
 }
