@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import javax.crypto.SecretKey;
 
-import com.rhythm_of_soul.identity_service.dto.response.UserBasicInfoResponse;
 import jakarta.transaction.Transactional;
 
 import org.springframework.context.ApplicationContext;
@@ -26,6 +25,7 @@ import com.rhythm_of_soul.identity_service.dto.request.BanUserRequest;
 import com.rhythm_of_soul.identity_service.dto.request.UserCreationRequest;
 import com.rhythm_of_soul.identity_service.dto.response.AccountResponse;
 import com.rhythm_of_soul.identity_service.dto.response.AuthenticationResponse;
+import com.rhythm_of_soul.identity_service.dto.response.UserBasicInfoResponse;
 import com.rhythm_of_soul.identity_service.entity.Account;
 import com.rhythm_of_soul.identity_service.entity.User;
 import com.rhythm_of_soul.identity_service.exception.AppException;
@@ -233,8 +233,8 @@ public class AccountServiceImp implements AccountService {
     }
 
     public UserBasicInfoResponse getUserInfoByAccountId(String accountId) {
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+        Account account =
+                accountRepository.findById(accountId).orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         if (account.getUser() == null) {
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
@@ -247,6 +247,4 @@ public class AccountServiceImp implements AccountService {
                 .name(user.getFirstName() + " " + user.getLastName())
                 .build();
     }
-
-
 }

@@ -1,8 +1,11 @@
 // src/hooks/usePlaylistPosts.ts
 import { useState, useEffect, useCallback } from 'react';
-import { PostWithUserInfo, CurrentUser } from '../../../model/post/post';
+import { PostWithUserInfo } from '../../../model/post/post';
 import { fetchPlaylists,uploadFile,createPlaylist,unlikePost,likePost } from '../../../services/postService';
-const usePlaylistPosts = (currentUser: CurrentUser) => {
+import { getAccessToken } from '../../../utils/tokenManager';
+import { jwtDecode } from 'jwt-decode';
+import { getUserByAccountId } from '../../../services/api/userService';
+const usePlaylistPosts = () => {
   const [posts, setPosts] = useState<PostWithUserInfo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -11,20 +14,40 @@ const usePlaylistPosts = (currentUser: CurrentUser) => {
   const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [creationError, setCreationError] = useState<string | null>(null);
-
+  const accessToken = getAccessToken();
+  const [currentUser, setCurrentUser] = useState({
+    username: '',
+    avatar: '',
+    acccountId: '',
+  });
+  let  userId = '';
+  if (accessToken) {
+    userId = jwtDecode(accessToken).sub || '';
+  }
+  
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetchPlaylists(currentUser.id);
+      const response = await fetchPlaylists(userId);
       
       if (response.code !== 200) {
         throw new Error(`HTTP error! Status: ${response.message}`);
       }
       
       if (response.code === 200 && Array.isArray(response.result)) {
+        const userResponse = await getUserByAccountId(userId);
+        if (userResponse.code !== 200) {
+          throw new Error('Failed to fetch user data');
+        }
+        const currentUser = userResponse.result;
+        setCurrentUser({
+          username: currentUser.first_name + " " + currentUser.last_name,
+          avatar: currentUser.avatar,
+          acccountId: currentUser.account_id,
+        });
         const postsWithUserInfo = response.result.map((post: any) => ({
           ...post,
-          username: currentUser.username,
+          username: currentUser.first_name + " " + currentUser.last_name,
           userAvatar: currentUser.avatar
         }));
         
@@ -43,7 +66,7 @@ const usePlaylistPosts = (currentUser: CurrentUser) => {
     } finally {
       setLoading(false);
     }
-  }, [currentUser]);
+  }, [userId]);
 
   useEffect(() => {
     fetchPosts();
@@ -90,23 +113,21 @@ const usePlaylistPosts = (currentUser: CurrentUser) => {
         tags: playlistData.tags || [], // Ensure tags is an array
         cover,
         image,
-        accountId: '1234', // Replace with actual user ID
       };
   
       const response = await createPlaylist(requestBody);
-      const result = await response.result;
       
-      if (result.code === 200) {
+      if (response.code === 200) {
         const newPost: PostWithUserInfo = {
-          ...result.result,
+          ...response.result,
           username: currentUser.username,
           userAvatar: currentUser.avatar,
           like_count: 0,
           comment_count: 0,
           view_count: 0,
-          type: 'playlist',
+          type: 'PLAYLIST',
           content: {
-            ...result.result.content,
+            ...response.result.content,
             tags: playlistData.tags || []
           }
         };
@@ -114,7 +135,7 @@ const usePlaylistPosts = (currentUser: CurrentUser) => {
         setPosts(prev => [newPost, ...prev]);
         return newPost;
       } else {
-        throw new Error(result.message || 'Failed to create playlist');
+        throw new Error(response.message || 'Failed to create playlist');
       }
     } catch (err) {
       setCreationError(err instanceof Error ? err.message : 'Failed to create playlist');

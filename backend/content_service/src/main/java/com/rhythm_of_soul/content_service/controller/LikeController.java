@@ -17,8 +17,10 @@ public class LikeController {
     @PostMapping
     public ApiResponse<Boolean> like(@RequestParam("postId") String postId) {
 
-//        String accountId = SecurityContextHolder.getContext().getAuthentication().getName();
+
         String accountId = SecurityUtils.getCurrentAccountId();
+
+
 
         boolean success = likeService.like(accountId, postId);
 
@@ -30,7 +32,6 @@ public class LikeController {
     @DeleteMapping
     public ApiResponse<Boolean> unlike(@RequestParam("postId") String postId) {
 
-//        String accountId = SecurityContextHolder.getContext().getAuthentication().getName();
         String accountId = SecurityUtils.getCurrentAccountId();
 
         boolean success = likeService.unlike(accountId, postId);

@@ -14,10 +14,12 @@ import com.rhythm_of_soul.content_service.dto.response.SongResponse;
 import com.rhythm_of_soul.content_service.service.ListeningHistoryService;
 import com.rhythm_of_soul.content_service.service.PostService;
 import com.rhythm_of_soul.content_service.utils.SecurityUtils;
+
 import io.minio.errors.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +27,8 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+
+import com.rhythm_of_soul.content_service.dto.response.BasicPlaylistResponse;
 
 @RequiredArgsConstructor
 @RestController
@@ -41,8 +45,10 @@ public class PostController {
                                         @RequestParam("tags") List<Tag> tags,
                                         @RequestParam("title") String title,
                                         @RequestParam(name = "caption" , required = false ) String caption,
-                                        @RequestParam("isPublic") String isPublic,
-                                        @RequestParam ("account_id") String account_id) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+                                        @RequestParam("isPublic") String isPublic
+                                        ) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        var account_id = SecurityUtils.getCurrentAccountId();
+
         return ApiResponse.<PostResponse>builder()
                 .message("File uploaded successfully")
                 .result(postService.storeFile(song,cover,image, account_id, tags, title, caption, isPublic))
@@ -90,10 +96,17 @@ public class PostController {
                 .result(postService.getAlbum(accountId))
                 .build();
     }
+    @GetMapping("/playlist/{accountId}")
+        ApiResponse<List<BasicPlaylistResponse>> getPlaylist(@PathVariable String accountId ,@RequestParam("songId") String songId) {
+                return ApiResponse.<List<BasicPlaylistResponse>>builder()
+                        .message("Playlist created successfully")
+                        .result(postService.getBasicPlaylists(accountId,songId))
+                        .build();
+        }
     @PutMapping("/{postId}")
-    ApiResponse<PostResponse> addSongs(@PathVariable String postId, @RequestParam List<String> songIds) {
+    ApiResponse<PostResponse> addSongs( @PathVariable String postId,@RequestParam("songId") String songId) {
         return ApiResponse.<PostResponse>builder()
-                .result(postService.addSong(postId, songIds))
+                .result(postService.addSong(postId, songId))
                 .build();
     }
     @GetMapping("/{accountId}")

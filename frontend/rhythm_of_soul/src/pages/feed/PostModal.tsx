@@ -2,6 +2,12 @@ import React, { useState, useCallback } from 'react';
 import { Modal, Button, Form, Tab, Tabs } from 'react-bootstrap';
 import { PostModalProps } from '../../model/post/post';
 import axios from 'axios';
+import { getAccessToken } from '../../utils/tokenManager';
+
+// Định nghĩa các định dạng file cho phép
+const ALLOWED_AUDIO_TYPES = ['audio/mpeg','audio/x-m4a'];
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
+const MAX_FILE_SIZE = 1000 * 1024 * 1024; // 50MB
 
 const PostModal: React.FC<PostModalProps> = ({
   onClose,
@@ -13,7 +19,7 @@ const PostModal: React.FC<PostModalProps> = ({
   const [activeTab, setActiveTab] = useState('TEXT');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  
+  const accessToken = getAccessToken();
   const visibilityOptions = ['Public', 'Private'];
   const tagOptions = ['ROCK', 'POP', 'JAZZ', 'CLASSICAL', 'HIP_HOP', 'ELECTRONIC'];
   
@@ -60,12 +66,50 @@ const PostModal: React.FC<PostModalProps> = ({
     });
   }, []);
 
+  const validateFile = (file: File, allowedTypes: string[], fileType: string): boolean => {
+    if (!allowedTypes.includes(file.type)) {
+      setErrorMessage(`Invalid ${fileType} file format. Please upload a supported format.`);
+      return false;
+    }
+    
+    if (file.size > MAX_FILE_SIZE) {
+      setErrorMessage(`${fileType} file is too large. Maximum size is 1000MB.`);
+      return false;
+    }
+    
+    return true;
+  };
+
   const handleFileChange = useCallback((fieldName: 'song' | 'image' | 'cover', e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
-    setFormData(prev => ({
-      ...prev,
-      [fieldName]: file
-    }));
+    
+    if (!file) {
+      setFormData(prev => ({
+        ...prev,
+        [fieldName]: null
+      }));
+      return;
+    }
+    
+    // Kiểm tra định dạng file tùy theo loại
+    let isValid = true;
+    
+    if (fieldName === 'song') {
+      isValid = validateFile(file, ALLOWED_AUDIO_TYPES, 'audio');
+    } else if (fieldName === 'image' || fieldName === 'cover') {
+      isValid = validateFile(file, ALLOWED_IMAGE_TYPES, 'image');
+    }
+    
+    if (isValid) {
+      setFormData(prev => ({
+        ...prev,
+        [fieldName]: file
+      }));
+      setErrorMessage(''); // Clear error message if validation passed
+    } else {
+      // Reset file input nếu validation failed
+      e.target.value = '';
+    }
   }, []);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
@@ -88,6 +132,13 @@ const PostModal: React.FC<PostModalProps> = ({
           setIsSubmitting(false);
           return;
         }
+        
+        // Kiểm tra lại định dạng file song (phòng trường hợp bypass UI)
+        if (!validateFile(formData.song, ALLOWED_AUDIO_TYPES, 'audio')) {
+          setIsSubmitting(false);
+          return;
+        }
+        
         if (!formData.title) {
           setErrorMessage('Please enter a title');
           setIsSubmitting(false);
@@ -102,6 +153,18 @@ const PostModal: React.FC<PostModalProps> = ({
         return;
       }
       
+      // Kiểm tra định dạng file image nếu có
+      if (formData.image && !validateFile(formData.image, ALLOWED_IMAGE_TYPES, 'image')) {
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // Kiểm tra định dạng file cover nếu có
+      if (formData.cover && !validateFile(formData.cover, ALLOWED_IMAGE_TYPES, 'cover image')) {
+        setIsSubmitting(false);
+        return;
+      }
+      
       // Xử lý khác nhau cho từng loại post
       if (activeTab === 'TEXT') {
         console.log('Posting text:', updatedFormData);
@@ -110,20 +173,21 @@ const PostModal: React.FC<PostModalProps> = ({
           // Tạo dữ liệu để gửi đi trong body của request
           const textPostData = {
             caption: updatedFormData.caption,
-            account_id: updatedFormData.account_id,
             type: updatedFormData.type,
             isPublic: updatedFormData.isPublic,
-            content : null
+            content: null
           };
+          
           console.log('Text post data:', textPostData);
           // Gọi API để đăng TEXT post - truyền dữ liệu trong body
           const response = await axios.post(
-            'http://localhost:8484/posts', 
+            'http://localhost:8484/content/posts', 
             textPostData,
             {
               headers: {
-                'Content-Type': 'application/json'
-              }
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`,
+              },
             }
           );
           
@@ -147,8 +211,6 @@ const PostModal: React.FC<PostModalProps> = ({
         if (formData.cover) formDataToSend.append('cover', formData.cover);
         formDataToSend.append('isPublic', formData.isPublic.toString());
         
-        // Thêm các trường thông tin
-        formDataToSend.append('account_id', currentUserId);
         if (formData.title) formDataToSend.append('title', formData.title);
         
         // Thêm caption vào form data nếu có
@@ -166,11 +228,12 @@ const PostModal: React.FC<PostModalProps> = ({
         
         // Gọi API upload
         const response = await axios.post(
-          'http://localhost:8484/posts/upload', 
+          'http://localhost:8484/content/posts/upload', 
           formDataToSend,
           {
             headers: {
-              'Content-Type': 'multipart/form-data'
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${accessToken}`,
             }
           }
         );
@@ -190,7 +253,7 @@ const PostModal: React.FC<PostModalProps> = ({
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, activeTab, onPost, currentUserId, onClose]);
+  }, [formData, activeTab, onPost, currentUserId, onClose, accessToken]);
 
   return (
     <Modal show={true} onHide={onClose} size="lg">
@@ -262,7 +325,6 @@ const PostModal: React.FC<PostModalProps> = ({
             <Tab eventKey="SONG" title="Song">
               <Form.Group className="mb-3">
                 <Form.Label>Title <span className="text-danger">*</span></Form.Label>
-                {/* Fix for title input - use an actual input element with required attribute */}
                 <input 
                   type="text"
                   className="form-control"
@@ -295,7 +357,6 @@ const PostModal: React.FC<PostModalProps> = ({
               <Form.Group className="mb-3">
                 <Form.Label>Tags</Form.Label>
                 
-                {/* Checkbox-based tag selection */}
                 <div className="border rounded p-2">
                   <div className="row g-2">
                     {tagOptions.map((tag, index) => (
@@ -318,7 +379,6 @@ const PostModal: React.FC<PostModalProps> = ({
                   </div>
                 </div>
                 
-                {/* Display selected tags as badges */}
                 {formData.tag.length > 0 && (
                   <div className="mt-2">
                     <div className="d-flex flex-wrap gap-2">
@@ -334,7 +394,6 @@ const PostModal: React.FC<PostModalProps> = ({
 
               <Form.Group className="mb-3">
                 <Form.Label>Song <span className="text-danger">*</span></Form.Label>
-                {/* Fix for song input - use an actual input element with required attribute */}
                 <input
                   type="file"
                   className="form-control"
@@ -343,6 +402,7 @@ const PostModal: React.FC<PostModalProps> = ({
                   onChange={(e) => handleFileChange('song', e as React.ChangeEvent<HTMLInputElement>)}
                   required={activeTab === 'SONG'}
                 />
+                <small className="text-muted">Allowed formats: MP3, M4A</small>
               </Form.Group>
               
               <Form.Group className="mb-3">
@@ -353,6 +413,7 @@ const PostModal: React.FC<PostModalProps> = ({
                   accept="image/*"
                   onChange={(e) => handleFileChange('image', e as React.ChangeEvent<HTMLInputElement>)}
                 />
+                <small className="text-muted">Allowed formats: JPG, PNG, GIF</small>
               </Form.Group>
               
               <Form.Group className="mb-3">
@@ -363,6 +424,7 @@ const PostModal: React.FC<PostModalProps> = ({
                   accept="image/*"
                   onChange={(e) => handleFileChange('cover', e as React.ChangeEvent<HTMLInputElement>)}
                 />
+                <small className="text-muted">Allowed formats: JPEG, PNG, GIF</small>
               </Form.Group>
             </Tab>
           </Tabs>

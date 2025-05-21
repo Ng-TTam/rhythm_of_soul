@@ -4,6 +4,7 @@ import { User } from '../../model/profile/UserProfile';
 import { APIResponse } from '../../model/APIResponse';
 import { AssignArtistRequest } from '../../model/profile/AssignArtistRequest';
 import { UpdateUserRequest } from '../../model/profile/UpdateUserRequest';
+import axios from 'axios';
 
 interface AssignArtistResponse {
 }
@@ -15,7 +16,12 @@ interface SearchUserResponse {
   totalElements: number;
   data: User[];
 }
-
+export interface UserInfo {
+  account_id: string;
+  first_name: string;
+  last_name: string;
+  avatar : string;
+}
 
 export const getUserByPreEmail = async (preEmail: string): Promise<User> => {
   const response = await apiClient.get<APIResponse<User>>(
@@ -65,7 +71,12 @@ export const unfollowUser = async (userId: string, token: string): Promise<void>
     headers: { Authorization: `Bearer ${token}` },
   });
 };
-
+export const getUserByAccountId = async (accountIdId: string): Promise<APIResponse<UserInfo>> => {
+  const response = await axios.get<APIResponse<UserInfo>>(
+    `http://localhost:8080/identity/users/information/${accountIdId}`
+  )
+  return response.data;
+}
 export const getFollowingIds = async (userId: string, token: string): Promise<string[]> => {
   const response = await apiClient.get<APIResponse<string[]>>(
     apiConfig.endpoints.user.getFollowingIds(userId),

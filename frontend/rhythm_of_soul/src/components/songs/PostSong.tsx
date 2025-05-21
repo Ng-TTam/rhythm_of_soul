@@ -15,6 +15,12 @@ import Swal from 'sweetalert2';
 import EditSongModal from './SongEditForm';
 import { Song, SongEditForm } from '../../model/post/Song';
 import { getSongs, editSong, unlikePost, likePost } from '../../services/postService';
+import { getAccessToken } from '../../utils/tokenManager';
+import { jwtDecode } from 'jwt-decode';
+import {  BsMusicNoteList } from '@react-icons/all-files/bs/BsMusicNoteList';
+
+import AddToPlaylistModal from './AddToPlaylistModal';
+
 export default function SongDisplay() {
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,13 +35,18 @@ export default function SongDisplay() {
       tags: string[];
     };
   } | null>(null);
+  const [showAddToPlaylistModal, setShowAddToPlaylistModal] = useState(false);
+  const [selectedSongId, setSelectedSongId] = useState<string | number | null>(null);
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const audioState = useAppSelector(state => state.audio);
-
-  const accountId = "1234";
-
+  
+  let accountId = '';
+  const accessToken = getAccessToken();
+  if(accessToken) {
+    accountId = jwtDecode(accessToken).sub || '';
+  }
 
   useEffect(() => {
     const fetchSongs = async () => {
@@ -55,15 +66,16 @@ export default function SongDisplay() {
     };
 
     fetchSongs();
-  }, []);
-  const handleSetLikedSongs = (songs : Song[] ) => {
+  }, [accountId]);
+
+  const handleSetLikedSongs = (songs: Song[]) => {
     const likedSongsMap: Record<string, boolean> = {};
     songs.forEach((song) => {
       likedSongsMap[song.id] = song._liked;
     });
     setLikedSongs(likedSongsMap);
-
   }
+
   const handlePlaySong = (e: React.MouseEvent, song: Song) => {
     e.stopPropagation();
 
@@ -84,25 +96,34 @@ export default function SongDisplay() {
     navigate(`/post/${songId}`);
   };
 
-  const toggleLike = (e: React.MouseEvent, songId: string | number) => {
+  const toggleLike = async (e: React.MouseEvent, songId: string ) => {
     e.stopPropagation();
     const alreadyLiked = likedSongs[songId];
 
-    setSongs(prev =>
-      prev.map(song => {
-        if (song.id === songId) {
-          alreadyLiked ? unlikePost(song.id) : likePost(song.id);
-          return {
-            ...song,
-            like_count: song.like_count + (alreadyLiked ? -1 : 1),
-            _liked: !alreadyLiked
-          };
-        }
-        return song;
-      })
-    );
+    try {
+      if (alreadyLiked) {
+        await unlikePost(songId);
+      } else {
+        await likePost(songId);
+      }
 
-    setLikedSongs(prev => ({ ...prev, [songId]: !alreadyLiked }));
+      setSongs(prev =>
+        prev.map(song => {
+          if (song.id === songId) {
+            return {
+              ...song,
+              like_count: song.like_count + (alreadyLiked ? -1 : 1),
+              _liked: !alreadyLiked
+            };
+          }
+          return song;
+        })
+      );
+
+      setLikedSongs(prev => ({ ...prev, [songId]: !alreadyLiked }));
+    } catch (err) {
+      console.error("Error toggling like:", err);
+    }
   };
 
   const toggleDropdown = (e: React.MouseEvent, songId: string | number) => {
@@ -123,13 +144,24 @@ export default function SongDisplay() {
     setShowDropdown(null);
   };
 
+  const handleAddToPlaylist = (e: React.MouseEvent, songId: string | number) => {
+    e.stopPropagation();
+    setSelectedSongId(songId);
+    setShowAddToPlaylistModal(true);
+    setShowDropdown(null);
+  };
+
+  const handleClosePlaylistModal = () => {
+    setShowAddToPlaylistModal(false);
+    setSelectedSongId(null);
+  };
+
   const handleSaveEdit = async (updatedData: SongEditForm) => {
     try {
       const response = await editSong(editingSong?.id ?? '', updatedData);
 
       if (response.code !== 200) throw new Error(response.message);
 
-      // Update local state
       setSongs(songs.map(song =>
         song.id === editingSong?.id
           ? {
@@ -139,7 +171,10 @@ export default function SongDisplay() {
           }
           : song
       ));
+      
+      setEditingSong(null);
     } catch (err) {
+      console.error("Error saving edit:", err);
       throw err;
     }
   };
@@ -162,7 +197,10 @@ export default function SongDisplay() {
 
     try {
       const response = await fetch(`http://localhost:8484/posts/${songId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
       });
 
       if (!response.ok) throw new Error('Failed to delete song');
@@ -277,7 +315,7 @@ export default function SongDisplay() {
                           <BsHeartFill className="text-danger me-1" size={16} /> :
                           <BsHeart className="me-1" size={16} />
                         }
-                        <span>{song.like_count}</span> {/* Chỉ hiển thị giá trị từ state */}
+                        <span>{song.like_count}</span>
                       </div>
                     </button>
 
@@ -312,13 +350,22 @@ export default function SongDisplay() {
                           className="dropdown-item"
                           onClick={(e) => navigateToEdit(e, song)}
                         >
-                          Chỉnh sửa
+                          Edit
+                        </button>
+                        <button
+                          className="dropdown-item"
+                          onClick={(e) => handleAddToPlaylist(e, song.id)}
+                        >
+                          <div className="d-flex align-items-center">
+                            <BsMusicNoteList className="me-1" size={14} />
+                            Add to playlist
+                          </div>
                         </button>
                         <button
                           className="dropdown-item text-danger"
                           onClick={(e) => handleDelete(e, song.id)}
                         >
-                          Xóa
+                          Delete
                         </button>
                       </div>
                     )}
@@ -350,6 +397,16 @@ export default function SongDisplay() {
           initialData={editingSong.data}
           onClose={() => setEditingSong(null)}
           onSave={handleSaveEdit}
+        />
+      )}
+
+      {showAddToPlaylistModal && selectedSongId && (
+        <AddToPlaylistModal 
+          songId={String(selectedSongId)}
+          onClose={handleClosePlaylistModal}
+          onAddSuccess={() => {
+            Swal.fire('Success', 'Successfully added to your playlist.', 'success');
+          }}
         />
       )}
 

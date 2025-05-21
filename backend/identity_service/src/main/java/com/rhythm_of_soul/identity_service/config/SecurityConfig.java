@@ -55,6 +55,7 @@ public class SecurityConfig {
         "/auth/log",
         "/api/sign-up",
         "/lib/**",
+        "/users/information/**",
     };
 
     @Value("${jwt.signerKey}")
@@ -68,8 +69,8 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
                         .permitAll()
-                        //                        .requestMatchers(HttpMethod.GET, "/users/**")
-                        //                        .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/users/information/**")
+                        .permitAll()
                         .requestMatchers("/sign-in", "/sign-up", "/css/**", "/images/**", "/auth/introspect")
                         .permitAll()
                         .anyRequest()

@@ -30,6 +30,7 @@ interface UserEndpoints {
   addComment: string;
   editComment: (commentId: string) => string;
   deleteComment: (commentId: string) => string;
+  addSongToPlaylist: (playlistId: string, songId: string ) => string;
 }
 
 interface ArtistEndpoints {

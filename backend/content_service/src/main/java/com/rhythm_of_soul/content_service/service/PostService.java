@@ -10,7 +10,9 @@ import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
 import com.rhythm_of_soul.content_service.dto.response.CommentResponse;
 import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
 import com.rhythm_of_soul.content_service.dto.response.SongResponse;
+
 import io.minio.errors.*;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -18,19 +20,21 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+import com.rhythm_of_soul.content_service.dto.response.BasicPlaylistResponse;
+
 public interface PostService {
     PostResponse storeFile(MultipartFile song, MultipartFile cover , MultipartFile image , String account_id, List<Tag> tags,String title, String caption,String isPublic)
             throws IOException, ServerException, InsufficientDataException,
             ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException,
             InvalidResponseException, XmlParserException, InternalException;
     PostResponse createPost(String accountId, PostRequest postRequest);
-    PostResponse addSong(String postId, List<String> songIds);
+    PostResponse addSong(String postId, String songIds);
     List<PostResponse> getPosts(String accountId);
 
     List<PostResponse> getSongs(String accountId);
     List<PostResponse> getPlaylists(String accountId);
     List<AlbumResponse> getAlbum(String accountId);
-
+    List<BasicPlaylistResponse> getBasicPlaylists(String accountId,String songId);
 
     /**
      * Search post with key

@@ -7,11 +7,13 @@ import TextPostContent from './postDetail/TextPostContent';
 import CommentSection from './postDetail/index';
 import PostActions from './postDetail/PostActions';
 import { Post, Comment,currentUser } from '../../model/post/post';
-import '../../style/PostDetail.css';
-import classNames from 'classnames/bind';
 import PostSongDetail  from '../../components/songs/PostSongDetail';
 import AlbumDetailView from '../../components/album/AlbumPage';
 import PlaylistDetail from '../../components/playlist/PlayListDetail';
+import { getUserByAccountId} from '../../services/api/userService';
+import styles from '../../styles/PostDetail.module.css'; // Updated import
+
+
 const PostDetail: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
@@ -28,8 +30,23 @@ const PostDetail: React.FC = () => {
     showAllComments: false,
     likedComments: {} as { [key: string]: boolean }
   });
-  const cx = classNames.bind(require('../../style/PostDetail.css'));
-  
+
+  const handleAddComment = (newComment: any) => {
+    const comment : Comment = {
+      id: newComment.id,
+      content: newComment.content,
+      account_id: currentUser.id,
+      created_at: new Date().toISOString(),
+      userAvatar: currentUser.avatar || '',
+      username: currentUser.username,
+      updated_at : new Date().toISOString(),
+      likes: 0,
+    }
+    setState(prev => ({
+      ...prev,
+      comments: [...prev.comments, comment]
+    }));
+  };
   const fetchPostData = useCallback(async () => {
     try {
       if (!postId) {
@@ -43,10 +60,15 @@ const PostDetail: React.FC = () => {
       if (response.code !== 200) {
         throw new Error('Invalid response from server');
       }
+      const userResponse = await getUserByAccountId(response.result.post.account_id);
+      if (userResponse.code !== 200) {
+        throw new Error('Failed to fetch user data');
+      }
+      const user = userResponse.result;
       const postData = {
         ...response.result.post,
-        username: response.result.post.username || 'Unknown User',
-        userAvatar: response.result.post.userAvatar || currentUser.avatar,
+        username: `${user.first_name} ${user.last_name}` || 'Unknown User',
+        userAvatar: user.avatar || currentUser.avatar,
         like_count: response.result.post.like_count || 0,
         view_count: response.result.post.view_count || 0
       };
@@ -62,7 +84,7 @@ const PostDetail: React.FC = () => {
       setState(prev => ({
         ...prev,
         post: postData,
-        isLiked : postData._liked,
+        isLiked: postData._liked,
         comments: formattedComments,
         likesCount: postData.like_count,
         loading: false,
@@ -95,12 +117,10 @@ const PostDetail: React.FC = () => {
         };
       });
   
-      // Sử dụng giá trị mới nhất từ functional update
       const currentIsLiked = !state.isLiked;
       currentIsLiked ? await likePost(postId) : await unlikePost(postId);
       
     } catch (err) {
-      // Rollback nếu có lỗi
       setState(prev => ({
         ...prev,
         isLiked: prev.isLiked,
@@ -108,11 +128,10 @@ const PostDetail: React.FC = () => {
       }));
       console.error('Error liking post:', err);
     }
-  }, [postId, state.isLiked]); // Thêm state.isLiked vào dependencies
+  }, [postId, state.isLiked]);
 
   const handleRepost = useCallback(async () => {
     try {
-      // await repost(postId!);
       setState(prev => ({
         ...prev,
         isReposted: !prev.isReposted,
@@ -123,58 +142,7 @@ const PostDetail: React.FC = () => {
     }
   }, [postId]);
 
-  const handleCommentSubmit = useCallback(async (content: string) => {
-    if (!postId || !state.post) return;
 
-    try {
-      // await addComment(postId, content);
-      addComment({postId: postId, content: content, parentId: null});
-      const newComment: Comment = {
-        id: `temp-${Date.now()}`,
-        account_id: currentUser.id,
-        content,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        username: currentUser.username,
-        userAvatar: currentUser.avatar,
-        likes: 0
-      };
-
-      setState(prev => ({
-        ...prev,
-        comments: [newComment, ...prev.comments]
-      }));
-    } catch (err) {
-      console.error('Error posting comment:', err);
-    }
-  }, [postId, state.post]);
-
-  const handleCommentLike = useCallback((commentId: string) => {
-    setState(prev => {
-      const wasLiked = prev.likedComments[commentId];
-      const updatedComments = prev.comments.map(comment =>
-        comment.id === commentId
-          ? { ...comment, likes: (comment.likes || 0) + (wasLiked ? -1 : 1) }
-          : comment
-      );
-
-      return {
-        ...prev,
-        likedComments: {
-          ...prev.likedComments,
-          [commentId]: !wasLiked
-        },
-        comments: updatedComments
-      };
-    });
-  }, []);
-
-  const toggleShowAllComments = useCallback(() => {
-    setState(prev => ({
-      ...prev,
-      showAllComments: !prev.showAllComments
-    }));
-  }, []);
 
   const handleCommentClick = () => {
     setOpenComment(prev => !prev);
@@ -188,8 +156,8 @@ const PostDetail: React.FC = () => {
 
     switch (state.post.type) {
       case 'TEXT':
-        return <TextPostContent caption={state.post.caption} />;
-      case 'SONG' :
+        return <TextPostContent caption={state.post.caption}  />;
+      case 'SONG':
         return postId ? <PostSongDetail postId={postId} /> : null;
       case 'ALBUM':
         return postId ? <AlbumDetailView albumId={postId} /> : null;
@@ -197,13 +165,12 @@ const PostDetail: React.FC = () => {
         return postId ? <PlaylistDetail playlistId={postId} /> : null;  
       default:
         return null;
-      
     }
   };
 
   if (state.loading) {
     return (
-      <Container className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+      <Container className={styles['loading-container']}>
         <Spinner animation="border" role="status">
           <span className="visually-hidden">Loading...</span>
         </Spinner>
@@ -213,7 +180,7 @@ const PostDetail: React.FC = () => {
 
   if (state.error) {
     return (
-      <Container className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+      <Container className={styles['error-container']}>
         <div className="text-center">
           <h2>{state.error}</h2>
           <button className="btn btn-primary mt-3" onClick={() => navigate('/')}>
@@ -226,7 +193,7 @@ const PostDetail: React.FC = () => {
 
   if (!state.post) {
     return (
-      <Container className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+      <Container className={styles['error-container']}>
         <div className="text-center">
           <h2>Post not found</h2>
           <button className="btn btn-primary mt-3" onClick={() => navigate('/')}>
@@ -238,8 +205,8 @@ const PostDetail: React.FC = () => {
   }
 
   return (
-    <Container className={cx('post-detail-container',classNames)}>
-      <Card className="post-card">
+    <Container className={styles['post-detail-container']}>
+      <Card className={styles['post-card']}>
         <PostHeader
           userAvatar={state.post.userAvatar || ''}
           username={state.post.username || 'Unknown User'}
@@ -263,14 +230,15 @@ const PostDetail: React.FC = () => {
           onCommentClick={handleCommentClick}
         />
       </Card>
+
       {openComment && (
         <div id="comment-section">
           <CommentSection
+            commentCount={state.comments.length}
+            onAddComment={handleAddComment}
           />
         </div>
-      )
-      }
-
+      )}
     </Container>
   );
 };

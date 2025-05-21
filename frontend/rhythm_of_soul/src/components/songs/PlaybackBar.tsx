@@ -54,7 +54,7 @@ const StreamingPlaybackBar: React.FC = () => {
   const [showPlaylist, setShowPlaylist] = useState(false);
 
   // API config
-  const API_BASE_URL = "http://localhost:8484/api/audio";
+  const API_BASE_URL = "http://localhost:8484/content/api/audio";
   const audioUrl = (currentSong as any)?.audioUrl || `${API_BASE_URL}/${mediaUrlSong}`;
 
   // Refs

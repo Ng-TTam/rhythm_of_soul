@@ -10,6 +10,7 @@ import com.rhythm_of_soul.content_service.dto.request.NewContentEvent;
 import com.rhythm_of_soul.content_service.dto.request.PlaylistCreationRequest;
 import com.rhythm_of_soul.content_service.dto.request.PostRequest;
 import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
+import com.rhythm_of_soul.content_service.dto.response.BasicPlaylistResponse;
 import com.rhythm_of_soul.content_service.dto.response.CommentResponse;
 import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
 import com.rhythm_of_soul.content_service.dto.response.SongResponse;
@@ -177,15 +178,13 @@ public class PostServiceImpl implements  PostService {
     }
 
     @Override
-    public PostResponse addSong(String postId, List<String> songIds) {
+    public PostResponse addSong(String postId, String songIds) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
-        List<String> songList = post.getContent().getSongIds();
-        for(String songId : songIds){
-            if(!songList.contains(songId)){
-                songList.add(songId);
-            }
+        if(post.getContent().getSongIds() == null){
+            post.getContent().setSongIds(new ArrayList<>());
         }
-
+        List<String> songList = post.getContent().getSongIds();
+        songList.add(songIds);
         post.getContent().setSongIds(songList);
         post.setUpdatedAt(Instant.now());
         postRepository.save(post);
@@ -595,6 +594,22 @@ public class PostServiceImpl implements  PostService {
         }
 
         return manager.getAllDepartments();
+    }
+
+    @Override
+    public List<BasicPlaylistResponse> getBasicPlaylists(String accountId, String songId) {
+        List<Post> posts = postRepository.findAllByAccountIdAndType(accountId, Type.PLAYLIST);
+        List<BasicPlaylistResponse> basicPlaylistResponses = new ArrayList<>();
+        for(Post post : posts){
+            if(post.getContent().getSongIds() == null || !post.getContent().getSongIds().contains(songId)){
+                BasicPlaylistResponse basicPlaylistResponse = BasicPlaylistResponse.builder()
+                        .id(post.getId())
+                        .name(post.getContent().getTitle())
+                        .build();
+                basicPlaylistResponses.add(basicPlaylistResponse);
+            }
+        }
+        return basicPlaylistResponses;
     }
 
 }

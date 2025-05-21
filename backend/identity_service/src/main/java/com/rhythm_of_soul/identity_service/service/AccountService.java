@@ -2,7 +2,6 @@ package com.rhythm_of_soul.identity_service.service;
 
 import java.util.List;
 
-import com.rhythm_of_soul.identity_service.dto.response.UserBasicInfoResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -12,6 +11,7 @@ import com.rhythm_of_soul.identity_service.constant.Status;
 import com.rhythm_of_soul.identity_service.dto.request.UserCreationRequest;
 import com.rhythm_of_soul.identity_service.dto.response.AccountResponse;
 import com.rhythm_of_soul.identity_service.dto.response.AuthenticationResponse;
+import com.rhythm_of_soul.identity_service.dto.response.UserBasicInfoResponse;
 
 public interface AccountService {
     /**

@@ -8,8 +8,9 @@ import { FaPlayCircle } from '@react-icons/all-files/fa/FaPlayCircle';
 
 import { useNavigate } from 'react-router-dom';
 import { CollectionPostCardProps } from '../../model/post/post';
-import '../../style/CollectionPostCard.css'; // We'll create this CSS file
-import classNames from 'classnames/bind';
+import styles from '../../styles/CollectionPostCard.module.css'; // Thay đổi cách import
+import classNames from 'classnames';
+
 const CollectionPostCard: React.FC<CollectionPostCardProps> = ({ 
   post, 
   playingTrackId, 
@@ -17,30 +18,31 @@ const CollectionPostCard: React.FC<CollectionPostCardProps> = ({
   onLike, 
   onComment 
 }) => {
-  console.log('CollectionPostCard', post);
   const navigate = useNavigate();
-  const cx = classNames.bind(require('../../style/CollectionPostCard.css'));
+
   if (!post.content || !post.content.songIds) return null;
   
   const imageUrl = post.content.imageUrl || '/assets/images/default/avatar.jpg';
+  
   const handlePostDetail = (postId: string, postType: string) => {
     navigate(`/post/${postId}`);  
   }
+
   return (
-    <Card className={cx('collection-post-card',classNames)}>
-      <Card.Header className="collection-header">
-        <div className="user-info">
+    <Card className={styles['collection-post-card']}>
+      <Card.Header className={styles['collection-header']}>
+        <div className={styles['user-info']}>
           <img
             src={post.userAvatar || '/assets/images/default/avatar.jpg'}
             alt={post.username}
-            className="user-avatar"
+            className={styles['user-avatar']}
             onError={(e) => {
               (e.target as HTMLImageElement).src = '/assets/images/default/avatar.jpg';
             }}
           />
-          <div className="user-details">
-            <span className="username">{post.username}</span>
-            <span className="post-date">
+          <div className={styles['user-details']}>
+            <span className={styles['username']}>{post.username}</span>
+            <span className={styles['post-date']}>
               {new Date(post.created_at).toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
@@ -49,46 +51,52 @@ const CollectionPostCard: React.FC<CollectionPostCardProps> = ({
             </span>
           </div>
         </div>
-        <span className={`collection-type ${post.type.toLowerCase()}`}>
+        <span className={classNames(
+          styles['collection-type'],
+          styles[post.type.toLowerCase()]
+        )}>
           {post.type}
         </span>
       </Card.Header>
       
       {post.caption && (
-        <Card.Text className="collection-caption">
+        <Card.Text className={styles['collection-caption']}>
           {post.caption}
         </Card.Text>
       )}
       
-      <Card.Body className="collection-body">
-        <Row className="collection-info">
-          <Col xs={12} md={4} className="collection-cover-container">
-            <div className="collection-cover-wrapper">
+      <Card.Body className={styles['collection-body']}>
+        <Row className={styles['collection-info']}>
+          <Col xs={12} md={4} className={styles['collection-cover-container']}>
+            <div className={styles['collection-cover-wrapper']}>
               <img
-                src={imageUrl }
+                src={imageUrl}
                 alt={post.content.title}
-                style={{ width: '100%', height: '100%' }}
-                className="collection-cover"
+                className={styles['collection-cover']}
                 onClick={() => handlePostDetail(post.id, post.type)}
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/assets/images/default/avatar.jpg';
                 }}
               />
-              <div className="play-overlay" onClick={() => handlePostDetail(post.id, post.type)}>
+              <div 
+                className={styles['play-overlay']} 
+                onClick={() => handlePostDetail(post.id, post.type)}
+              >
+                <FaPlayCircle size={24} color="white" />
               </div>
             </div>
           </Col>
-          <Col xs={12} md={8} className="collection-details">
-            <h2 className="collection-title">{post.content.title}</h2>
-            <p className="collection-meta">
+          <Col xs={12} md={8} className={styles['collection-details']}>
+            <h2 className={styles['collection-title']}>{post.content.title}</h2>
+            <p className={styles['collection-meta']}>
               <span>by {post.username}</span>
               <span>•</span>
               <span>{post.content.songIds.length} tracks</span>
             </p>
             
-            <div className="collection-tags">
+            <div className={styles['collection-tags']}>
               {post.content.tags?.map((tag, index) => (
-                <span key={index} className="collection-tag">
+                <span key={index} className={styles['collection-tag']}>
                   #{tag}
                 </span>
               ))}
@@ -96,24 +104,24 @@ const CollectionPostCard: React.FC<CollectionPostCardProps> = ({
           </Col>
         </Row>
 
-        <div className="track-list">
+        <div className={styles['track-list']}>
           {post.content.songIds.map((song, index) => (
-            <div key={index} className="track-item">
-              <div className="track-number">{index + 1}</div>
+            <div key={index} className={styles['track-item']}>
+              <div className={styles['track-number']}>{index + 1}</div>
               <img
                 src={song.imageUrl || '/assets/images/default/track-thumbnail.jpg'}
                 alt={song.title}
-                className="track-thumbnail"
+                className={styles['track-thumbnail']}
                 onClick={() => song.songId && navigate(`/post/${song.songId}`)}
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/assets/images/default/track-thumbnail.jpg';
                 }}
               />
-              <div className="track-info">
-                <div className="track-title">{song.title}</div>
-                <div className="track-tags">
+              <div className={styles['track-info']}>
+                <div className={styles['track-title']}>{song.title}</div>
+                <div className={styles['track-tags']}>
                   {song.tags?.map((tag, tagIndex) => (
-                    <span key={tagIndex} className="track-tag">
+                    <span key={tagIndex} className={styles['track-tag']}>
                       #{tag}
                     </span>
                   ))}
@@ -121,7 +129,7 @@ const CollectionPostCard: React.FC<CollectionPostCardProps> = ({
               </div>
               <Button 
                 variant="link" 
-                className="track-play-btn" 
+                className={styles['track-play-btn']} 
                 onClick={() => onPlayTrack(song.songId || `song-${index}`)}
               >
                 {playingTrackId === (song.songId || `song-${index}`) ? (
@@ -134,26 +142,30 @@ const CollectionPostCard: React.FC<CollectionPostCardProps> = ({
           ))}
         </div>
 
-        <div className="collection-actions">
+        <div className={styles['collection-actions']}>
           <Button 
             variant="link" 
-            className={`action-btn like-btn ${post._liked ? 'liked' : ''}`}
+            className={classNames(
+              styles['action-btn'],
+              styles['like-btn'],
+              { [styles['liked']]: post._liked }
+            )}
             onClick={onLike}
           >
-            <FaHeart className="action-icon" /> 
-            <span className="action-count">{post.like_count}</span>
+            <FaHeart className={styles['action-icon']} /> 
+            <span className={styles['action-count']}>{post.like_count}</span>
           </Button>
           <Button 
             variant="link" 
-            className="action-btn comment-btn"
+            className={classNames(styles['action-btn'], styles['comment-btn'])}
             onClick={onComment}
           >
-            <FaComment className="action-icon" />
-            <span className="action-count">{post.comment_count}</span>
+            <FaComment className={styles['action-icon']} />
+            <span className={styles['action-count']}>{post.comment_count}</span>
           </Button>
-          <div className="action-btn view-count">
-            <FaPlayCircle className="action-icon" />
-            <span className="action-count">{post.view_count}</span>
+          <div className={classNames(styles['action-btn'], styles['view-count'])}>
+            <FaPlayCircle className={styles['action-icon']} />
+            <span className={styles['action-count']}>{post.view_count}</span>
           </div>
         </div>
       </Card.Body>

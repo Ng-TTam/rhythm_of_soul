@@ -25,5 +25,4 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     @Query("SELECT ap.user FROM ArtistProfile ap WHERE ap.status = 'PENDING'")
     List<User> findAllUsersWithPendingArtistRequest();
-
 }

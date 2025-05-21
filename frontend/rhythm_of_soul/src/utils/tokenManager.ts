@@ -1,6 +1,6 @@
 import { jwtDecode } from 'jwt-decode';
 
-interface DecodedToken {
+export interface DecodedToken {
   exp: number; // Thời gian hết hạn (Unix timestamp, giây)
   iat: number;
   scope: string;

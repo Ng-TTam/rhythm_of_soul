@@ -15,6 +15,7 @@ import com.rhythm_of_soul.identity_service.constant.ArtistProfileStatus;
 import com.rhythm_of_soul.identity_service.constant.Role;
 import com.rhythm_of_soul.identity_service.dto.request.ArtistProfileRequest;
 import com.rhythm_of_soul.identity_service.dto.request.UserUpdateRequest;
+import com.rhythm_of_soul.identity_service.dto.response.InformationResponse;
 import com.rhythm_of_soul.identity_service.dto.response.PageResponse;
 import com.rhythm_of_soul.identity_service.dto.response.UserResponse;
 import com.rhythm_of_soul.identity_service.entity.Account;
@@ -76,6 +77,20 @@ public class UserServiceImpl implements UserService {
                 .findByAccountId(jwtUtil.getAccountInContext())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+    @Override
+    @PreAuthorize("permitAll()")
+    public InformationResponse getInformation(String accountId) {
+        User user = userRepository
+                .findByAccountId(accountId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        return InformationResponse.builder()
+                .account_id(user.getAccount().getId())
+                .first_name(user.getFirstName())
+                .last_name(user.getLastName())
+                .avatar(user.getAvatar())
+                .build();
     }
 
     @Override
@@ -190,9 +205,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserResponse> getAllArtistRequestUsers() {
         List<User> users = userRepository.findAllUsersWithPendingArtistRequest();
-        return users.stream()
-                .map(userMapper::toUserResponse)
-                .collect(Collectors.toList());
+        return users.stream().map(userMapper::toUserResponse).collect(Collectors.toList());
     }
-
 }

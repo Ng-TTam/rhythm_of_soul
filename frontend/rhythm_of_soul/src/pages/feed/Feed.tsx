@@ -1,6 +1,5 @@
 import React, { useRef, useEffect } from 'react';
 import { Container, Card, Button, Row, Col } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
 import { FaPlus } from '@react-icons/all-files/fa/FaPlus';
 import usePosts from './hooks/usePosts';
 import TextPostCard from './TextPostCard';
@@ -10,30 +9,49 @@ import PostModal from './PostModal';
 import ErrorBoundary from './ErrorBoundary';
 import SkeletonPost from './SkeletonPost';
 import { CurrentUser, PostWithUserInfo } from '../../model/post/post';
-
-const currentUser: CurrentUser = {
-  id: "326e6645-aa0f-4f89-b885-019c05b1a970",
-  username: "Current User",
-  avatar: "https://i1.sndcdn.com/avatars-6zJmWE24BNXpCEdL-qVvuHg-t120x120.jpg"
-};
-
+import {User} from '../../model/profile/UserProfile';
+import { getProfile } from '../../services/api/userService';
 const Layout: React.FC = () => {
+
+  const [currentUser, setCurrentUser] = React.useState<CurrentUser>({
+    id: '',
+    username: '',
+    avatar: '/assets/images/default/avatar.jpg',
+  });
+  
+  const fetchCurrentUser = async () => {
+    try {
+      const response = await getProfile();
+      const user: User = response;
+      setCurrentUser({
+        id: user.id,
+        username: user.firstName + ' ' + user.lastName,
+        avatar: user.avatar || '/assets/images/default/avatar.jpg',
+      });
+      console.log('Current user:', user);
+    } catch (error) {
+      console.error('Error fetching current user:', error);
+    }
+  };
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
+ 
+
   const {
     posts,
     loading,
     error,
-    likedPosts,
     playingTrackId,
     fetchPosts,
     handleLike,
     toggleComment,
     handlePlayTrack,
     addNewPost
-  } = usePosts(currentUser);
-
+  } = usePosts();
+  
   const [isPostModalOpen, setIsPostModalOpen] = React.useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const navigate = useNavigate();
   console.log(posts);
   useEffect(() => {
     fetchPosts();
@@ -92,7 +110,7 @@ const Layout: React.FC = () => {
               className="me-3" 
               style={{ width: '40px', height: '40px', borderRadius: '50%' }}
               onError={(e) => {
-                (e.target as HTMLImageElement).src = '/default-avatar.jpg';
+                (e.target as HTMLImageElement).src = '/assets/images/default/avatar.jpg';
               }}
             />
             <Button 

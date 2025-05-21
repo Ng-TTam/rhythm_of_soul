@@ -1,7 +1,10 @@
-import {  useEffect, useState } from 'react';
+import {  use, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getTopLevelComment, addComment } from '../../../services/postService';
 import { CommentCreationRequest } from '../../../model/post/Comment';
+import { getAccessToken } from '../../../utils/tokenManager';
+import { getUserByAccountId} from '../../../services/api/userService';
+import { jwtDecode } from 'jwt-decode';
 // Types
 interface User {
   id: string;
@@ -18,6 +21,7 @@ interface Comment {
   createdAt: string;
   updatedAt: string | null;
   likes: number;
+  isArtist?: boolean;
   child_comments?: Comment[];
 }
 
@@ -33,12 +37,8 @@ const getRelativeTime = (timestamp: string) => {
   return `${Math.floor(diffInSeconds / 86400)}d ago`;
 };
 
-// Current user
-const currentUser: User = {
-  id: '123',
-  username: 'CurrentUser',
-  avatar: '/assets/images/default/avatar.jpg'
-};
+
+
 
 // Comment Form Component
 interface CommentFormProps {
@@ -51,7 +51,29 @@ const CommentForm = ({ onSubmit, replyTo = null, onCancelReply }: CommentFormPro
   const [commentContent, setCommentContent] = useState(
     replyTo ? `${replyTo.username} ` : ''
   );
-
+  const accessToken = getAccessToken();
+  let userId = '';
+  if(accessToken){
+    userId = jwtDecode(accessToken).sub || '';
+  }
+  const currentUser = useRef<User>({
+    id: userId,
+    username: 'User',
+    avatar: '/assets/images/default/avatar.jpg'
+  });
+  useEffect(() => {
+    const fetchUser = async () => {
+      const response = await getUserByAccountId(userId);
+      if (response.code === 200) {
+        currentUser.current = {
+          id: response.result.account_id,
+          username: response.result.first_name + ' ' + response.result.last_name,
+          avatar: response.result.avatar || '/assets/images/default/avatar.jpg'
+        };
+      }
+    };
+    fetchUser();
+  }, [userId]);
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (commentContent.trim()) {
@@ -82,8 +104,8 @@ const CommentForm = ({ onSubmit, replyTo = null, onCancelReply }: CommentFormPro
 
       <div className="flex items-start gap-2">
         <img
-          src={currentUser.avatar}
-          alt={currentUser.username}
+          src={currentUser.current.avatar}
+          alt={currentUser.current.username}
           className="w-8 h-8 rounded-full"
         />
         <textarea
@@ -151,6 +173,22 @@ const CommentItem = ({
           <div className="bg-gray-100 rounded-2xl px-4 py-2">
             <div className="flex items-center">
               <span className="font-semibold mr-2">{comment.username}</span>
+              {comment.isArtist && (
+                <span className="bg-purple-600 text-white text-xs px-2 py-0.5 rounded-full flex items-center mr-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  Artist
+                </span>
+              )}
+              {!comment.isArtist && (
+                <span className="bg-gray-400 text-white text-xs px-2 py-0.5 rounded-full flex items-center mr-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                  </svg>
+                  User
+                </span>
+              )}
               <span className="text-xs text-gray-500">{getRelativeTime(comment.createdAt)}</span>
             </div>
             <p className="mt-1" dangerouslySetInnerHTML={{ __html: contentWithMention }} />
@@ -252,7 +290,14 @@ const CommentList = ({
 };
 
 // Main Comment Section Component
-export default function CommentSection() {
+interface CommentSectionProps {
+  commentCount: number;
+  onAddComment: (newComment: Comment) => void;
+}
+const CommentSection: React.FC<CommentSectionProps> = ({
+  commentCount,
+  onAddComment
+}) =>  {
 
   const [comments, setComments] = useState<Comment[]>([]);
 
@@ -327,6 +372,7 @@ export default function CommentSection() {
       createdAt: new Date().toISOString(),
       updatedAt: null as string | null,
       likes: 0,
+      isArtist: false // Default to regular user
     };
     fetchAddComments(addCommentRequest)
       .then((comment: Comment) => {
@@ -339,7 +385,10 @@ export default function CommentSection() {
           createdAt: comment.createdAt,
           updatedAt: comment.updatedAt,
           likes: 0,
+          isArtist: comment.isArtist || false
         }
+        commentCount++;
+        onAddComment(newComment); 
         if (parentId) {
           const addReply = (comments: Comment[]): Comment[] => {
             return comments.map(comment => {
@@ -369,7 +418,7 @@ export default function CommentSection() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4 bg-white rounded-lg shadow">
+    <div className=" mx-auto p-4 bg-white rounded-lg shadow">
       <h2 className="text-xl font-bold mb-4">Comments</h2>
 
       {!replyTo && (
@@ -400,3 +449,4 @@ export default function CommentSection() {
     </div>
   );
 }
+export default CommentSection;

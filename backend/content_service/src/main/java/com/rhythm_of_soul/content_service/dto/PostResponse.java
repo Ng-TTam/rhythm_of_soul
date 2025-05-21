@@ -27,4 +27,5 @@ public class PostResponse {
     Instant updated_at;
     Instant scheduled_at;
     boolean is_liked;
+    
 }

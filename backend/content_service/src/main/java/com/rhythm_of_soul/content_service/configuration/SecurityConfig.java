@@ -32,7 +32,8 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_ENDPOINTS = {
             "/posts/**",
-            "/comments/**"
+            "/comments/**",
+            "/api/audio/**"
     };
 
     @Value("${jwt.signerKey}")

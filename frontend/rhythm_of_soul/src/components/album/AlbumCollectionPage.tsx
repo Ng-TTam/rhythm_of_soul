@@ -18,8 +18,8 @@ import { FaPlus} from '@react-icons/all-files/fa/FaPlus';
 import AddAlbumModal from './AddAlbumForm';
 import { Album } from '../../model/post/Album';
 import {getAlbumOfUser,uploadFile,createALbum, unlikePost,likePost} from '../../services/postService';
-
-
+import { getAccessToken,DecodedToken } from '../../utils/tokenManager';
+import { jwtDecode } from 'jwt-decode';
 const AlbumPost = () => {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,13 +29,22 @@ const AlbumPost = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [showAddModal, setShowAddModal] = useState(false);
 
-
+  
   const navigate = useNavigate();
-
+  const accessToken = getAccessToken();
+  let accountId = "";
+  let isArtist = false
+  if (accessToken) {
+    const decoded = jwtDecode<DecodedToken>(accessToken);
+     accountId = decoded.sub;
+     isArtist = decoded.scope === 'ROLE_ARTIST' ? true : false;
+  }
+  
   useEffect(() => {
     const fetchAlbums = async () => {
       try {
-        const accountId = "326e6645-aa0f-4f89-b885-019c05b1a970";
+        
+
         const response = await getAlbumOfUser(accountId);
 
         if (response.code === 200 && Array.isArray(response.result)) {
@@ -122,7 +131,6 @@ const AlbumPost = () => {
         tags: newAlbumData.tags,
         cover,
         image,
-        accountId: '326e6645-aa0f-4f89-b885-019c05b1a970', // Replace with actual user ID
         scheduleAt: newAlbumData.scheduleAt?.toISOString(),
         songIds: newAlbumData.tracks
       };
@@ -184,14 +192,16 @@ const AlbumPost = () => {
     <Container className="py-4" style={{ maxWidth: '100%' }}>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="fw-bold mb-0">Music Albums</h2>
-        <Button 
-          variant="primary" 
-          onClick={() => setShowAddModal(true)}
-          className="d-flex align-items-center"
-        >
-          <FaPlus className="me-2" />
-          New Album
-        </Button>
+        {isArtist && (
+          <Button 
+            variant="primary" 
+            onClick={() => setShowAddModal(true)}
+            className="d-flex align-items-center"
+          >
+            <FaPlus className="me-2" />
+            New Album
+          </Button>
+        )}
       </div>
 
       <Tab.Container
@@ -278,7 +288,7 @@ const AlbumPost = () => {
                       <Card.Body onClick={() => handleClickPost(album.id)}>
                         <Row>
                           <Col md={5} className="mb-3 mb-md-0">
-                            <div className="position-relative rounded overflow-hidden shadow-sm" style={{ aspectRatio: '1/1' }}>
+                            <div className="position-relative rounded overflow-hidden shadow-sm" style={{ aspectRatio: "1 / 1", width: "50% !important", height: "100% !important" }}>
                               <img
                                 src={album.imageUrl}
                                 alt={album.title}
@@ -321,7 +331,7 @@ const AlbumPost = () => {
                                   <Col>{album.title}</Col>
                                 </Row>
                                 <Row className="mb-2">
-                                  <Col xs={4} className="fw-bold text-muted">Tracks:</Col>
+                                  <Col xs={4} className="fw-bold text-muted">Songs:</Col>
                                   <Col>{album.tracks}</Col>
                                 </Row>
                                 <Row>
@@ -355,6 +365,7 @@ const AlbumPost = () => {
                             variant="light"
                             size="sm"
                             className="d-flex align-items-center"
+                            onClick={() => handleClickPost(album.id)}
                           >
                             <FaComment className="me-2" />
                             {album.commentCount || 0}

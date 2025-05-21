@@ -237,7 +237,7 @@ export default function Nav() {
                 <Notification />
                 <li className="nav-item dropdown">
                   <a className="p-0 ps-3 nav-link d-flex align-items-center position-relative" href="#" id="profile-setting" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src={user?.avatar} alt="User-Profile" className="theme-color-default-img img-fluid avatar avatar-40 avatar-rounded" loading="lazy" />
+                    <img src={user?.avatar || '/assets/images/default/avatar.jpg'}  className="theme-color-default-img img-fluid avatar avatar-40 avatar-rounded" loading="lazy" />
                     <div className="iq-profile-badge bg-success" />
                   </a>
                   <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="profile-setting">

@@ -7,8 +7,8 @@ import { FaEllipsisH } from '@react-icons/all-files/fa/FaEllipsisH';
 
 import { TextPostCardProps } from '../../model/post/post';
 import { useNavigate } from 'react-router-dom';
-import '../../style/TextPostCard.css'; // We'll create this CSS file
-import classNames from 'classnames/bind';
+import styles from '../../styles/TextPostCard.module.css'; // Updated import
+import classNames from 'classnames';
 
 const TextPostCard: React.FC<TextPostCardProps> = ({ 
   post, 
@@ -26,67 +26,70 @@ const TextPostCard: React.FC<TextPostCardProps> = ({
       year: 'numeric'
     });
   };
-  const cx = classNames.bind(require('../../style/TextPostCard.css'));
   return (
-    <Card className={cx("text-post-card",classNames)}>
-      <Card.Header className="post-header">
-        <div className="user-info">
+    <Card className={styles['text-post-card']}>
+      <Card.Header className={styles['post-header']}>
+        <div className={styles['user-info']}>
           <img
             src={post.userAvatar || '/assets/images/default/avatar.jpg'}
             alt={post.username}
-            className="user-avatar"
+            className={styles['user-avatar']}
             onError={(e) => {
               (e.target as HTMLImageElement).src = '/assets/images/default/avatar.jpg';
             }}
           />
-          <div className="user-details">
-            <span className="username">{post.username}</span>
-            <span className="post-date">{formatDate(post.created_at)}</span>
+          <div className={styles['user-details']}>
+            <span className={styles['username']}>{post.username}</span>
+            <span className={styles['post-date']}>{formatDate(post.created_at)}</span>
           </div>
         </div>
-        <Button variant="link" className="post-options">
+        <Button variant="link" className={styles['post-options']}>
           <FaEllipsisH />
         </Button>
       </Card.Header>
       
       <Card.Body 
-        className="post-content" 
+        className={styles['post-content']} 
         onClick={() => navigate(`/post/${post.id}`)}
       >
-        <div className="post-text">{post.caption}</div>
+        <div className={styles['post-text']}>{post.caption}</div>
       </Card.Body>
       
-      <Card.Footer className="post-footer">
-        <div className="post-actions">
+      <Card.Footer className={styles['post-footer']}>
+        <div className={styles['post-actions']}>
           <Button 
             variant="link" 
-            className={`action-btn like-btn ${isLiked ? 'liked' : ''}`}
+            className={classNames(
+              styles['action-btn'],
+              styles['like-btn'],
+              { [styles['liked']]: isLiked }
+            )}
             onClick={(e) => {
               e.stopPropagation();
               onLike();
             }}
             aria-label={isLiked ? "Unlike post" : "Like post"}
           >
-            <FaHeart className="action-icon" />
-            <span className="action-count">{post.like_count}</span>
+            <FaHeart className={styles['action-icon']} />
+            <span className={styles['action-count']}>{post.like_count}</span>
           </Button>
           
           <Button 
             variant="link" 
-            className="action-btn comment-btn"
+            className={classNames(styles['action-btn'], styles['comment-btn'])}
             onClick={(e) => {
               e.stopPropagation();
               onComment();
             }}
             aria-label="Comment on post"
           >
-            <FaComment className="action-icon" />
-            <span className="action-count">{post.comment_count}</span>
+            <FaComment className={styles['action-icon']} />
+            <span className={styles['action-count']}>{post.comment_count}</span>
           </Button>
           
-          <div className="action-btn view-count">
-            <FaPlayCircle className="action-icon" />
-            <span className="action-count">{post.view_count}</span>
+          <div className={classNames(styles['action-btn'], styles['view-count'])}>
+            <FaPlayCircle className={styles['action-icon']} />
+            <span className={styles['action-count']}>{post.view_count}</span>
           </div>
         </div>
       </Card.Footer>

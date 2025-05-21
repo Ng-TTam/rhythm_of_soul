@@ -7,8 +7,9 @@ import { FaEye } from '@react-icons/all-files/fa/FaEye';
 
 
 import { PlaylistPostCardProps} from '../../model/post/post';
-import '../../style/PlaylistPost.css';
-import classNames from 'classnames/bind';
+import styles from '../../styles/PlaylistPost.module.css'; // Updated import
+import classNames from 'classnames';
+
 const PlaylistPostCard: React.FC<PlaylistPostCardProps> = ({
   post,
   playingTrackId,
@@ -18,9 +19,8 @@ const PlaylistPostCard: React.FC<PlaylistPostCardProps> = ({
   onComment
 }) => {
   const navigate = useNavigate();
-  const cx = classNames.bind(require('../../style/PlaylistPost.css'));
   const [localLikedTracks, setLocalLikedTracks] = useState<Record<string, boolean>>({});
-  console.log('PlaylistPostCard', post);
+
   if (!post.content) return null;
 
   const formattedDate = new Date(post.created_at).toLocaleDateString('en-US', {
@@ -32,7 +32,6 @@ const PlaylistPostCard: React.FC<PlaylistPostCardProps> = ({
   const songs = post.content.songIds || [];
   const coverImage = post.content.coverUrl || '/assets/images/default/playlist-cover.jpg';
   const playlistImage = post.content.imageUrl || '/assets/images/default/playlist-thumbnail.jpg';
-console.log( isLiked)
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -48,9 +47,7 @@ console.log( isLiked)
 
   const handleComment = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (onComment) {
-      onComment();
-    }
+    navigate(`/post/${post.id}`);
   };
 
   const handleViewDetail = () => {
@@ -58,53 +55,53 @@ console.log( isLiked)
   };
 
   return (
-    <div className={cx("playlist-card",classNames)} onClick={handleViewDetail}>
+    <div className={styles['playlist-card']} onClick={handleViewDetail}>
       {/* Header with Banner Background */}
       <div 
-        className="card-header-banner"
+        className={styles['card-header-banner']}
         style={{ backgroundImage: `url(${coverImage})` }}
       >
-        <div className="banner-overlay"></div>
+        <div className={styles['banner-overlay']}></div>
         
-        <div className="header-content">
-          <div className="user-info">
+        <div className={styles['header-content']}>
+          <div className={styles['user-info']}>
             <img
               src={post.userAvatar || '/assets/images/default/avatar.jpg'}
               alt={post.username}
-              className="user-avatar"
+              className={styles['user-avatar']}
               onError={(e) => {
                 (e.target as HTMLImageElement).src = '/assets/images/default/avatar.jpg';
               }}
             />
-            <div className="user-details">
-              <div className="username">{post.username}</div>
-              <div className="post-date">{formattedDate}</div>
+            <div className={styles['user-details']}>
+              <div className={styles['username']}>{post.username}</div>
+              <div className={styles['post-date']}>{formattedDate}</div>
             </div>
           </div>
-          <span className="playlist-type">
+          <span className={styles['playlist-type']}>
             {post.type}
           </span>
         </div>
         
-        <div className="banner-content">
-          <div className="banner-title-area">
-            <h2 className="banner-title">{post.content.title}</h2>
-            <div className="banner-meta">
+        <div className={styles['banner-content']}>
+          <div className={styles['banner-title-area']}>
+            <h2 className={styles['banner-title']}>{post.content.title}</h2>
+            <div className={styles['banner-meta']}>
               • {songs.length} {songs.length === 1 ? 'track' : 'tracks'}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="card-body">
-        <div className="flex-container">
+      <div className={styles['card-body']}>
+        <div className={styles['flex-container']}>
           {/* Album Cover */}
-          <div className="album-cover-container">
-            <div className="album-cover-wrapper">
+          <div className={styles['album-cover-container']}>
+            <div className={styles['album-cover-wrapper']}>
               <img
                 src={playlistImage}
                 alt={post.content.title}
-                className="album-cover"
+                className={styles['album-cover']}
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/assets/images/default/playlist-thumbnail.jpg';
                 }}
@@ -113,44 +110,46 @@ console.log( isLiked)
           </div>
           
           {/* Playlist Details */}
-          <div className="playlist-details">
+          <div className={styles['playlist-details']}>
             {/* Tags */}
             {post.content.tags?.length && post.content.tags.length > 0 && (
-              <div className="tags-container">
+              <div className={styles['tags-container']}>
                 {post.content.tags.map((tag, index) => (
-                  <span key={index} className="tag">
+                  <span key={index} className={styles['tag']}>
                     #{tag}
                   </span>
                 ))}
               </div>
             )}
-            
           </div>
         </div>
         
         {/* Action Buttons */}
-        <div className="actions-container">
+        <div className={styles['actions-container']}>
           <button 
-            className={`action-button ${isLiked ? 'liked' : ''}`}
+            className={classNames(
+              styles['action-button'],
+              { [styles['liked']]: isLiked }
+            )}
             onClick={handleLike}
           >
             {isLiked ? (
-              <FaHeart className="action-icon" />
+              <FaHeart className={styles['action-icon']} />
             ) : (
-              <FaRegHeart className="action-icon" />
+              <FaRegHeart className={styles['action-icon']} />
             )}
-            <span className="action-count">{post.like_count}</span>
+            <span className={styles['action-count']}>{post.like_count}</span>
           </button>
           <button 
-            className="action-button"
+            className={styles['action-button']}
             onClick={handleComment}
           >
-            <FaComment className="action-icon" />
-            <span className="action-count">{post.comment_count}</span>
+            <FaComment className={styles['action-icon']} />
+            <span className={styles['action-count']}>{post.comment_count}</span>
           </button>
-          <div className="view-display">
-            <FaEye className="action-icon" />
-            <span className="action-count">{post.view_count}</span>
+          <div className={styles['view-display']}>
+            <FaEye className={styles['action-icon']} />
+            <span className={styles['action-count']}>{post.view_count}</span>
           </div>
         </div>
       </div>

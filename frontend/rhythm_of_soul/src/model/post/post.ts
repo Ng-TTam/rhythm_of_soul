@@ -163,7 +163,7 @@ export interface PostDetailResponse {
 export const currentUser: User = {
   id: '5678',
   username: 'Current User',
-  avatar: 'https://i1.sndcdn.com/avatars-6zJmWE24BNXpCEdL-qVvuHg-t120x120.jpg'
+  avatar: '/assets/images/default/avatar.jpg',
 };
 
 export const formatTime = (seconds: number): string => {

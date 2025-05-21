@@ -1,5 +1,7 @@
 package com.rhythm_of_soul.identity_service.api;
 
+import java.util.List;
+
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import com.rhythm_of_soul.identity_service.dto.request.ArtistProfileRequest;
 import com.rhythm_of_soul.identity_service.dto.request.UserUpdateRequest;
 import com.rhythm_of_soul.identity_service.dto.response.ApiResponse;
+import com.rhythm_of_soul.identity_service.dto.response.InformationResponse;
 import com.rhythm_of_soul.identity_service.dto.response.PageResponse;
 import com.rhythm_of_soul.identity_service.dto.response.UserResponse;
 import com.rhythm_of_soul.identity_service.service.UserService;
@@ -17,8 +20,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -47,6 +48,13 @@ public class UserController {
     //                .result(userService.getUser(userId))
     //                .build();
     //    }
+    @GetMapping("/information/{accountId}")
+    ApiResponse<InformationResponse> getUserProfile(@PathVariable String accountId) {
+        return ApiResponse.<InformationResponse>builder()
+                .message(SUCCESS)
+                .result(userService.getInformation(accountId))
+                .build();
+    }
 
     @GetMapping("/{preEmail}")
     ApiResponse<UserResponse> getUserProfileByEmail(@PathVariable String preEmail) {
@@ -122,5 +130,4 @@ public class UserController {
                 .result(result)
                 .build());
     }
-
 }

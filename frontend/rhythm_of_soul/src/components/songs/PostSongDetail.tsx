@@ -5,7 +5,6 @@ import {
   Col, 
   Card, 
   Button, 
-  Image, 
   Badge, 
   Alert
 } from 'react-bootstrap';
@@ -20,6 +19,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hook';
 import { toggleePlay, setAudio } from '../../reducers/audioReducer';
 import  {SongDetail} from '../../model/post/Song';
 import { getSongDetail } from '../../services/postService';
+import { getUserByAccountId, UserInfo } from '../../services/api/userService';
 
 
 interface PostSongDetailProps {
@@ -31,7 +31,7 @@ const PostSongDetail: React.FC<PostSongDetailProps> = ({ postId }) =>{
   
   const dispatch = useAppDispatch();
   const audioState = useAppSelector(state => state.audio);
-  
+  const [user, setUser] = useState<UserInfo | null>( null)
   useEffect(() => {
     const fetchSongDetail = async () => {
       try {
@@ -42,6 +42,12 @@ const PostSongDetail: React.FC<PostSongDetailProps> = ({ postId }) =>{
         }
         
         setSongDetail(response.result);
+        const userResponse = await getUserByAccountId(response.result.post.account_id);
+        if (userResponse.code !== 200) {
+          throw new Error('Failed to fetch user data');
+        }
+        const user = userResponse.result;
+        setUser(user);
         
       } catch (err) {
         console.error(err);
@@ -160,16 +166,14 @@ const PostSongDetail: React.FC<PostSongDetailProps> = ({ postId }) =>{
             
             <Card.Body>
               <div className="d-flex align-items-center">
-                <Image 
-                  src="/api/placeholder/64/64" 
+                <img 
+                  src={user?.avatar || "/assets/images/default/avatar.jpg"} 
                   alt="User" 
-                  roundedCircle
                   className="me-3"
-                  width={64} 
-                  height={64} 
+                  style={{ width: '50px', height: '50px', borderRadius: '50%' }}
                 />
                 <div>
-                  <h6 className="mb-0">User ID: {post.account_id}</h6>
+                  <h6 className="mb-0"> {`${user?.first_name} ${user?.last_name}`}</h6>
                   <Button variant="outline-primary" size="sm" className="mt-2">
                     Follow
                   </Button>

@@ -2,10 +2,6 @@ package com.rhythm_of_soul.identity_service.api;
 
 import java.util.List;
 
-import com.rhythm_of_soul.identity_service.dto.response.UserBasicInfoResponse;
-import com.rhythm_of_soul.identity_service.entity.User;
-import com.rhythm_of_soul.identity_service.exception.AppException;
-import com.rhythm_of_soul.identity_service.exception.ErrorCode;
 import jakarta.validation.Valid;
 
 import org.slf4j.Logger;
@@ -27,6 +23,7 @@ import com.rhythm_of_soul.identity_service.dto.request.UserCreationRequest;
 import com.rhythm_of_soul.identity_service.dto.response.AccountResponse;
 import com.rhythm_of_soul.identity_service.dto.response.ApiResponse;
 import com.rhythm_of_soul.identity_service.dto.response.AuthenticationResponse;
+import com.rhythm_of_soul.identity_service.dto.response.UserBasicInfoResponse;
 import com.rhythm_of_soul.identity_service.service.AccountService;
 
 import lombok.AccessLevel;
@@ -124,5 +121,4 @@ public class AccountController {
                 .message("User info fetched successfully")
                 .build();
     }
-
 }

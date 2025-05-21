@@ -1,13 +1,14 @@
 package com.rhythm_of_soul.identity_service.service;
 
+import java.util.List;
+
 import org.springframework.security.access.AccessDeniedException;
 
 import com.rhythm_of_soul.identity_service.dto.request.ArtistProfileRequest;
 import com.rhythm_of_soul.identity_service.dto.request.UserUpdateRequest;
+import com.rhythm_of_soul.identity_service.dto.response.InformationResponse;
 import com.rhythm_of_soul.identity_service.dto.response.PageResponse;
 import com.rhythm_of_soul.identity_service.dto.response.UserResponse;
-
-import java.util.List;
 
 public interface UserService {
     UserResponse updateUser(String userId, UserUpdateRequest userUpdateRequest);
@@ -15,6 +16,8 @@ public interface UserService {
     UserResponse getUser(String userId);
 
     UserResponse getMe();
+
+    InformationResponse getInformation(String acccountId);
 
     UserResponse getUserByEmail(String email);
 
@@ -51,5 +54,4 @@ public interface UserService {
     PageResponse<UserResponse> getAllUsers(int page, int size, String searchKey);
 
     List<UserResponse> getAllArtistRequestUsers();
-
 }

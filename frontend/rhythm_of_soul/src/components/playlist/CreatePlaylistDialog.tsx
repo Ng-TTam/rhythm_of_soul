@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Modal, Form, Button, Spinner, Row, Col } from 'react-bootstrap';
 import {AddPlaylistModalProps} from '../../model/post/Playlist';
-const MUSIC_TAGS = ['ROCK', 'POP', 'JAZZ', 'CLASSICAL', 'HIP-HOP', 'ELECTRONIC'];
+const MUSIC_TAGS = ['ROCK', 'POP', 'JAZZ', 'CLASSICAL', 'HIP_HOP', 'ELECTRONIC'];
 
 const AddPlaylistModal: React.FC<AddPlaylistModalProps> = ({
   show,

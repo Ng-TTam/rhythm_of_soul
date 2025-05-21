@@ -1,32 +1,51 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { PostWithUserInfo, CurrentUser } from '../../../model/post/post';
 import { likePost, unlikePost } from '../../../services/postService';
-
-const usePosts = (currentUser: CurrentUser) => {
+import { getAccessToken,DecodedToken } from '../../../utils/tokenManager';
+import { getProfile } from '../../../services/api/userService';
+import { jwtDecode } from 'jwt-decode';
+const usePosts = () => {
+  const currentUser = useRef<CurrentUser>({
+    id: '',
+    username: '',
+    avatar: '/assets/images/default/avatar.jpg',
+  });
   const [posts, setPosts] = useState<PostWithUserInfo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [commentOpen, setCommentOpen] = useState<Record<string, boolean>>({});
   const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
   const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
+  const accessToken = getAccessToken();
+  const decodedToken = accessToken ? jwtDecode<DecodedToken>(accessToken) : null;
+  const userId = decodedToken ? decodedToken.sub : null;
 
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8484/posts/${currentUser.id}`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
+      const responseUser = await getProfile();
+      currentUser.current = {
+        id: userId || '',
+        username: responseUser.firstName + ' ' + responseUser.lastName,
+        avatar: responseUser.avatar || '/assets/images/default/avatar.jpg',
+      };
+      console.log('Current user:', currentUser.current.id);
+      const response = await fetch(`http://localhost:8484/content/posts/${currentUser.current.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      console.log('Response:', currentUser.current.id);
+
       
       const result = await response.json();
-      console.log('Fetched posts:', result);
-      
       if (result.code === 200 && Array.isArray(result.result)) {
         const postsWithUserInfo = result.result.map((post: any) => ({
           ...post,
-          username: currentUser.username,
-          userAvatar: currentUser.avatar
+          username: currentUser.current.username,
+          userAvatar: currentUser.current.avatar
         }));
         postsWithUserInfo.forEach((post: PostWithUserInfo) => {
           setLikedPosts(prev => ({
@@ -45,7 +64,7 @@ const usePosts = (currentUser: CurrentUser) => {
     } finally {
       setLoading(false);
     }
-  }, [currentUser]);
+  }, []);
 
   useEffect(() => {
     fetchPosts();

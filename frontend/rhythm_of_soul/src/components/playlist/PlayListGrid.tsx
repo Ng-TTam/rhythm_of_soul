@@ -29,7 +29,7 @@ const PlaylistGrid: React.FC = () => {
     createNewPlaylist,
     isCreating,
     creationError,
-  } = playlistPosts(currentUser);
+  } = playlistPosts();
   
   const navigate = useNavigate();
   const [showAddModal, setShowAddModal] = useState(false);
@@ -46,10 +46,11 @@ const PlaylistGrid: React.FC = () => {
     tags: string[];
   }) => {
     try {
-      await createNewPlaylist({
+      const response = await createNewPlaylist({
         ...playlistData,
         songIds: [] // Start with empty playlist, can add songs later
       });
+      
       setShowAddModal(false);
     } catch (err) {
       console.error("Failed to create playlist:", err);

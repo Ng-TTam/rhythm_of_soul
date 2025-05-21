@@ -124,7 +124,7 @@ export default function UserProfile() {
           <Col lg={4}>
             <Card className="border-0 shadow-sm mb-4">
               <Card.Body className="text-center p-4">
-                <div className="position-relative mb-4">
+                <div className="position-relative mb-4" style={{justifyItems : "center"}}>
                   <img
                     src={user?.avatar || "/assets/images/default/avatar.jpg"}
                     alt={`${user?.firstName + " " + user?.lastName}'s Avatar`}
@@ -159,7 +159,7 @@ export default function UserProfile() {
                   <div className="bg-light rounded-pill px-3 py-1 text-muted small">{user?.gender}</div>
                 </div>
 
-                <Button variant="outline-primary" className="rounded-pill px-4" onClick={handleEditOpen}>
+                <Button variant="outline-primary" className="rounded-pill px-4" onClick={handleEditOpen} style={{justifyItems :"center"}}>
                   <FaPencilAlt className="me-2" />
                   Edit Profile
                 </Button>
