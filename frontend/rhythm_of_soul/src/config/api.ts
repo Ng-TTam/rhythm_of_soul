@@ -67,7 +67,7 @@ export const apiConfig = {
       login: `${config.apiBaseUrl}/identity/auth/login`,
       log_out: `${config.apiBaseUrl}/identity/auth/logout`,
       register: `${config.apiBaseUrl}/identity/api/sign-up`,
-      refresh_token: `${config.apiBaseUrl}/identity/auth/refresh-token`,
+      refresh_token: `${config.apiBaseUrl}/identity/auth/refresh`,
       reset_pass: `${config.apiBaseUrl}/identity/reset-password/request`,
       reset_pass_verify: `${config.apiBaseUrl}/identity/reset-password/verify`,
     },

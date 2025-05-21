@@ -78,7 +78,7 @@ const LoginForm: React.FC = () => {
     } catch (err: any) {
       Swal.fire({
         icon: 'error',
-        title: 'Tài khoản hoặc mật khẩu không đúng',
+        title: 'Email or password is wrong',
         showConfirmButton: true,
         confirmButtonText: 'OK',
         confirmButtonColor: '#ff4545',

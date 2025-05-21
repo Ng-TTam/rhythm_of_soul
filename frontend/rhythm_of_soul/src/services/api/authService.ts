@@ -5,18 +5,10 @@ import { APIResponse } from '../../model/APIResponse';
 import { RegisterRequest } from '../../model/auth/RegisterRequest';
 import { ResetPasswordRequest } from '../../model/auth/ResetPasswordRequest';
 import { LoginRequest } from '../../model/auth/LoginRequest';
+import { TokenResponse } from '../../model/auth/TokenResponse';
 
-interface LoginResponse {
-  token: string;
-}
-
-interface RegisterResponse {
-  token: string;
-}
-
-
-export const login = async (data: LoginRequest): Promise<APIResponse<LoginResponse>> => {
-  const response = await apiClient.post<APIResponse<LoginResponse>>(
+export const login = async (data: LoginRequest): Promise<APIResponse<TokenResponse>> => {
+  const response = await apiClient.post<APIResponse<TokenResponse>>(
     apiConfig.endpoints.auth.login,
     data
   );
@@ -26,8 +18,8 @@ export const login = async (data: LoginRequest): Promise<APIResponse<LoginRespon
 };
 
 
-export const register = async (data: RegisterRequest): Promise<APIResponse<RegisterResponse>> => {
-  const response = await apiClient.post<APIResponse<RegisterResponse>>(
+export const register = async (data: RegisterRequest): Promise<APIResponse<TokenResponse>> => {
+  const response = await apiClient.post<APIResponse<TokenResponse>>(
     apiConfig.endpoints.auth.register,
     data
   );
@@ -37,8 +29,8 @@ export const register = async (data: RegisterRequest): Promise<APIResponse<Regis
 };
 
 
-export const refreshToken = async (): Promise<APIResponse<LoginResponse>> => {
-  const response = await apiClient.post<APIResponse<LoginResponse>>(
+export const refreshToken = async (): Promise<APIResponse<TokenResponse>> => {
+  const response = await apiClient.post<APIResponse<TokenResponse>>(
     apiConfig.endpoints.auth.refresh_token,
     {}
   );

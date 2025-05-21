@@ -1,6 +1,9 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { apiConfig, envConfig } from '../../config';
 import { getAccessToken, setAccessToken, clearAccessToken } from '../../utils/tokenManager';
+import { APIResponse } from '../../model/APIResponse';
+import { TokenResponse } from '../../model/auth/TokenResponse';
+import Swal from 'sweetalert2';
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: apiConfig.baseUrl,
@@ -44,8 +47,8 @@ apiClient.interceptors.response.use(
 
       try {
         // Gọi API refresh token (cookie sẽ tự động gửi)
-        const response = await apiClient.post(apiConfig.endpoints.auth.refresh_token, {});
-        const { accessToken } = response.data;
+        const response = await apiClient.post<APIResponse<TokenResponse>>(apiConfig.endpoints.auth.refresh_token, {});
+        const accessToken = response.data.result.token;
 
         setAccessToken(accessToken);
 
@@ -57,7 +60,17 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         // Refresh token thất bại, xóa token và redirect
         clearAccessToken();
-        window.location.href = '/login';
+        Swal.fire({
+          icon: 'warning',
+          title: 'Your session is expired!!!',
+          showConfirmButton: true,
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#ff4545',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = '/login';
+          }
+        });
         return Promise.reject(refreshError);
       }
     }
