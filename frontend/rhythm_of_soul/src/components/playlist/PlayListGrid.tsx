@@ -1,18 +1,19 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { Container, Card, Button, Row, Col } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-import { FaPlus } from '@react-icons/all-files/fa/FaPlus';
-import playlistPosts from './hooks/playlistPosts';
-import ErrorBoundary from '../../pages/feed/ErrorBoundary';
-import SkeletonPost from '../../pages/feed/SkeletonPost';
-import { CurrentUser } from '../../model/post/post';
-import PlayListPost from './PlayListPost';
-import AddPlaylistModal from './CreatePlaylistDialog'; // Import the new modal
+import React, { useEffect, useState, Suspense, lazy } from "react";
+import { Container, Button, Row, Col, Spinner } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { FaPlus } from "@react-icons/all-files/fa/FaPlus";
+import playlistPosts from "./hooks/playlistPosts";
+import ErrorBoundary from "../../pages/feed/ErrorBoundary";
+import SkeletonPost from "../../pages/feed/SkeletonPost";
+import { CurrentUser } from "../../model/post/post";
+import PlayListPost from "./PlayListPost";
+
+const AddPlaylistModal = lazy(() => import("./CreatePlaylistDialog"));
 
 const currentUser: CurrentUser = {
   id: "326e6645-aa0f-4f89-b885-019c05b1a970",
   username: "Current User",
-  avatar: "https://i1.sndcdn.com/avatars-6zJmWE24BNXpCEdL-qVvuHg-t120x120.jpg"
+  avatar: "https://i1.sndcdn.com/avatars-6zJmWE24BNXpCEdL-qVvuHg-t120x120.jpg",
 };
 
 const PlaylistGrid: React.FC = () => {
@@ -38,17 +39,11 @@ const PlaylistGrid: React.FC = () => {
     fetchPosts();
   }, [fetchPosts]);
 
-  const handleCreatePlaylist = async (playlistData: {
-    title: string;
-    isPublic: boolean;
-    cover?: File;
-    image?: File;
-    tags: string[];
-  }) => {
+  const handleCreatePlaylist = async (playlistData: { title: string; isPublic: boolean; cover?: File; image?: File; tags: string[] }) => {
     try {
       const response = await createNewPlaylist({
         ...playlistData,
-        songIds: [] // Start with empty playlist, can add songs later
+        songIds: [], // Start with empty playlist, can add songs later
       });
       
       setShowAddModal(false);
@@ -63,25 +58,18 @@ const PlaylistGrid: React.FC = () => {
       <Container className="my-4">
         {/* Add New Playlist Button */}
         <div className="d-flex justify-content-end mb-4">
-          <Button 
-            variant="primary" 
-            className="d-flex align-items-center"
-            onClick={() => setShowAddModal(true)}
-          >
+          <Button variant="primary" className="d-flex align-items-center" onClick={() => setShowAddModal(true)}>
             <FaPlus className="me-2" />
-            Tạo Playlist Mới
+            Creat new playlist
           </Button>
         </div>
 
         {/* Add Playlist Modal */}
-        <AddPlaylistModal
-          show={showAddModal}
-          onHide={() => setShowAddModal(false)}
-          currentUser={currentUser}
-          onCreate={handleCreatePlaylist}
-          isCreating={isCreating}
-          error={creationError}
-        />
+        {showAddModal && (
+          <Suspense fallback={<Spinner animation="border" />}>
+            <AddPlaylistModal show={showAddModal} onHide={() => setShowAddModal(false)} currentUser={currentUser} onCreate={handleCreatePlaylist} isCreating={isCreating} error={creationError} />
+          </Suspense>
+        )}
 
         {loading && (
           <div className="text-center py-5">
@@ -90,33 +78,22 @@ const PlaylistGrid: React.FC = () => {
             ))}
           </div>
         )}
-        
+
         {/* Error state */}
         {error && (
           <div className="alert alert-danger" role="alert">
             Error loading posts: {error}
-            <Button 
-              variant="link" 
-              onClick={fetchPosts}
-              className="ms-2"
-            >
+            <Button variant="link" onClick={fetchPosts} className="ms-2">
               Retry
             </Button>
           </div>
         )}
-        
+
         {/* Feed content */}
         <Row>
           {posts.map((post) => (
             <Col xs={12} key={post.id} className="mb-4">
-              <PlayListPost 
-                post={post}
-                playingTrackId={playingTrackId}
-                onPlayTrack={handlePlayTrack}
-                isLiked={likedPosts[post.id]}
-                onLike={() => handleLike(post.id)}
-                onComment={() => toggleComment(post.id)}
-              />
+              <PlayListPost post={post} playingTrackId={playingTrackId} onPlayTrack={handlePlayTrack} isLiked={likedPosts[post.id]} onLike={() => handleLike(post.id)} onComment={() => toggleComment(post.id)} />
             </Col>
           ))}
         </Row>

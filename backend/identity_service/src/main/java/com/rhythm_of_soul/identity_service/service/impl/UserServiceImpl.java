@@ -1,16 +1,5 @@
 package com.rhythm_of_soul.identity_service.service.impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import jakarta.transaction.Transactional;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Service;
-
 import com.rhythm_of_soul.identity_service.constant.ArtistProfileStatus;
 import com.rhythm_of_soul.identity_service.constant.Role;
 import com.rhythm_of_soul.identity_service.dto.request.ArtistProfileRequest;
@@ -29,11 +18,19 @@ import com.rhythm_of_soul.identity_service.repository.AccountRepository;
 import com.rhythm_of_soul.identity_service.repository.UserRepository;
 import com.rhythm_of_soul.identity_service.service.UserService;
 import com.rhythm_of_soul.identity_service.utils.JwtUtils;
-
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service

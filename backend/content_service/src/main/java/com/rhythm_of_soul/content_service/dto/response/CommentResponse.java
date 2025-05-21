@@ -22,6 +22,7 @@ public class CommentResponse {
     String parentId ;    // ID comment cha (nếu là reply)
     String username;
     String userAvatar;
+    boolean userIsArtist;
     Instant createdAt; // Thời gian tạo comment
     Instant updatedAt;
     List<CommentResponse> child_comments;// Danh sách comment con (nếu có)

@@ -83,7 +83,7 @@ const AddPlaylistModal: React.FC<AddPlaylistModalProps> = ({
   return (
     <Modal show={show} onHide={onHide} centered size="lg">
       <Modal.Header closeButton>
-        <Modal.Title>Tạo Playlist Mới</Modal.Title>
+        <Modal.Title>Create new playlist</Modal.Title>
       </Modal.Header>
       <Form onSubmit={handleSubmit}>
         <Modal.Body>
@@ -96,10 +96,10 @@ const AddPlaylistModal: React.FC<AddPlaylistModalProps> = ({
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Tên Playlist</Form.Label>
+                <Form.Label>Playlist name</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Nhập tên playlist"
+                  placeholder="Enter playlist name"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
@@ -136,7 +136,7 @@ const AddPlaylistModal: React.FC<AddPlaylistModalProps> = ({
 
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Ảnh bìa</Form.Label>
+                <Form.Label>Cover</Form.Label>
                 <div className="border rounded p-3 text-center">
                   {previewCover ? (
                     <img 
@@ -148,7 +148,7 @@ const AddPlaylistModal: React.FC<AddPlaylistModalProps> = ({
                   ) : (
                     <div className="py-5 bg-light mb-2">
                       <i className="bi bi-image fs-1 text-muted"></i>
-                      <p className="text-muted">Chưa có ảnh bìa</p>
+                      <p className="text-muted">No cover</p>
                     </div>
                   )}
                   <Form.Control
@@ -158,12 +158,12 @@ const AddPlaylistModal: React.FC<AddPlaylistModalProps> = ({
                     ref={fileInputRef}
                   />
                   <Form.Text className="text-muted">
-                    Tải lên ảnh bìa cho playlist 
+                    Upload cover for playlist 
                   </Form.Text>
                 </div>
               </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Label>Ảnh đại diện</Form.Label>
+                <Form.Label>Avatar</Form.Label>
                 <div className="border rounded p-3 text-center">
                   {previewImage ? (
                     <img 
@@ -175,7 +175,7 @@ const AddPlaylistModal: React.FC<AddPlaylistModalProps> = ({
                   ) : (
                     <div className="py-5 bg-light mb-2">
                       <i className="bi bi-image fs-1 text-muted"></i>
-                      <p className="text-muted">Chưa có ảnh </p>
+                      <p className="text-muted">No image</p>
                     </div>
                   )}
                   <Form.Control
@@ -185,7 +185,7 @@ const AddPlaylistModal: React.FC<AddPlaylistModalProps> = ({
                     ref={fileInputRef}
                   />
                   <Form.Text className="text-muted">
-                    Tải lên ảnh cho playlist 
+                    Upload image for playlist 
                   </Form.Text>
                 </div>
               </Form.Group>
@@ -200,7 +200,7 @@ const AddPlaylistModal: React.FC<AddPlaylistModalProps> = ({
             {isCreating ? (
               <>
                 <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
-                <span className="ms-2">Đang tạo...</span>
+                <span className="ms-2">Creating...</span>
               </>
             ) : 'Tạo Playlist'}
           </Button>

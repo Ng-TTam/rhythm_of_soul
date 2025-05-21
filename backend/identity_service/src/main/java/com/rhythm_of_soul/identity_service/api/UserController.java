@@ -1,13 +1,5 @@
 package com.rhythm_of_soul.identity_service.api;
 
-import java.util.List;
-
-import jakarta.validation.Valid;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
 import com.rhythm_of_soul.identity_service.dto.request.ArtistProfileRequest;
 import com.rhythm_of_soul.identity_service.dto.request.UserUpdateRequest;
 import com.rhythm_of_soul.identity_service.dto.response.ApiResponse;
@@ -15,11 +7,16 @@ import com.rhythm_of_soul.identity_service.dto.response.InformationResponse;
 import com.rhythm_of_soul.identity_service.dto.response.PageResponse;
 import com.rhythm_of_soul.identity_service.dto.response.UserResponse;
 import com.rhythm_of_soul.identity_service.service.UserService;
-
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")

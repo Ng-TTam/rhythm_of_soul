@@ -15,6 +15,7 @@ import com.rhythm_of_soul.content_service.repository.PostRepository;
 import com.rhythm_of_soul.content_service.service.CommentService;
 import com.rhythm_of_soul.content_service.service.IdentityClient;
 import com.rhythm_of_soul.content_service.service.RedisPublisher;
+import com.rhythm_of_soul.content_service.utils.SecurityUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -56,7 +57,8 @@ public class CommentServiceImpl implements CommentService {
         postRepository.save(post);
 
         Comment comment = commentMapper.toComment(request);
-        comment.setAccountId(getCurrentAccountId());
+        comment.setAccountId(SecurityUtils.getCurrentAccountId());
+        comment.setUserIsArtist("ROLE_ARTIST".equals(SecurityUtils.getRoleFromToken()));
         Instant now = Instant.now();
         comment.setCreatedAt(now);
         comment.setUpdatedAt(now);
@@ -135,9 +137,5 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void reportComment(String commentId, String accountId, CommentReportRequest request) {
 
-    }
-
-    private String getCurrentAccountId() {
-        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 }

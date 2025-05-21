@@ -1,11 +1,8 @@
 package com.rhythm_of_soul.content_service.dto.response;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 @Getter
 @Setter 
 @Builder

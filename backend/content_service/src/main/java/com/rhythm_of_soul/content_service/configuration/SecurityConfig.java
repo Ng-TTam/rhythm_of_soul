@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS)
                         .permitAll()
-                        .requestMatchers(HttpMethod.POST, "posts/**", "comments/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/posts/**", "/comments/**").permitAll()
                         .anyRequest()
                         .authenticated());
 

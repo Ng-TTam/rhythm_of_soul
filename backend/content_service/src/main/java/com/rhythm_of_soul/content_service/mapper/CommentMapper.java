@@ -6,7 +6,6 @@ import com.rhythm_of_soul.content_service.dto.response.CommentResponse;
 import com.rhythm_of_soul.content_service.entity.Comment;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")

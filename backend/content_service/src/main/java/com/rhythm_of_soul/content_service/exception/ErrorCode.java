@@ -20,6 +20,7 @@ public enum ErrorCode {
     // 6xxx - comment error code
     COMMENT_NOT_FOUND(6001, "Comment not found", HttpStatus.NOT_FOUND),
     BLANK_COMMENT(6002, "Blank comment", HttpStatus.NOT_FOUND),
+    BLANK_COMMENT_USER_NAME(6003, "Blank comment user name", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

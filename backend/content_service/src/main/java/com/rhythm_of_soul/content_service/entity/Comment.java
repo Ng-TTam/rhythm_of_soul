@@ -20,6 +20,9 @@ public class Comment {
     private String accountId;      // Người comment
     private String content;     // Nội dung comment
     private String parentId;    // ID comment cha (nếu là reply)
+    private String username;
+    private String userAvatar;
+    private boolean userIsArtist;
     private Instant createdAt;
     private Instant updatedAt;
 }
