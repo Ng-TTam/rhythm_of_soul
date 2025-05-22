@@ -1,20 +1,13 @@
+
 import React, { useEffect, useState, Suspense, lazy } from "react";
 import { Container, Button, Row, Col, Spinner } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
 import { FaPlus } from "@react-icons/all-files/fa/FaPlus";
 import playlistPosts from "./hooks/playlistPosts";
 import ErrorBoundary from "../../pages/feed/ErrorBoundary";
 import SkeletonPost from "../../pages/feed/SkeletonPost";
-import { CurrentUser } from "../../model/post/post";
 import PlayListPost from "./PlayListPost";
 
 const AddPlaylistModal = lazy(() => import("./CreatePlaylistDialog"));
-
-const currentUser: CurrentUser = {
-  id: "326e6645-aa0f-4f89-b885-019c05b1a970",
-  username: "Current User",
-  avatar: "https://i1.sndcdn.com/avatars-6zJmWE24BNXpCEdL-qVvuHg-t120x120.jpg",
-};
 
 const PlaylistGrid: React.FC = () => {
   const {
@@ -32,7 +25,6 @@ const PlaylistGrid: React.FC = () => {
     creationError,
   } = playlistPosts();
   
-  const navigate = useNavigate();
   const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
@@ -45,7 +37,6 @@ const PlaylistGrid: React.FC = () => {
         ...playlistData,
         songIds: [], // Start with empty playlist, can add songs later
       });
-      
       setShowAddModal(false);
     } catch (err) {
       console.error("Failed to create playlist:", err);
@@ -67,9 +58,10 @@ const PlaylistGrid: React.FC = () => {
         {/* Add Playlist Modal */}
         {showAddModal && (
           <Suspense fallback={<Spinner animation="border" />}>
-            <AddPlaylistModal show={showAddModal} onHide={() => setShowAddModal(false)} currentUser={currentUser} onCreate={handleCreatePlaylist} isCreating={isCreating} error={creationError} />
+            <AddPlaylistModal show={showAddModal} onHide={() => setShowAddModal(false)} onCreate={handleCreatePlaylist} isCreating={isCreating} error={creationError} />
           </Suspense>
         )}
+
 
         {loading && (
           <div className="text-center py-5">
@@ -93,7 +85,7 @@ const PlaylistGrid: React.FC = () => {
         <Row>
           {posts.map((post) => (
             <Col xs={12} key={post.id} className="mb-4">
-              <PlayListPost post={post} playingTrackId={playingTrackId} onPlayTrack={handlePlayTrack} isLiked={likedPosts[post.id]} onLike={() => handleLike(post.id)} onComment={() => toggleComment(post.id)} />
+              <PlayListPost post={post} playingTrackId={playingTrackId} onPlayTrack={handlePlayTrack} isLiked={likedPosts[post.id]} onLike={() => handleLike(post.id)} onComment={() => toggleComment(post.id)}  />
             </Col>
           ))}
         </Row>

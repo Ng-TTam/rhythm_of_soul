@@ -8,6 +8,7 @@ export default function Playlist() {
             style={{
                 paddingRight: "10px",
                 borderRight: "1px solid #ccc",
+                color : "black"
             }}>Playlist</h2>
             </div>
             <Outlet />

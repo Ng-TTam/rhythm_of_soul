@@ -10,10 +10,10 @@ spring:
     name: identity-service
   datasource:
 
-    url: jdbc:mariadb://localhost:3307/identity
+    url: jdbc:mariadb://localhost:3366/identity
     driverClassName: org.mariadb.jdbc.Driver
     username: root
-    password: root
+    password: 12345678
   jpa:
     hibernate:
       ddl-auto: update

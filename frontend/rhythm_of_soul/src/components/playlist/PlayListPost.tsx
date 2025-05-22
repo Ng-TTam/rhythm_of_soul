@@ -9,6 +9,9 @@ import { FaEye } from '@react-icons/all-files/fa/FaEye';
 import { PlaylistPostCardProps} from '../../model/post/post';
 import styles from '../../styles/PlaylistPost.module.css'; // Updated import
 import classNames from 'classnames';
+import { FaEllipsisH } from '@react-icons/all-files/fa/FaEllipsisH';
+import { updatePlaylist } from '../../services/postService';
+import EditPlaylistModal from './EditPlaylist';
 
 const PlaylistPostCard: React.FC<PlaylistPostCardProps> = ({
   post,
@@ -20,8 +23,57 @@ const PlaylistPostCard: React.FC<PlaylistPostCardProps> = ({
 }) => {
   const navigate = useNavigate();
   const [localLikedTracks, setLocalLikedTracks] = useState<Record<string, boolean>>({});
-
+  const [playlist, setPlaylist] = useState(post);
+  const [editingPlaylistId, setEditingPlaylistId] = useState<string | null>(null);
+  
   if (!post.content) return null;
+  
+  const handleEditPlaylist = async (updatedPlaylistData: {
+    title: string;
+    isPublic: boolean;
+    tags: string[];
+    coverUrl: string;
+    imageUrl: string;
+    tracks: string[];
+    caption : string;
+  }) => {
+    if (!editingPlaylistId) return;
+    console.log("Update:", updatedPlaylistData);
+    try {
+
+      const requestBody = {
+        title: updatedPlaylistData.title,
+        isPublic: updatedPlaylistData.isPublic,
+        tags: updatedPlaylistData.tags,
+        coverUrl: updatedPlaylistData.coverUrl,
+        imageUrl: updatedPlaylistData.imageUrl,
+        songIds: updatedPlaylistData.tracks,
+        caption: updatedPlaylistData.caption,
+      };
+
+      const response = await updatePlaylist(editingPlaylistId, requestBody);
+      console.log("Response:", response);
+      if (response.code === 200) {
+        setPlaylist({
+          ...playlist,
+          content: {
+            ...playlist.content,
+            title: response.result.content.title,
+            tags: response.result.content.tags,
+            coverUrl: response.result.content.coverUrl,
+            imageUrl: response.result.content.imageUrl,
+            songIds: response.result.content.tracks
+          }
+        } as any); // Update the playlist state with the new data
+        setEditingPlaylistId(null);
+        return Promise.resolve();
+      }
+      throw new Error(response.message || 'Failed to update Playlist');
+    } catch (err) {
+      console.error("Error updating Playlist:", err);
+      return Promise.reject(err);
+    }
+  };
 
   const formattedDate = new Date(post.created_at).toLocaleDateString('en-US', {
     month: 'short',
@@ -30,9 +82,7 @@ const PlaylistPostCard: React.FC<PlaylistPostCardProps> = ({
   });
 
   const songs = post.content.songIds || [];
-  const coverImage = post.content.coverUrl || '/assets/images/default/playlist-cover.jpg';
-  const playlistImage = post.content.imageUrl || '/assets/images/default/playlist-thumbnail.jpg';
-
+  
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onLike) {
@@ -49,21 +99,31 @@ const PlaylistPostCard: React.FC<PlaylistPostCardProps> = ({
     e.stopPropagation();
     navigate(`/post/${post.id}`);
   };
-
+  
   const handleViewDetail = () => {
     navigate(`/post/${post.id}`);
   };
-
+  
+  const handleViewEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingPlaylistId(post.id);
+  }
+  
   return (
-    <div className={styles['playlist-card']} onClick={handleViewDetail}>
+    <div className={styles['playlist-card']} >
       {/* Header with Banner Background */}
       <div 
         className={styles['card-header-banner']}
-        style={{ backgroundImage: `url(${coverImage})` }}
+        style={{ backgroundImage: `url(${playlist.content?.coverUrl})` , height : "280px"}}
       >
-        <div className={styles['banner-overlay']}></div>
-        
-        <div className={styles['header-content']}>
+        <div className={styles['banner-overlay']}>
+        <button className={styles['playlist-type']} style={{justifyItems : "end",width :"99%", background :"none"}} onClick={(e) => handleViewEdit(e)} >
+              <FaEllipsisH style={{color :"black"}} />
+            </button>
+        </div>
+       
+        <div className={styles['header-content']} onClick={handleViewDetail}>
+          
           <div className={styles['user-info']}>
             <img
               src={post.userAvatar || '/assets/images/default/avatar.jpg'}
@@ -78,14 +138,16 @@ const PlaylistPostCard: React.FC<PlaylistPostCardProps> = ({
               <div className={styles['post-date']}>{formattedDate}</div>
             </div>
           </div>
+          
           <span className={styles['playlist-type']}>
-            {post.type}
+            {playlist.type}
           </span>
         </div>
         
         <div className={styles['banner-content']}>
           <div className={styles['banner-title-area']}>
-            <h2 className={styles['banner-title']}>{post.content.title}</h2>
+            <h2 className={styles['banner-title']}>{playlist.content?.title}</h2>
+            <h5 className={styles['banner-meta']}>{playlist.caption}</h5>
             <div className={styles['banner-meta']}>
               • {songs.length} {songs.length === 1 ? 'track' : 'tracks'}
             </div>
@@ -95,12 +157,12 @@ const PlaylistPostCard: React.FC<PlaylistPostCardProps> = ({
 
       <div className={styles['card-body']}>
         <div className={styles['flex-container']}>
-          {/* Album Cover */}
+          {/* Playlist Cover */}
           <div className={styles['album-cover-container']}>
             <div className={styles['album-cover-wrapper']}>
               <img
-                src={playlistImage}
-                alt={post.content.title}
+                src={playlist.content?.imageUrl || '/assets/images/default/playlist-thumbnail.jpg'}
+                alt={playlist.content?.title}
                 className={styles['album-cover']}
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/assets/images/default/playlist-thumbnail.jpg';
@@ -112,9 +174,9 @@ const PlaylistPostCard: React.FC<PlaylistPostCardProps> = ({
           {/* Playlist Details */}
           <div className={styles['playlist-details']}>
             {/* Tags */}
-            {post.content.tags?.length && post.content.tags.length > 0 && (
+            {playlist.content?.tags && playlist.content.tags.length > 0 && (
               <div className={styles['tags-container']}>
-                {post.content.tags.map((tag, index) => (
+                {playlist.content.tags.map((tag, index) => (
                   <span key={index} className={styles['tag']}>
                     #{tag}
                   </span>
@@ -138,21 +200,29 @@ const PlaylistPostCard: React.FC<PlaylistPostCardProps> = ({
             ) : (
               <FaRegHeart className={styles['action-icon']} />
             )}
-            <span className={styles['action-count']}>{post.like_count}</span>
+            <span className={styles['action-count']}>{playlist.like_count}</span>
           </button>
           <button 
             className={styles['action-button']}
             onClick={handleComment}
           >
             <FaComment className={styles['action-icon']} />
-            <span className={styles['action-count']}>{post.comment_count}</span>
+            <span className={styles['action-count']}>{playlist.comment_count}</span>
           </button>
           <div className={styles['view-display']}>
             <FaEye className={styles['action-icon']} />
-            <span className={styles['action-count']}>{post.view_count}</span>
+            <span className={styles['action-count']}>{playlist.view_count}</span>
           </div>
         </div>
       </div>
+      {editingPlaylistId && (
+        <EditPlaylistModal
+          show={!!editingPlaylistId}
+          onHi={() => setEditingPlaylistId(null)}
+          onEditPlaylist={handleEditPlaylist}
+          postId={post.id}
+        />
+      )}
     </div>
   );
 };

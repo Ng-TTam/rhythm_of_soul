@@ -6,7 +6,6 @@ const MUSIC_TAGS = ['ROCK', 'POP', 'JAZZ', 'CLASSICAL', 'HIP_HOP', 'ELECTRONIC']
 const AddPlaylistModal: React.FC<AddPlaylistModalProps> = ({
   show,
   onHide,
-  currentUser,
   onCreate,
   isCreating,
   error

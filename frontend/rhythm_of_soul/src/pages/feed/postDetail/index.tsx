@@ -21,7 +21,7 @@ interface Comment {
   createdAt: string;
   updatedAt: string | null;
   likes: number;
-  isArtist?: boolean;
+  userIsArtist?: boolean;
   child_comments?: Comment[];
 }
 
@@ -173,7 +173,7 @@ const CommentItem = ({
           <div className="bg-gray-100 rounded-2xl px-4 py-2">
             <div className="flex items-center">
               <span className="font-semibold mr-2">{comment.username}</span>
-              {comment.isArtist && (
+              {comment.userIsArtist && (
                 <span className="bg-purple-600 text-white text-xs px-2 py-0.5 rounded-full flex items-center mr-2">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -181,7 +181,7 @@ const CommentItem = ({
                   Artist
                 </span>
               )}
-              {!comment.isArtist && (
+              {!comment.userIsArtist && (
                 <span className="bg-gray-400 text-white text-xs px-2 py-0.5 rounded-full flex items-center mr-2">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
@@ -306,11 +306,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   const [replyTo, setReplyTo] = useState<{ id: string; username: string } | null>(null);
 
   const postId = useParams().postId;
-  console.log('Post ID:', postId);
   useEffect(() => {
     const fetchComments = async () => {
       const response = await getTopLevelComment(postId ?? '');
-      console.log('Fetched comments:', response);
       if (response.code === 200) {
         setComments(
           response.result.map((comment: Comment) => ({
@@ -357,11 +355,24 @@ const CommentSection: React.FC<CommentSectionProps> = ({
     setReplyTo({ id, username });
   };
 
-  const handleSubmitComment = (content: string, parentId?: string | null) => {
+  const handleSubmitComment = async (content: string, parentId?: string | null) => {
+    const accessToken = getAccessToken();
+    let userId = '';
+    if(accessToken){
+      userId = jwtDecode(accessToken).sub || '';
+    }
+    const res = await getUserByAccountId(userId);
+    if (res.code !== 200) {
+      console.error('Error fetching user data:', res.message);
+      return;
+    }
+    const user = res.result;
     const addCommentRequest: CommentCreationRequest = {
       content,
       postId: postId ?? '',
-      parentId: parentId || null
+      parentId: parentId || null,
+      username : user.first_name + ' ' + user.last_name,
+      userAvatar: user.avatar || '/assets/images/default/avatar.jpg',
     };
     let newComment = {
       id: '',
@@ -372,7 +383,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
       createdAt: new Date().toISOString(),
       updatedAt: null as string | null,
       likes: 0,
-      isArtist: false // Default to regular user
+      userIsArtist: false // Default to regular user
     };
     fetchAddComments(addCommentRequest)
       .then((comment: Comment) => {
@@ -385,7 +396,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
           createdAt: comment.createdAt,
           updatedAt: comment.updatedAt,
           likes: 0,
-          isArtist: comment.isArtist || false
+          userIsArtist: comment.userIsArtist || false
         }
         commentCount++;
         onAddComment(newComment); 

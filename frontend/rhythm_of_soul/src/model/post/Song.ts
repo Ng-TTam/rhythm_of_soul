@@ -5,12 +5,13 @@ export interface Song {
     title: string;
     tags: string[];
     mediaUrl: string;
+    coverUrl?: string;
   };
   caption?: string;
   _public: boolean;
   like_count: number;
   comment_count?: number;
-  view_count?: number;
+  view_count: number;
   created_at: string;
   account_id: string; 
   _liked: boolean;
@@ -19,7 +20,10 @@ export interface Song {
 export interface SongEditForm {
   title: string;
   caption: string;
+  imageUrl: string;
+  coverUrl: string;
   tags: string[];
+  isPublic: boolean;
 }
 export interface Comment {
   id: string;
@@ -47,6 +51,7 @@ export interface Post {
   comment_count: number;
   _public: boolean;
   account_id: string;
+  id : string;
 }
 
 export interface SongDetail {

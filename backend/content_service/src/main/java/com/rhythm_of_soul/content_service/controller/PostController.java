@@ -4,9 +4,7 @@ import com.rhythm_of_soul.content_service.common.Tag;
 import com.rhythm_of_soul.content_service.common.Type;
 import com.rhythm_of_soul.content_service.dto.ApiResponse;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
-import com.rhythm_of_soul.content_service.dto.request.AlbumCreationRequest;
-import com.rhythm_of_soul.content_service.dto.request.PlaylistCreationRequest;
-import com.rhythm_of_soul.content_service.dto.request.PostRequest;
+import com.rhythm_of_soul.content_service.dto.request.*;
 import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
 import com.rhythm_of_soul.content_service.dto.response.CommentResponse;
 import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
@@ -60,10 +58,41 @@ public class PostController {
                                    @RequestParam("type") String type) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         return ApiResponse.<String>builder()
                 .message("File uploaded successfully")
-                .result(postService.createFile(file,type))
+                .result(postService.createFile(file, type))
                 .build();
     }
-
+    @PutMapping ("/updateSong/{songId}")
+    ApiResponse<PostResponse> updateSong(@PathVariable String songId,
+                                         @RequestBody EditPostSong editPostSong) {
+        return ApiResponse.<PostResponse>builder()
+                .message("File uploaded successfully")
+                .result(postService.updateSong(songId,editPostSong))
+                .build();
+    }
+    @PutMapping ("/updateAlbum/{albumId}")
+    ApiResponse<AlbumResponse> updateAlbum(@PathVariable String albumId,
+                                          @RequestBody EditAlbum editAlbum) {
+        return ApiResponse.<AlbumResponse>builder()
+                .message("File uploaded successfully")
+                .result(postService.updateAlbum(albumId,editAlbum))
+                .build();
+    }
+    @PutMapping("/updatePlaylist/{playlistId}")
+    ApiResponse<PostResponse> updatePlaylist(@PathVariable String playlistId,
+                                             @RequestBody EditPlaylist editPlaylist) {
+        return ApiResponse.<PostResponse>builder()
+                .message("File uploaded successfully")
+                .result(postService.updatePlaylist(playlistId,editPlaylist))
+                .build();
+    }
+    @PutMapping("/updatePostText/{postId}")
+    ApiResponse<PostResponse> updatePostText(@PathVariable String postId,
+                                             @RequestBody EditText editPostText) {
+        return ApiResponse.<PostResponse>builder()
+                .message("File uploaded successfully")
+                .result(postService.updatePostText(postId,editPostText))
+                .build();
+    }
     @PostMapping
     ApiResponse<PostResponse> createPost(@Valid @RequestBody PostRequest postRequest) {
         // get accountId in token

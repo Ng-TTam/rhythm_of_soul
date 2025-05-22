@@ -9,7 +9,7 @@ public class CommentManager {
     private final Map<String, CommentResponse> commentMap = new HashMap<>();
     private final Map<String,CommentResponse> resultMap = new HashMap<>();
     // Method to add a department to the map
-    public void addDepartment(String id, String accountId, String parentId, String content, Instant createdAt, Instant updatedAt) {
+    public void addDepartment(String id, String accountId, String parentId, String content, Instant createdAt, Instant updatedAt,boolean userIsArtist) {
 
         if (commentMap.containsKey(id)) {
             return;
@@ -24,7 +24,7 @@ public class CommentManager {
             }
         }
 
-        CommentResponse newComment = new CommentResponse(id, accountId, parentId, createdAt, updatedAt, content);
+        CommentResponse newComment = new CommentResponse(id, accountId, parentId, createdAt, updatedAt, content,userIsArtist);
         commentMap.put(id, newComment);
 
         if (parentComment != null) {

@@ -3,9 +3,7 @@ package com.rhythm_of_soul.content_service.service;
 import com.rhythm_of_soul.content_service.common.Tag;
 import com.rhythm_of_soul.content_service.common.Type;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
-import com.rhythm_of_soul.content_service.dto.request.AlbumCreationRequest;
-import com.rhythm_of_soul.content_service.dto.request.PlaylistCreationRequest;
-import com.rhythm_of_soul.content_service.dto.request.PostRequest;
+import com.rhythm_of_soul.content_service.dto.request.*;
 import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
 import com.rhythm_of_soul.content_service.dto.response.CommentResponse;
 import com.rhythm_of_soul.content_service.dto.response.PostDetailResponse;
@@ -35,7 +33,8 @@ public interface PostService {
     List<PostResponse> getPlaylists(String accountId);
     List<AlbumResponse> getAlbum(String accountId);
     List<BasicPlaylistResponse> getBasicPlaylists(String accountId,String songId);
-
+    PostResponse updateSong(String songId, EditPostSong postRequest);
+    AlbumResponse updateAlbum(String albumId, EditAlbum postRequest);
     /**
      * Search post with key
      * if type = TEXT -> find caption
@@ -50,7 +49,7 @@ public interface PostService {
      * @return list post
      */
     List<PostResponse> searchPosts(String accountId, String keyword, String tag, Type type, int page, int size);
-
+    PostResponse updatePlaylist(String playlistId, EditPlaylist postRequest);
     PostDetailResponse getPostDetail(String accountId, String postId);
     PostResponse getPost(String postId);
     List<SongResponse> getListSongs();
@@ -61,4 +60,5 @@ public interface PostService {
     AlbumResponse createAlbum(AlbumCreationRequest postRequest);
     PostResponse createPlaylist(PlaylistCreationRequest postRequest);
     List<CommentResponse> getComments(String postId);
+    PostResponse updatePostText(String postId, EditText postRequest);
 }

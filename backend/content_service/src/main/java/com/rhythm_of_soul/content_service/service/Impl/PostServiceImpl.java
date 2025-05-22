@@ -5,10 +5,7 @@ import com.rhythm_of_soul.content_service.common.Type;
 import com.rhythm_of_soul.content_service.config.MinioConfig;
 import com.rhythm_of_soul.content_service.dto.ContentResponse;
 import com.rhythm_of_soul.content_service.dto.PostResponse;
-import com.rhythm_of_soul.content_service.dto.request.AlbumCreationRequest;
-import com.rhythm_of_soul.content_service.dto.request.NewContentEvent;
-import com.rhythm_of_soul.content_service.dto.request.PlaylistCreationRequest;
-import com.rhythm_of_soul.content_service.dto.request.PostRequest;
+import com.rhythm_of_soul.content_service.dto.request.*;
 import com.rhythm_of_soul.content_service.dto.response.AlbumResponse;
 import com.rhythm_of_soul.content_service.dto.response.BasicPlaylistResponse;
 import com.rhythm_of_soul.content_service.dto.response.CommentResponse;
@@ -274,7 +271,7 @@ public class PostServiceImpl implements  PostService {
                     .title(post.getContent().getTitle())
                     .imageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()))
                     .coverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()))
-                    .tracks(post.getContent().getSongIds().size())
+                    .tracks(post.getContent().getSongIds() != null ? post.getContent().getSongIds().size() : 0)
                     .createdAt(post.getCreatedAt())
                     .updatedAt(post.getUpdatedAt() != null ? post.getUpdatedAt() : null)
                     .tags(post.getContent().getTags())
@@ -283,6 +280,7 @@ public class PostServiceImpl implements  PostService {
                     .viewCount(post.getViewCount())
                     .isLiked(likeRepository.existsByAccountIdAndPostId(accountId, post.getId()))
                     .likeCount(post.getLikeCount())
+                    .caption(post.getCaption())
                     .commentCount(post.getCommentCount())
                     .scheduledAt(post.getScheduledAt() != null ? post.getScheduledAt() : null)
                     .build();
@@ -345,6 +343,33 @@ public class PostServiceImpl implements  PostService {
         List<Post> posts = mongoTemplate.find(query, Post.class);
 
         return processPosts(posts, accountId);
+    }
+
+    @Override
+    public PostResponse updatePlaylist(String playlistId, EditPlaylist postRequest) {
+        Post post = postRepository.findById(playlistId).orElseThrow(() -> new RuntimeException("Post not found"));
+        if(post.getType() != Type.PLAYLIST){
+            throw new RuntimeException("Post is not a playlist");
+        }
+        post.setUpdatedAt(Instant.now());
+        post.setPublic(postRequest.getIsPublic());
+        post.setCaption(postRequest.getCaption());
+        Content content = post.getContent();
+        content.setTitle(postRequest.getTitle());
+        if(!postRequest.getImageUrl().contains("http://localhost:9000")) content.setImageUrl(postRequest.getImageUrl());
+        if(!postRequest.getCoverUrl().contains("http://localhost:9000")) content.setCoverUrl(postRequest.getCoverUrl());
+        content.setTags(postRequest.getTags());
+        content.setSongIds(postRequest.getSongIds());
+        post.setContent(content);
+        postRepository.save(post);
+        PostResponse postResponse = postMapper.toPostResponse(post);
+        ContentResponse contentResponse = postResponse.getContent();
+        contentResponse.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
+        contentResponse.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
+        postResponse.setContent(contentResponse);
+        postResponse.set_liked(likeRepository.existsByAccountIdAndPostId(SecurityUtils.getCurrentAccountId(), post.getId()));
+        return postResponse;
+
     }
 
     @Override
@@ -458,7 +483,7 @@ public class PostServiceImpl implements  PostService {
                     .title(post.getContent().getTitle())
                     .imageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()))
                     .coverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()))
-                    .tracks(post.getContent().getSongIds().size())
+                    .tracks(post.getContent().getSongIds() != null ? post.getContent().getSongIds().size() : 0)
                     .createdAt(post.getCreatedAt())
                     .updatedAt(post.getUpdatedAt() != null ? post.getUpdatedAt() : null)
                     .tags(post.getContent().getTags())
@@ -602,10 +627,25 @@ public class PostServiceImpl implements  PostService {
         CommentManager manager = new CommentManager();
         for(Comment comment : comments){
             String parentId = comment.getParentId();
-            manager.addDepartment(comment.getId(), comment.getAccountId(), parentId, comment.getContent(), comment.getCreatedAt(), comment.getUpdatedAt());
+            manager.addDepartment(comment.getId(), comment.getAccountId(), parentId, comment.getContent(), comment.getCreatedAt(), comment.getUpdatedAt(),comment.isUserIsArtist());
         }
 
         return manager.getAllDepartments();
+    }
+
+    @Override
+    public PostResponse updatePostText(String postId, EditText postRequest) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
+        if(post.getType() != Type.TEXT){
+            throw new RuntimeException("Post is not a text");
+        }
+        post.setUpdatedAt(Instant.now());
+        post.setCaption(postRequest.getCaption());
+        post.setPublic(postRequest.getIsPublic());
+        postRepository.save(post);
+        PostResponse postResponse = postMapper.toPostResponse(post);
+        postResponse.set_liked(likeRepository.existsByAccountIdAndPostId(post.getAccountId(), post.getId()));
+        return postResponse;
     }
 
     @Override
@@ -622,6 +662,69 @@ public class PostServiceImpl implements  PostService {
             }
         }
         return basicPlaylistResponses;
+    }
+
+    @Override
+    public PostResponse updateSong(String songId, EditPostSong postRequest) {
+        Post post = postRepository.findById(songId).orElseThrow(() -> new RuntimeException("Post not found"));
+        if(post.getType() != Type.SONG){
+            throw new RuntimeException("Post is not a song");
+        }
+        post.setUpdatedAt(Instant.now());
+        post.setCaption(postRequest.getCaption());
+        post.setPublic(postRequest.getIsPublic());
+        Content content = post.getContent();
+        content.setTitle(postRequest.getTitle());
+        if(!postRequest.getImageUrl().contains("http://localhost:9000")) content.setImageUrl(postRequest.getImageUrl());
+        if(!postRequest.getCoverUrl().contains("http://localhost:9000")) content.setCoverUrl(postRequest.getCoverUrl());
+        content.setTags(postRequest.getTags());
+        post.setContent(content);
+        postRepository.save(post);
+        PostResponse postResponse = postMapper.toPostResponse(post);
+        ContentResponse contentResponse = postResponse.getContent();
+        contentResponse.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
+        contentResponse.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
+        postResponse.setContent(contentResponse);
+        postResponse.set_liked(likeRepository.existsByAccountIdAndPostId(post.getAccountId(), post.getId()));
+        return postResponse;
+    }
+
+    @Override
+    public AlbumResponse updateAlbum(String albumId, EditAlbum postRequest) {
+        Post post = postRepository.findById(albumId).orElseThrow(() -> new RuntimeException("Post not found"));
+        if(post.getType() != Type.ALBUM){
+            throw new RuntimeException("Post is not a album");
+        }
+        post.setUpdatedAt(Instant.now());
+        post.setPublic(postRequest.getIsPublic());
+        post.setScheduledAt(postRequest.getScheduledAt());
+        post.setCaption(postRequest.getCaption());
+        Content content = post.getContent();
+        content.setTitle(postRequest.getTitle());
+        if(!postRequest.getImageUrl().contains("http://localhost:9000")) content.setImageUrl(postRequest.getImageUrl());
+        if(!postRequest.getCoverUrl().contains("http://localhost:9000")) content.setCoverUrl(postRequest.getCoverUrl());
+        content.setTags(postRequest.getTags());
+        content.setSongIds(postRequest.getSongIds());
+        post.setContent(content);
+        postRepository.save(post);
+        return AlbumResponse.builder()
+                .id(post.getId())
+                .title(post.getContent().getTitle())
+                .imageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()))
+                .coverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()))
+                .tracks(post.getContent().getSongIds() != null ? post.getContent().getSongIds().size() : 0)
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt() != null ? post.getUpdatedAt() : null)
+                .tags(post.getContent().getTags())
+                .caption(post.getCaption())
+                .isPublic(post.isPublic())
+                .accountId(post.getAccountId())
+                .viewCount(post.getViewCount())
+                .isLiked(likeRepository.existsByAccountIdAndPostId(post.getAccountId(), post.getId()))
+                .likeCount(post.getLikeCount())
+                .commentCount(post.getCommentCount())
+                .scheduledAt(post.getScheduledAt() != null ? post.getScheduledAt() : null)
+                .build();
     }
 
 }

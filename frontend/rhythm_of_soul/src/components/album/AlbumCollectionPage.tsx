@@ -14,12 +14,15 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Card, Container, Row, Col, Button, Badge, Spinner, Nav, Tab, Alert 
 } from 'react-bootstrap';
-import { FaPlus} from '@react-icons/all-files/fa/FaPlus';
+import { FaPlus } from '@react-icons/all-files/fa/FaPlus';
 import AddAlbumModal from './AddAlbumForm';
-import { Album } from '../../model/post/Album';
-import {getAlbumOfUser,uploadFile,createALbum, unlikePost,likePost} from '../../services/postService';
-import { getAccessToken,DecodedToken } from '../../utils/tokenManager';
+import { Album, AlbumResponse } from '../../model/post/Album';
+import { getAlbumOfUser, uploadFile, createALbum, unlikePost, likePost, updateAlbum } from '../../services/postService';
+import { getAccessToken, DecodedToken } from '../../utils/tokenManager';
 import { jwtDecode } from 'jwt-decode';
+import EditAlbumModal from './EditAlbum';
+import { FaEllipsisH } from '@react-icons/all-files/fa/FaEllipsisH';
+
 const AlbumPost = () => {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,35 +31,31 @@ const AlbumPost = () => {
   const [likedAlbums, setLikedAlbums] = useState<Record<string, boolean>>({});
   const [activeTab, setActiveTab] = useState('all');
   const [showAddModal, setShowAddModal] = useState(false);
-
+  const [editingAlbumId, setEditingAlbumId] = useState<string | null>(null);
   
   const navigate = useNavigate();
   const accessToken = getAccessToken();
   let accountId = "";
-  let isArtist = false
+  let isArtist = false;
+  
   if (accessToken) {
     const decoded = jwtDecode<DecodedToken>(accessToken);
-     accountId = decoded.sub;
-     isArtist = decoded.scope === 'ROLE_ARTIST' ? true : false;
+    accountId = decoded.sub;
+    isArtist = decoded.scope === 'ROLE_ARTIST';
   }
   
   useEffect(() => {
     const fetchAlbums = async () => {
       try {
-        
-
         const response = await getAlbumOfUser(accountId);
 
         if (response.code === 200 && Array.isArray(response.result)) {
           setAlbums(response.result);
-          const albums = response.result as Album[];
-          albums.forEach(album => {
-            setLikedAlbums(prev => ({
-              ...prev,
-              [album.id]: album.isLiked
-            }));
-          })          
-
+          const initialLikedState: Record<string, boolean> = {};
+          response.result.forEach(album => {
+            initialLikedState[album.id] = album.isLiked;
+          });
+          setLikedAlbums(initialLikedState);
         } else {
           throw new Error('Invalid data format');
         }
@@ -68,31 +67,41 @@ const AlbumPost = () => {
     };
 
     fetchAlbums();
-  }, []);
+  }, [accountId]);
 
   const handleClickPost = (albumId: string) => {
     navigate(`/post/${albumId}`);
   };
 
-  const handleLike = (albumId: string) => {
+  const handleLike = async (albumId: string) => {
     const alreadyLiked = likedAlbums[albumId];
-
-    setAlbums(prev =>
-      prev.map(album => {
-        if (album.id === albumId) {
-          alreadyLiked ? unlikePost(album.id) : likePost(album.id);
-          return {
-            ...album,
-            likeCount: album.likeCount + (alreadyLiked ? -1 : 1),
-            isLiked: !alreadyLiked
-          };
-        }
-        return album;
+    
+    try {
+      if (alreadyLiked) {
+        await unlikePost(albumId);
+      } else {
+        await likePost(albumId);
+      }
+      
+      setAlbums(prev =>
+        prev.map(album => {
+          if (album.id === albumId) {
+            return {
+              ...album,
+              likeCount: album.likeCount + (alreadyLiked ? -1 : 1),
+              isLiked: !alreadyLiked
+            };
+          }
+          return album;
+        }));
+      
+      setLikedAlbums(prev => ({
+        ...prev,
+        [albumId]: !alreadyLiked
       }));
-    setLikedAlbums(prev => ({
-      ...prev,
-      [albumId]: !alreadyLiked
-    }));
+    } catch (err) {
+      console.error("Error handling like:", err);
+    }
   };
 
   const handleAddAlbum = async (newAlbumData: {
@@ -105,7 +114,6 @@ const AlbumPost = () => {
     tracks: string[];
   }) => {
     try {
-      // First upload the images if they exist
       let cover = '';
       let image = '';
   
@@ -124,7 +132,7 @@ const AlbumPost = () => {
         });
         image = imageResponse.result;
       }
-      // Prepare the request body
+
       const requestBody = {
         title: newAlbumData.title,
         isPublic: newAlbumData.isPublic,
@@ -134,16 +142,59 @@ const AlbumPost = () => {
         scheduleAt: newAlbumData.scheduleAt?.toISOString(),
         songIds: newAlbumData.tracks
       };
-      // Send the request
+
       const response = await createALbum(requestBody);
   
       if (response.code === 200) {
-        setAlbums([response.result, ...albums]);
+        setAlbums(prev => [response.result, ...prev]);
         return Promise.resolve();
       }
       throw new Error(response.message || 'Failed to add album');
     } catch (err) {
       console.error("Error adding album:", err);
+      return Promise.reject(err);
+    }
+  };
+
+  const handleEditAlbum = async (updatedAlbumData: {
+    title: string;
+    isPublic: boolean;
+    tags: string[];
+    coverUrl: string;
+    imageUrl: string;
+    scheduleAt: Date | null;
+    tracks: string[];
+    caption?: string;
+  }) => {
+    if (!editingAlbumId) return;
+    console.log("Update:", updatedAlbumData);
+    try {
+
+      const requestBody = {
+        title: updatedAlbumData.title,
+        isPublic: updatedAlbumData.isPublic,
+        tags: updatedAlbumData.tags,
+        coverUrl: updatedAlbumData.coverUrl,
+        imageUrl: updatedAlbumData.imageUrl,
+        scheduleAt: updatedAlbumData.scheduleAt?.toISOString(),
+        songIds: updatedAlbumData.tracks,
+        caption: updatedAlbumData.caption
+      };
+
+      const response = await updateAlbum(editingAlbumId, requestBody);
+      console.log("Response:", response);
+      if (response.code === 200) {
+        setAlbums(prev => 
+          prev.map(album => 
+            album.id === editingAlbumId ? response.result : album
+          )
+        );
+        setEditingAlbumId(null);
+        return Promise.resolve();
+      }
+      throw new Error(response.message || 'Failed to update album');
+    } catch (err) {
+      console.error("Error updating album:", err);
       return Promise.reject(err);
     }
   };
@@ -230,27 +281,29 @@ const AlbumPost = () => {
         </Nav>
 
         <Tab.Content>
-          <Tab.Pane eventKey={activeTab} style={{width :"100%"}}>
+          <Tab.Pane eventKey={activeTab} style={{width: "100%"}}>
             {filteredAlbums.length === 0 ? (
               <Card className="text-center p-5 bg-light border-dashed">
                 <Card.Body>
                   <FaMusic size={48} className="text-secondary mb-3" />
                   <h3>No albums found</h3>
                   <p className="text-muted">Start by creating a new album!</p>
-                  <Button 
+                  {isArtist && (
+                    <Button 
                       variant="primary" 
-                    onClick={() => setShowAddModal(true)}
-                    className="mt-3"
-                  >
-                    <FaPlus className="me-2" />
-                    Create Album
-                  </Button>
+                      onClick={() => setShowAddModal(true)}
+                      className="mt-3"
+                    >
+                      <FaPlus className="me-2" />
+                      Create Album
+                    </Button>
+                  )}
                 </Card.Body>
               </Card>
             ) : (
-              <Row xs={1} md={2} lg={3} className="g-4" style={{width :"100%",justifyContent :"center"}}>
+              <Row xs={1} md={2} lg={3} className="g-4" style={{width: "100%", justifyContent: "center"}}>
                 {filteredAlbums.map(album => (
-                  <Col key={album.id} style={{width :"80%"}} >
+                  <Col key={album.id} style={{width: "80%"}}>
                     <Card className="h-100 shadow-sm hover-lift">
                       <div
                         className="position-relative"
@@ -264,7 +317,8 @@ const AlbumPost = () => {
                         <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark-gradient"></div>
                         <div className="position-absolute top-0 start-0 w-100 p-3 d-flex justify-content-between align-items-center">
                           <div className="d-flex align-items-center">
-                            <div className="rounded-circle bg-primary d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
+                            <div className="rounded-circle bg-primary d-flex align-items-center justify-content-center" 
+                                 style={{ width: '40px', height: '40px' }}>
                               <FaMusic color="white" size={16} />
                             </div>
                             <div className="ms-2">
@@ -275,10 +329,23 @@ const AlbumPost = () => {
                           <Badge bg={album.isPublic ? 'success' : 'warning'}>
                             {album.isPublic ? 'Public' : 'Private'}
                           </Badge>
+                          {isArtist && (
+                            <button 
+                              style={{justifyItems: "end"}} 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingAlbumId(album.id);
+                              }}
+                            >
+                              <FaEllipsisH />
+                            </button>
+                          )}
                         </div>
                         <div className="position-absolute bottom-0 start-0 w-100 p-3">
                           <h2 className="text-white fw-bold">{album.title}</h2>
+                          
                           <div className="text-white-50 small">
+                          
                             <FaMusic size={12} className="me-1" />
                             {album.tracks} tracks
                           </div>
@@ -288,7 +355,8 @@ const AlbumPost = () => {
                       <Card.Body onClick={() => handleClickPost(album.id)}>
                         <Row>
                           <Col md={5} className="mb-3 mb-md-0">
-                            <div className="position-relative rounded overflow-hidden shadow-sm" style={{ aspectRatio: "1 / 1", width: "50% !important", height: "100% !important" }}>
+                            <div className="position-relative rounded overflow-hidden shadow-sm" 
+                                 style={{ aspectRatio: "1 / 1", width: "100%", height: "100%" }}>
                               <img
                                 src={album.imageUrl}
                                 alt={album.title}
@@ -298,7 +366,8 @@ const AlbumPost = () => {
                                 className="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-25 d-flex align-items-center justify-content-center opacity-0 hover-opacity-100"
                                 style={{ cursor: 'pointer', transition: 'opacity 0.3s' }}
                               >
-                                <div className="bg-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: '60px', height: '60px' }}>
+                                <div className="bg-white rounded-circle d-flex align-items-center justify-content-center" 
+                                     style={{ width: '60px', height: '60px' }}>
                                   {playingAlbumId === album.id ? 
                                     <FaPause size={24} className="text-primary" /> : 
                                     <FaPlay size={24} className="text-primary" />
@@ -331,6 +400,10 @@ const AlbumPost = () => {
                                   <Col>{album.title}</Col>
                                 </Row>
                                 <Row className="mb-2">
+                                  <Col xs={4} className="fw-bold text-muted">Caption:</Col>
+                                  <Col>{album.caption}</Col>
+                                </Row>
+                                <Row className="mb-2">
                                   <Col xs={4} className="fw-bold text-muted">Songs:</Col>
                                   <Col>{album.tracks}</Col>
                                 </Row>
@@ -351,7 +424,10 @@ const AlbumPost = () => {
                           <Button
                             variant={likedAlbums[album.id] ? "danger" : "light"}
                             size="sm"
-                            onClick={() => handleLike(album.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleLike(album.id);
+                            }}
                             className="d-flex align-items-center"
                           >
                             {likedAlbums[album.id] ? 
@@ -365,7 +441,10 @@ const AlbumPost = () => {
                             variant="light"
                             size="sm"
                             className="d-flex align-items-center"
-                            onClick={() => handleClickPost(album.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleClickPost(album.id);
+                            }}
                           >
                             <FaComment className="me-2" />
                             {album.commentCount || 0}
@@ -391,6 +470,15 @@ const AlbumPost = () => {
         onHide={() => setShowAddModal(false)}
         onAddAlbum={handleAddAlbum}
       />
+      
+      {editingAlbumId && (
+        <EditAlbumModal 
+          show={!!editingAlbumId}
+          onHi={() => setEditingAlbumId(null)}
+          onEditAlbum={handleEditAlbum}
+          postId={editingAlbumId}
+        />
+      )}
     </Container>
   );
 };

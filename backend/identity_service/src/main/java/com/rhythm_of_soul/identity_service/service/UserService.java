@@ -1,5 +1,6 @@
 package com.rhythm_of_soul.identity_service.service;
 
+
 import org.springframework.security.access.AccessDeniedException;
 
 import com.rhythm_of_soul.identity_service.dto.request.ArtistProfileRequest;

@@ -68,6 +68,7 @@ const PostSongDetail: React.FC<PostSongDetailProps> = ({ postId }) =>{
     } else {
       dispatch(setAudio({
         play: true,
+        id: post.id,
         imageSong: post.content.imageUrl || '',
         titleSong: post.content.title,
         artistSong: post.account_id,

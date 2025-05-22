@@ -14,7 +14,6 @@ export interface CurrentUser {
 export interface  AddPlaylistModalProps {
   show: boolean;
   onHide: () => void;
-  currentUser: CurrentUser;
   onCreate: (playlistData: {
     title: string;
     isPublic: boolean;
@@ -25,6 +24,9 @@ export interface  AddPlaylistModalProps {
   isCreating: boolean;
   error?: string | null;
 }
+
+
+
 export interface PlaylistData {
   post: {
     content: {
@@ -51,4 +53,18 @@ export interface PlaylistData {
     content?: string;
   }[];
   isLiked?: boolean;
+}
+export interface EditPlaylistModalProps {
+  show: boolean;
+  onHi: () => void;
+  onEditPlaylist: (newAlbum: {
+    title: string;
+    isPublic: boolean;
+    tags: string[];
+    coverUrl: string;
+    imageUrl: string;
+    tracks: string[];
+    caption: string;
+  }) => Promise<void>;
+  postId ?: string;
 }

@@ -198,11 +198,51 @@ export const getSongDetail = async (songId: string): Promise<APIResponse<SongDet
   );
   return response.data;
 }
-export const recordListen = async (sessionId: string, postId: string): Promise<void> => {
-    await axios.post(`${API_BASE_URL}/listen`, null, {params: {sessionId,postId,},
+export const recordListen = async ( postId: string): Promise<void> => {
+  const sessionId =sessionStorage.getItem("session_id")
+    await axios.post(`${API_BASE_URL}/posts/listen`, null, {params: {sessionId,postId},
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
     });
-};  
+};
+export const updateAlbum = async (postId : string,formData : any): Promise<APIResponse<any>> => {
+  const response = await axios.put<APIResponse<any>>(
+    `${API_BASE_URL}/posts/updateAlbum/${postId}`,
+    JSON.stringify(formData),
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+  return response.data;
+}
+export const updatePlaylist = async (postId : string,formData : any): Promise<APIResponse<any>> => {
+  const response = await axios.put<APIResponse<any>>(
+    `${API_BASE_URL}/posts/updatePlaylist/${postId}`,
+    JSON.stringify(formData),
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+  return response.data;
+}
+export const editTextPost = async (postId: string, formData: any): Promise<APIResponse<any>> => {
+  const response = await apiClient.put<APIResponse<any>>(
+    apiConfig.endpoints.user.editTextPost(postId),
+    JSON.stringify(formData),
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  )
+  return  response.data;
+}  

@@ -10,7 +10,13 @@ export interface Album {
   imageUrl: string;
   tags?: string[];
   createdAt: string;
+  caption?: string;
   isLiked: boolean;
+  scheduleAt?: Date | null;
+}
+export interface AlbumResponse {
+  album: Album;
+  songs: Track[];
 }
 export interface AddAlbumModalProps {
   show: boolean;
@@ -24,6 +30,22 @@ export interface AddAlbumModalProps {
     tracks: string[];
     scheduleAt: Date | null;
   }) => Promise<void>;
+ 
+}
+export interface EditAlbumModalProps {
+  show: boolean;
+  onHi: () => void;
+  onEditAlbum: (newAlbum: {
+    title: string;
+    isPublic: boolean;
+    tags: string[];
+    coverUrl: string;
+    imageUrl: string;
+    tracks: string[];
+    caption ?: string;
+    scheduleAt: Date | null;
+  }) => Promise<void>;
+  postId ?: string;
 }
 
 export interface Track {
@@ -60,6 +82,7 @@ export interface AlbumDetail {
   comment_count: number;
   created_at: string;
   _public: boolean;
+  schedule_at: string;
 }
 
 export interface Comment {

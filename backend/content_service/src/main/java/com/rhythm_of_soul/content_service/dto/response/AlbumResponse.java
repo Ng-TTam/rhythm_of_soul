@@ -23,6 +23,7 @@ public class AlbumResponse {
     List<Tag> tags; // Danh sách tag của album
     Instant createdAt; // Thời gian phát hành album
     Boolean isPublic;
+    String caption; // Mô tả album
     Instant updatedAt; // Thời gian cập nhật album
     Instant scheduledAt; // Thời gian phát hành album
     int viewCount; // Số lượt xem album

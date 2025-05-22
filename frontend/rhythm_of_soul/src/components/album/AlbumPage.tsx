@@ -72,6 +72,7 @@ const AlbumDetailView : React.FC<AlbumDetailProps> = ({ albumId }) =>{
       setCurrentSongIndex(index);
       dispatch(setAudio({
         play: true,
+        id: song.songId,
         imageSong: song.imageUrl,
         titleSong: song.title,
         artistSong: song.artist || albumDetail.post.user_id,

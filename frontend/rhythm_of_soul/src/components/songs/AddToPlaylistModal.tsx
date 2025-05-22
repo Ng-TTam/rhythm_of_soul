@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, ListGroup, Spinner } from 'react-bootstrap';
 import {addSongToPlaylist,getBasicPlaylist } from '../../services/postService';
-import { getAccessToken } from '../../utils/tokenManager';
-import { jwtDecode } from 'jwt-decode';
 interface AddToPlaylistModalProps {
   songId: string;
   onClose: () => void;

@@ -34,10 +34,13 @@ interface UserEndpoints {
   get_assigned_artist: string;
   upgradeArtist: (userId: string) => string;
   revokeArtist: (userId: string) => string;
+  editTextPost: (postId: string) => string;
+
 }
 
 interface ArtistEndpoints {
   createAlbum: string;
+  updateAlbum: (albumId: string) => string;
 }
 
 interface AdminEndpoints {
@@ -88,15 +91,17 @@ export const apiConfig = {
       getFollowers: (userId: string) => `${config.apiBaseUrl}/identity/${userId}/followers`,
       getFollowing: (userId: string) => `${config.apiBaseUrl}/identity/${userId}/following`,
       createPlaylist: `${contentURL}/content/posts/playlist`,
-      editSong: (songId: string) => `${contentURL}/content/posts/${songId}`,
+      editSong: (songId: string) => `${contentURL}/content/posts/updateSong/${songId}`,
       likePost: (postId: string) => `${contentURL}/content/likes?postId=${postId}`,
       unlikePost: (postId: string) => `${contentURL}/content/likes?postId=${postId}`,
       addComment: `${contentURL}/content/comments`,
       editComment: (commentId: string, content: string) => `${contentURL}/content/comments?commentId=${commentId}`,
       deleteComment: (commentId: string) => `${contentURL}/content/comments?commentId=${commentId}`,
+
       get_assigned_artist: `${config.apiBaseUrl}/identity/users/artist-requests`,
       upgradeArtist: (userId: string) => `${config.apiBaseUrl}/identity/users/upgrade-artist/${userId}`,
       revokeArtist: (userId: string) => `${config.apiBaseUrl}/identity/users/revoke-artist/${userId}`,
+      editTextPost: (postId: string) => `${contentURL}/content/posts/updatePostText/${postId}`,
     },
     artist: {
       createAlbum: `${contentURL}/content/posts/album`,

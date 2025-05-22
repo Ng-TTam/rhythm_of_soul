@@ -111,10 +111,10 @@ public class ListeningHistoryServiceImpl implements ListeningHistoryService {
     public void recordListen(String accountId, String sessionId, String postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
+
         if (post.getType() != Type.SONG) {
             throw new IllegalArgumentException("Post is not a song");
         }
-
         if (sessionId == null) {
             throw new IllegalArgumentException("Missing sessionId");
         }
@@ -146,7 +146,7 @@ public class ListeningHistoryServiceImpl implements ListeningHistoryService {
         listeningHistoryRepository.save(history);
 
         Query updateQuery = new Query(Criteria.where("_id").is(postId));
-        Update update = new Update().inc("listenCount", 1);
+        Update update = new Update().inc("viewCount", 1);
         mongoTemplate.findAndModify(updateQuery, update, Post.class);
 
         log.info("Recorded listen for postId: " + postId + ", sessionId: " + sessionId);

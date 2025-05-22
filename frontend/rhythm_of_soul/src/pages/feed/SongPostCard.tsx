@@ -6,7 +6,7 @@ import { FaComment } from '@react-icons/all-files/fa/FaComment';
 import { FaEllipsisH } from '@react-icons/all-files/fa/FaEllipsisH';
 import { Card, Button, ProgressBar } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { SongPostCardProps } from '../../model/post/post';
+import { PostResponse, SongPostCardProps } from '../../model/post/post';
 import styles from '../../styles/SongPostCard.module.css';
 import classNames from 'classnames';
 import { useAppDispatch, useAppSelector } from '../../store/hook';
@@ -14,6 +14,9 @@ import { toggleePlay, setAudio } from '../../reducers/audioReducer';
 import { BsMusicNoteList } from '@react-icons/all-files/bs/BsMusicNoteList';
 import Swal from 'sweetalert2';
 import AddToPlaylistModal from '../../components/songs/AddToPlaylistModal';
+import EditSongModal from '../../components/songs/SongEditForm';
+import { editSong } from '../../services/postService';
+import { SongEditForm } from '../../model/post/Song';
 
 const SongPostCard: React.FC<SongPostCardProps> = ({ 
   post, 
@@ -27,6 +30,31 @@ const SongPostCard: React.FC<SongPostCardProps> = ({
   const [showDropdown, setShowDropdown] = useState<number | string | null>(null);
   const [showAddToPlaylistModal, setShowAddToPlaylistModal] = useState(false);
   const [selectedSongId, setSelectedSongId] = useState<string | number | null>(null);
+  const [editingSong, setEditingSong] = useState<{
+    id: string;
+    data: {
+      title: string;
+      caption?: string;
+      tags: string[];
+      imageUrl: string;
+      coverUrl: string;
+      isPublic: boolean;
+    };
+  } | null>(null);
+  const [song, setSong] = useState<PostResponse>({
+    id: post.id,
+    account_id: post.account_id,
+    type: post.type,
+    caption: post.caption,
+    content: post.content,
+    view_count: post.view_count,
+    like_count: post.like_count,
+    comment_count: post.comment_count,
+    created_at: post.created_at,
+    updated_at: post.updated_at,
+    _public: post._public,
+    _liked: post._liked,
+  });
   const handleAddToPlaylist = (e: React.MouseEvent, songId: string | number) => {
     e.stopPropagation();
     setSelectedSongId(songId);
@@ -42,13 +70,53 @@ const SongPostCard: React.FC<SongPostCardProps> = ({
     e.stopPropagation();
     setShowDropdown(showDropdown === songId ? null : songId);
   };
+  const handleSaveEdit = async (updatedData: SongEditForm) => {
+    try {
+      console.log(updatedData)
+      const response = await editSong(editingSong?.id ?? '', updatedData);
 
+      if (response.code !== 200) throw new Error(response.message);
+      console.log(response.result);
+      // Update the song state with the new data
+      setSong((prev) => ({
+        ...prev,  
+        content: {
+          ...prev.content,
+          title: response.result.content.title,
+          imageUrl: response.result.content.imageUrl,
+          coverUrl: response.result.content.coverUrl,
+          tags: response.result.content.tags,
+        },
+        caption: response.result.caption,
+      }));      
+      setEditingSong(null);
+    } catch (err) {
+      console.error("Error saving edit:", err);
+      throw err;
+    }
+  };
+  const navigateToEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingSong({
+      id: post.id,
+      data: {
+        title: post.content?.title ?? '',
+        caption: post.caption,
+        tags: post.content?.tags ?? [],
+        imageUrl : post.content?.imageUrl ?? '',
+        coverUrl : post.content?.coverUrl ?? '', 
+        isPublic: post._public,
 
+      }
+    });
+
+    setShowDropdown(null);
+  };
   if (!post.content) return null;
   
   const songImage = post.content.imageUrl || '/assets/images/default/music-thumbnail.jpg';
   const hasCover = post.content.coverUrl;
-  
+
   // Determine if current song is playing
   const isPlaying = audioState.mediaUrlSong === post.content.mediaUrl && audioState.play;
   const handlePlaySong = (e: React.MouseEvent) => {
@@ -59,6 +127,7 @@ const SongPostCard: React.FC<SongPostCardProps> = ({
     } else {
       dispatch(setAudio({
         play: true,
+        id: post.id,
         imageSong: post.content?.imageUrl ?? '/assets/images/default/music-thumbnail.jpg',
         titleSong: post.content?.title ?? '',
         artistSong: post.username || 'Unknown Artist',
@@ -93,7 +162,7 @@ const SongPostCard: React.FC<SongPostCardProps> = ({
       {hasCover && (
         <div 
           className={styles['cover_background']}
-          style={{ backgroundImage: `url(${post.content.coverUrl})` }}
+          style={{ backgroundImage: `url(${song.content?.coverUrl})` }}
         />
       )}
       
@@ -128,28 +197,36 @@ const SongPostCard: React.FC<SongPostCardProps> = ({
                       }}>
                         <button
                           className="dropdown-item"
-                          onClick={(e) => handleAddToPlaylist(e, post.id)}
+                          onClick={(e) => handleAddToPlaylist(e, song.id)}
                         >
                           <div className="d-flex align-items-center">
                             <BsMusicNoteList className="me-1" size={14} />
                             Add to playlist
                           </div>
                         </button>
+                        <button
+                          className="dropdown-item"
+                          onClick={(e) => navigateToEdit(e)}
+                        >
+                          <div className="d-flex align-items-center">
+                            Edit
+                          </div>
+                        </button> 
                       </div>
                     )}
       <Card.Body className={styles['post-content']} onClick={handleCardClick}>
         <div className={styles['song-media']}>
           <img
-            src={songImage}
-            alt={post.content.title}
+            src={song.content?.imageUrl || songImage}
+            alt={song.content?.title}
             className={styles['song-thumbnail']}
           />
           
           <div className={styles['song-info']}>
-            <h3 className={styles['song-title']}>{post.content.title}</h3>
+            <h3 className={styles['song-title']}>{song.content?.title}</h3>
             
             {post.caption && (
-              <p className={styles['song-caption']}>{post.caption}</p>
+              <p className={styles['song-caption']}>{song.caption}</p>
             )}
             
             <div className={styles['player-controls']}>
@@ -191,7 +268,14 @@ const SongPostCard: React.FC<SongPostCardProps> = ({
           <FaComment /> {post.comment_count}
         </Button>
       </Card.Footer>
-    
+      {editingSong && (
+        <EditSongModal
+          songId={editingSong.id}
+          initialData={editingSong.data}
+          onClose={() => setEditingSong(null)}
+          onSave={handleSaveEdit}
+        />
+      )}
       {showAddToPlaylistModal && selectedSongId && (
         <AddToPlaylistModal 
           songId={String(selectedSongId)}

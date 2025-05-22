@@ -33,6 +33,9 @@ export default function SongDisplay() {
       title: string;
       caption?: string;
       tags: string[];
+      imageUrl?: string;
+      coverUrl?: string;
+      isPublic: boolean;
     };
   } | null>(null);
   const [showAddToPlaylistModal, setShowAddToPlaylistModal] = useState(false);
@@ -84,11 +87,13 @@ export default function SongDisplay() {
     } else {
       dispatch(setAudio({
         play: true,
+        id : song.id,
         imageSong: song.content.imageUrl,
         titleSong: song.content.title,
         artistSong: song.account_id,
         mediaUrlSong: song.content.mediaUrl
       }));
+
     }
   };
 
@@ -138,7 +143,10 @@ export default function SongDisplay() {
       data: {
         title: song.content.title,
         caption: song.caption,
-        tags: song.content.tags
+        tags: song.content.tags,
+        imageUrl: song.content.imageUrl,
+        coverUrl: song.content.coverUrl,
+        isPublic: song._public
       }
     });
     setShowDropdown(null);
@@ -158,6 +166,7 @@ export default function SongDisplay() {
 
   const handleSaveEdit = async (updatedData: SongEditForm) => {
     try {
+      console.log("Saving edit with data:", updatedData);
       const response = await editSong(editingSong?.id ?? '', updatedData);
 
       if (response.code !== 200) throw new Error(response.message);
@@ -166,8 +175,8 @@ export default function SongDisplay() {
         song.id === editingSong?.id
           ? {
             ...song,
-            content: { ...song.content, title: updatedData.title, tags: updatedData.tags },
-            caption: updatedData.caption
+            content: { ...song.content, title: response.result.content.title, tags: response.result.content.tags, imageUrl: response.result.content.imageUrl, coverUrl: response.result.content.coverUrl },
+            caption:response.result.caption
           }
           : song
       ));
@@ -321,7 +330,7 @@ export default function SongDisplay() {
 
                     <div className="d-flex align-items-center">
                       <BsEyeFill size={16} className="me-1" />
-                      <span>{song.view_count || 0}</span>
+                      <span>{song.view_count}</span>
                     </div>
 
                     <div className="d-flex align-items-center">

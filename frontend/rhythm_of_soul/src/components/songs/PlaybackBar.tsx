@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import axios from "axios";
 import { BsFillPlayFill } from '@react-icons/all-files/bs/BsFillPlayFill';
 import { BsPauseFill } from '@react-icons/all-files/bs/BsPauseFill';
 import { BsSkipBackwardFill } from '@react-icons/all-files/bs/BsSkipBackwardFill';
@@ -18,13 +19,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { BsX } from '@react-icons/all-files/bs/BsX';
 import { BsPlayFill } from '@react-icons/all-files/bs/BsPlayFill';
 import { playNextSong, playPreviousSong, playSingleSong, toggleePlay, toggleRepeatMode, toggleShuffle } from "../../reducers/audioReducer";
-interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  imageUrl: string;
-  audioUrl: string;
-}
+import { recordListen } from "../../services/postService";
+
+const API_BASE_URL = "http://localhost:8484/content/api/audio";
 
 const StreamingPlaybackBar: React.FC = () => {
   // Redux state
@@ -40,7 +37,7 @@ const StreamingPlaybackBar: React.FC = () => {
     mediaUrlSong
   } = useAppSelector(state => state.audio);
   const dispatch = useAppDispatch();
-
+  console.log("Current song:", currentSong);
   // Player state
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -52,9 +49,9 @@ const StreamingPlaybackBar: React.FC = () => {
   const [isBuffering, setIsBuffering] = useState(false);
   const [loadedRanges, setLoadedRanges] = useState<TimeRanges | null>(null);
   const [showPlaylist, setShowPlaylist] = useState(false);
+  const [recordedTrack, setRecordedTrack] = useState<string | null>(null);
 
   // API config
-  const API_BASE_URL = "http://localhost:8484/content/api/audio";
   const audioUrl = (currentSong as any)?.audioUrl || `${API_BASE_URL}/${mediaUrlSong}`;
 
   // Refs
@@ -68,7 +65,26 @@ const StreamingPlaybackBar: React.FC = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }, []);
 
-  // Toggle play/pause - ĐÃ SỬA
+  // Record listen function
+  const recordsListen = useCallback(async (postId: string) => {
+    if (recordedTrack === postId) return;
+    
+    try {
+      
+      await recordListen(postId);
+      
+      setRecordedTrack(postId);
+    } catch (error) {
+      console.error("Error recording listen:", error);
+    }
+  }, [recordedTrack]);
+
+  const extractPostIdFromUrl = useCallback((url: string): string | null => {
+    const matches = url.match(/\/([^\/]+)$/);
+    return matches ? matches[1] : null;
+  }, []);
+
+  // Toggle play/pause
   const togglePlay = useCallback(async () => {
     if (!audioRef.current) return;
 
@@ -76,19 +92,24 @@ const StreamingPlaybackBar: React.FC = () => {
       if (play) {
         await audioRef.current.pause();
       } else {
-        // Chỉ reset về đầu nếu bài đã kết thúc
-        if (audioRef.current.currentTime >= audioRef.current.duration - 0.1) {
+        const shouldRecord = audioRef.current.currentTime >= audioRef.current.duration - 0.1;
+        
+        if (shouldRecord) {
           audioRef.current.currentTime = 0;
+          if (currentSong?.id) {
+            await recordsListen(currentSong.id);
+          } 
         }
+        
         await audioRef.current.play();
       }
       dispatch(toggleePlay(!play));
     } catch (error) {
       console.error("Playback error:", error);
     }
-  }, [play, dispatch]);
+  }, [play, dispatch, currentSong, mediaUrlSong, extractPostIdFromUrl]);
 
-  // Thêm effect đồng bộ trạng thái phát - MỚI THÊM
+  // Thêm effect đồng bộ trạng thái phát
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -162,7 +183,7 @@ const StreamingPlaybackBar: React.FC = () => {
     }
   }, [playlist, dispatch]);
 
-  // Update audio element when song changes - ĐÃ SỬA
+  // Update audio element when song changes
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !audioUrl) return;
@@ -175,9 +196,15 @@ const StreamingPlaybackBar: React.FC = () => {
           dispatch(toggleePlay(false));
         });
       }
+      
+      // Record listen when new song is loaded
+      if (currentSong?.id) {
+        recordsListen(currentSong.id);
+      }
     };
 
-    // Giữ nguyên currentTime khi thay đổi bài hát
+    // Reset recorded track when song changes
+    setRecordedTrack(null);
     const prevTime = audio.currentTime;
     audio.src = audioUrl;
     audio.load();
@@ -189,9 +216,9 @@ const StreamingPlaybackBar: React.FC = () => {
     return () => {
       audio.removeEventListener('canplay', handleCanPlay);
     };
-  }, [audioUrl, play, dispatch]);
+  }, [audioUrl, play, dispatch, currentSong, mediaUrlSong, extractPostIdFromUrl]);
 
-  // Audio event listeners - ĐÃ SỬA
+  // Audio event listeners
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -427,10 +454,10 @@ const StreamingPlaybackBar: React.FC = () => {
                   className="btn btn-primary rounded-circle p-2 mx-3"
                   onClick={togglePlay}
                   aria-label={play ? "Pause" : "Play"}
-                  disabled={!currentSong && !mediaUrlSong} // Vô hiệu hóa nếu không có dữ liệu
+                  disabled={!currentSong && !mediaUrlSong}
                 >
                   {(!currentSong && !mediaUrlSong) ? (
-                    <BsMusicNoteList size={24} /> // Icon "không có bài hát"
+                    <BsMusicNoteList size={24} />
                   ) : isBuffering ? (
                     <div className="spinner-border spinner-border-sm text-white" role="status">
                       <span className="visually-hidden">Loading...</span>
@@ -517,7 +544,7 @@ const StreamingPlaybackBar: React.FC = () => {
         .music-player-container {
           position: relative;
           z-index: 1000;
-          margin-top :80px;
+          margin-top: 80px;
         }
         
         .playlist-modal {

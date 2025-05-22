@@ -27,7 +27,7 @@ public class CommentResponse {
     Instant updatedAt;
     List<CommentResponse> child_comments;// Danh sách comment con (nếu có)
     // Constructor
-    public CommentResponse(String id, String accountId, String parentId, Instant createdAt, Instant updatedAt, String content) {
+    public CommentResponse(String id, String accountId, String parentId, Instant createdAt, Instant updatedAt, String content,boolean userIsArtist) {
         this.id = id;
         this.accountId = accountId;
         this.parentId = parentId;
@@ -36,6 +36,7 @@ public class CommentResponse {
         this.content = content;
         this.username = "User";
         this.userAvatar ="/assets/images/default/avatar.jpg";
+        this.userIsArtist = userIsArtist;
     }
 
 

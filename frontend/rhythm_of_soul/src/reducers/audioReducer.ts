@@ -30,6 +30,7 @@ interface AudioSliceState {
   titleSong: string;
   artistSong: string;
   mediaUrlSong: string;
+  id: string;
 }
 
 const initialState: AudioSliceState = {
@@ -42,6 +43,7 @@ const initialState: AudioSliceState = {
   titleSong: '',
   artistSong: '',
   mediaUrlSong: '',
+  id: '',
 };
 
 const audioSlice = createSlice({
@@ -167,6 +169,7 @@ const audioSlice = createSlice({
     // Giữ nguyên action cũ để tương thích
     setAudio: (state, action: PayloadAction<{
       play: boolean;
+      id : string;
       imageSong: string;
       titleSong: string;
       artistSong: string;
@@ -174,13 +177,14 @@ const audioSlice = createSlice({
     }>) => {
       state.play = action.payload.play;
       state.imageSong = action.payload.imageSong;
+      state.id = action.payload.id;
       state.titleSong = action.payload.titleSong;
       state.artistSong = action.payload.artistSong;
       state.mediaUrlSong = action.payload.mediaUrlSong;
       
       // Cập nhật currentSong nếu cần
       state.currentSong = {
-        id: '', // hoặc generate ID tạm
+        id: action.payload.id, // hoặc generate ID tạm
         imageUrl: action.payload.imageSong,
         title: action.payload.titleSong,
         artist: action.payload.artistSong,
