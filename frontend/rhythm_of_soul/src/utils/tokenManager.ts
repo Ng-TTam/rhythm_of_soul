@@ -54,3 +54,16 @@ export const getSessionId = (): string => {
   }
   return sessionId;
 };
+
+export const getUserRole = (): string | null => {
+  const token = getAccessToken();
+  if (!token) return null;
+
+  try {
+    const decoded = jwtDecode<DecodedToken>(token);
+    return decoded.scope || null;
+  } catch (error) {
+    console.error('Cannot decode role from scope:', error);
+    return null;
+  }
+};

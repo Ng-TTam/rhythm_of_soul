@@ -52,5 +52,7 @@ public interface UserService {
     //    Tìm kiếm người dùng để follow
     PageResponse<UserResponse> getAllUsers(int page, int size, String searchKey);
 
-    List<UserResponse> getAllArtistRequestUsers();
+
+    PageResponse<UserResponse> getAllArtistRequestUsers(int page, int size, String searchKey, String status);
+
 }

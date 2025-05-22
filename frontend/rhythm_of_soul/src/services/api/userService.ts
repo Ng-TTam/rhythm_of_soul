@@ -6,6 +6,8 @@ import { AssignArtistRequest } from '../../model/profile/AssignArtistRequest';
 import { UpdateUserRequest } from '../../model/profile/UpdateUserRequest';
 import axios from 'axios';
 
+import { PageResponse } from '../../model/PageRespone';
+
 interface AssignArtistResponse {
 }
 
@@ -22,6 +24,7 @@ export interface UserInfo {
   last_name: string;
   avatar : string;
 }
+
 
 export const getUserByPreEmail = async (preEmail: string): Promise<User> => {
   const response = await apiClient.get<APIResponse<User>>(
@@ -126,3 +129,31 @@ export const getFollowing = async (userId: string, token: string): Promise<User[
   return response.data.result;
 };
 
+export const getAssignArtist = async (
+  page: number,
+  size: number,
+  keySearch?: string,
+  status?: string
+): Promise<PageResponse<User>> => {
+  const params = new URLSearchParams();
+  params.append("page", page.toString());
+  params.append("size", size.toString());
+  if (keySearch) params.append("searchKey", keySearch);
+  if (status) params.append('status', status);
+
+  const response = await apiClient.get<APIResponse<PageResponse<User>>>(
+    `${apiConfig.endpoints.user.get_assigned_artist}?${params.toString()}`
+  );
+
+  return response.data.result; 
+};
+
+export const upgradeArtist = async (userId: string) => {
+  const res = await apiClient.post<APIResponse<any>>(apiConfig.endpoints.user.upgradeArtist(userId));
+  return res.data;
+};
+
+export const revokeArtist = async (userId: string) => {
+  const res = await apiClient.post<APIResponse<any>>(apiConfig.endpoints.user.revokeArtist(userId));
+  return res.data;
+};

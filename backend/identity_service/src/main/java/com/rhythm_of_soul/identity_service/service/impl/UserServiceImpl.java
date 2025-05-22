@@ -1,5 +1,20 @@
 package com.rhythm_of_soul.identity_service.service.impl;
 
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import jakarta.transaction.Transactional;
+
+import org.apache.coyote.BadRequestException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+
 import com.rhythm_of_soul.identity_service.constant.ArtistProfileStatus;
 import com.rhythm_of_soul.identity_service.constant.Role;
 import com.rhythm_of_soul.identity_service.dto.request.ArtistProfileRequest;
@@ -23,14 +38,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -199,9 +207,62 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    @Override
-    public List<UserResponse> getAllArtistRequestUsers() {
-        List<User> users = userRepository.findAllUsersWithPendingArtistRequest();
-        return users.stream().map(userMapper::toUserResponse).collect(Collectors.toList());
+
+    public PageResponse<UserResponse> getAllArtistRequestUsers(int page, int size, String searchKey, String status) {
+        List<User> combinedUsers;
+
+        if (status == null || status.isBlank()) {
+            // Lấy cả PENDING và APPROVED
+            List<User> pendingUsers = userRepository.findPendingUsers(searchKey);
+            List<User> approvedUsers = userRepository.findApprovedUsers(searchKey);
+            combinedUsers = new ArrayList<>();
+            combinedUsers.addAll(pendingUsers);
+            combinedUsers.addAll(approvedUsers);
+        } else {
+            ArtistProfileStatus requestedStatus;
+            try {
+                requestedStatus = ArtistProfileStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid status: " + status);
+            }
+            if (requestedStatus == ArtistProfileStatus.PENDING) {
+                combinedUsers = userRepository.findPendingUsers(searchKey);
+            } else if (requestedStatus == ArtistProfileStatus.APPROVED) {
+                combinedUsers = userRepository.findApprovedUsers(searchKey);
+            } else {
+                combinedUsers = Collections.emptyList(); // hoặc xử lý khác nếu có status mới
+            }
+        }
+
+        // map sang UserResponse
+        List<UserResponse> allResponses = combinedUsers.stream()
+                .map(userMapper::toUserResponse)
+                .toList();
+
+        // Phân trang thủ công
+        int total = allResponses.size();
+        int fromIndex = page * size;
+        if (fromIndex >= total) {
+            // trả về trang rỗng nếu out of bound
+            return PageResponse.<UserResponse>builder()
+                    .currentPage(page)
+                    .pageSize(size)
+                    .totalElements(total)
+                    .totalPages((total + size - 1) / size)
+                    .data(Collections.emptyList())
+                    .build();
+        }
+        int toIndex = Math.min(fromIndex + size, total);
+        List<UserResponse> pageData = allResponses.subList(fromIndex, toIndex);
+
+        return PageResponse.<UserResponse>builder()
+                .currentPage(page)
+                .pageSize(size)
+                .totalElements(total)
+                .totalPages((total + size - 1) / size)
+                .data(pageData)
+                .build();
     }
+
+
 }

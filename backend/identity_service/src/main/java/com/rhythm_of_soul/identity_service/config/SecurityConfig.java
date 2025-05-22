@@ -69,7 +69,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
                         .permitAll()
-                        .requestMatchers(HttpMethod.GET, "/users/information/**")
+                        .requestMatchers(HttpMethod.GET, "/users/information/**", "/users/searchUser")
                         .permitAll()
                         .requestMatchers("/sign-in", "/sign-up", "/css/**", "/images/**", "/auth/introspect")
                         .permitAll()

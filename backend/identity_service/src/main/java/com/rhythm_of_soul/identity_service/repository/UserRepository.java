@@ -3,6 +3,7 @@ package com.rhythm_of_soul.identity_service.repository;
 import java.util.List;
 import java.util.Optional;
 
+import com.rhythm_of_soul.identity_service.constant.ArtistProfileStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,6 +24,31 @@ public interface UserRepository extends JpaRepository<User, String> {
     Page<User> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
             String firstName, String lastName, Pageable pageable);
 
-    @Query("SELECT ap.user FROM ArtistProfile ap WHERE ap.status = 'PENDING'")
-    List<User> findAllUsersWithPendingArtistRequest();
+    @Query("""
+    SELECT u FROM User u
+    LEFT JOIN u.artistProfile ap
+    WHERE ap.status = 'PENDING'
+    AND u.isArtist = false
+    AND (
+        :keySearch IS NULL
+        OR LOWER(u.firstName) LIKE LOWER(CONCAT('%', :keySearch, '%'))
+        OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :keySearch, '%'))
+    )
+""")
+    List<User> findPendingUsers(@Param("keySearch") String keySearch);
+
+    @Query("""
+    SELECT u FROM User u
+    LEFT JOIN u.artistProfile ap
+    WHERE ap.status = 'APPROVED'
+    AND u.isArtist = true
+    AND (
+        :keySearch IS NULL
+        OR LOWER(u.firstName) LIKE LOWER(CONCAT('%', :keySearch, '%'))
+        OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :keySearch, '%'))
+    )
+""")
+    List<User> findApprovedUsers(@Param("keySearch") String keySearch);
+
+
 }

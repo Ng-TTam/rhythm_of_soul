@@ -12,6 +12,7 @@ import { Playlist } from '../components/songs/AddToPlaylistModal';
 import { jwtDecode } from 'jwt-decode';
 const API_BASE_URL = 'http://localhost:8484/content';
 
+
 const accessToken = getAccessToken();
 export const fetchPostDetail = async (postId: string): Promise<PostDetailResponse> => {
   const response = await axios.get<PostDetailResponse>(

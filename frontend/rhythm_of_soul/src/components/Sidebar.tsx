@@ -1,15 +1,28 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { getUserRole } from "../utils/tokenManager";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
+
+interface MenuItem {
+  id: string;
+  path: string;
+  label: string;
+  short: string;
+}
+
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const role = getUserRole();
+  const userId = useSelector((state: RootState) => state.user.currentUser?.id ?? "");
 
   const redirectPath = (url: string) => {
     navigate(url);
   };
   useEffect(() => {
-    const script = document.createElement("script"); 
+    const script = document.createElement("script");
     script.src = "/assets/js/sidebarf700.js?v=1.0.1";
     document.body.appendChild(script);
     return () => {
@@ -17,33 +30,33 @@ export default function Sidebar() {
     };
   }, []);
 
-  const menuHome = [
-    { id: "home-menu", label: "Dashboard", short: "H", path: "/" },
-    { id: "release-menu", label: "Feed", short: "F", path: "/feed" },
-    { id: "albums-menu", label: "Albums", short: "A", path: "/albums" }
-];
 
-  const menuAdmin = [
-    { id: "admin", label: "Admin", short: "A", path: "#" },
-    { id: "category", label: "Category", short: "C", path: "admin/admin-category.html" },
-    { id: "writer", label: "Writer", short: "W", path: "admin/admin-writer.html" },
+  const menuHome: MenuItem[] = !role
+    ? [{ id: "home-menu", label: "Dashboard", short: "H", path: "/" }]
+    : [
+      { id: "home-menu", label: "Dashboard", short: "H", path: "/" },
+      { id: "release-menu", label: "Feed", short: "F", path: "/feed" },
+      { id: "albums-menu", label: "Albums", short: "A", path: "/albums" }
+    ];
+
+  const menuAdmin: MenuItem[] = [
     { id: "user", label: "User", short: "U", path: "/admin/admin-user" },
-    { id: "muzic", label: "Muzic", short: "M", path: "admin/admin-song.html" }
+    { id: "assign", label: "Assign Artist", short: "A", path: "/admin/admin-assign" }
   ];
 
   const menuUser = [
     { id: "user-profile", label: "User Profile", short: "U", path: "/userProfile" },
     { id: "songs", label: "Songs", short: "S", path: "/songs" },
     { id: "playlist", label: "Playlist", short: "P", path: "/playlist" },
-    { id: "follows", label: "Follows", short: "F", path: "/follows" }
+    { id: "follows", label: "Follows", short: "F", path: "/user/"+userId+"/followers" }
   ];
 
   return (
     <>
       <aside className="sidebar sidebar-base sidebar-white sidebar-default" id="first-tour" data-toggle="main-sidebar" data-sidebar="responsive">
         <div className="sidebar-header d-flex align-items-center justify-content-center">
-          <a className="navbar-brand" 
-            onClick={(e) => {e.preventDefault(); navigate('/');}}>
+          <a className="navbar-brand"
+            onClick={(e) => { e.preventDefault(); navigate('/'); }}>
             <div className="logo-main">
               <img src="https://templates.iqonic.design/muzik/html/assets/images/logo.svg" className="logo-normal img-fluid" alt="logo" />
               <img src="https://templates.iqonic.design/muzik/html/assets/images/logo-dark.svg" className="logo-normal dark-normal img-fluid" alt="logo-dark" />
@@ -122,9 +135,8 @@ export default function Sidebar() {
                   {menuHome.map((menu) => (
                     <li className="nav-item" key={menu.id}>
                       <button
-                        className={`nav-link btn-sidebar ${
-                          menu.path && location.pathname === menu.path ? "active" : ""
-                        }`}
+                        className={`nav-link btn-sidebar ${menu.path && location.pathname === menu.path ? "active" : ""
+                          }`}
                         onClick={() => {
                           if (menu.path) redirectPath(menu.path);
                         }}
@@ -150,53 +162,53 @@ export default function Sidebar() {
               </li>
 
               {/* Admin menu */}
-              <li className="nav-item">
-                <a className={`nav-link ${menuAdmin.some(item => item.path === location.pathname) ? 'active' : ''}`} data-bs-toggle="collapse" href="#admin-menu" role="button" aria-expanded="false" aria-controls="admin-menu">
-                  <i className="icon" data-bs-toggle="tooltip" title="Admin" data-bs-placement="right">
-                    <svg className="icon-20" xmlns="http://www.w3.org/2000/svg" width={20} height={20} viewBox="0 0 20 20" fill="none">
-                      <g clipPath="url(#clip0_389_2900)">
-                        <path
-                          d="M8.4375 12.5C11.0263 12.5 13.125 10.4013 13.125 7.8125C13.125 5.22367 11.0263 3.125 8.4375 3.125C5.84867 3.125 3.75 5.22367 3.75 7.8125C3.75 10.4013 5.84867 12.5 8.4375 12.5Z"
-                          stroke="currentColor"
-                          strokeWidth="1.2"
-                          strokeMiterlimit={10}
-                        />
-                        <path d="M1.875 15.625C3.48047 13.7148 5.74688 12.5 8.4375 12.5C11.1281 12.5 13.3945 13.7148 15 15.625" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                        <path
-                          d="M16.875 11.875C17.5654 11.875 18.125 11.3154 18.125 10.625C18.125 9.93464 17.5654 9.375 16.875 9.375C16.1846 9.375 15.625 9.93464 15.625 10.625C15.625 11.3154 16.1846 11.875 16.875 11.875Z"
-                          stroke="currentColor"
-                          strokeWidth="1.2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path d="M16.875 9.375V8.4375" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M15.7922 10L14.9805 9.53125" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M15.7922 11.25L14.9805 11.7188" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M16.875 11.875V12.8125" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M17.9578 11.25L18.7695 11.7188" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M17.9578 10L18.7695 9.53125" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                      </g>
-                      <defs>
-                        <clipPath id="clip0_389_2900">
-                          <rect width={20} height={20} fill="white" />
-                        </clipPath>
-                      </defs>
-                    </svg>
-                  </i>
-                  <span className="item-name">Admin</span>
-                  <i className="right-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width={18} className="icon-18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </i>
-                </a>
-                <ul className="sub-nav collapse" id="admin-menu" data-bs-parent="#sidebar-menu">
-                  {menuAdmin.map((menu) => (
+              {role === "ROLE_ADMIN" && (
+                < li className="nav-item">
+                  <a className={`nav-link ${menuAdmin.some(item => item.path === location.pathname) ? 'active' : ''}`} data-bs-toggle="collapse" href="#admin-menu" role="button" aria-expanded="false" aria-controls="admin-menu">
+                    <i className="icon" data-bs-toggle="tooltip" title="Admin" data-bs-placement="right">
+                      <svg className="icon-20" xmlns="http://www.w3.org/2000/svg" width={20} height={20} viewBox="0 0 20 20" fill="none">
+                        <g clipPath="url(#clip0_389_2900)">
+                          <path
+                            d="M8.4375 12.5C11.0263 12.5 13.125 10.4013 13.125 7.8125C13.125 5.22367 11.0263 3.125 8.4375 3.125C5.84867 3.125 3.75 5.22367 3.75 7.8125C3.75 10.4013 5.84867 12.5 8.4375 12.5Z"
+                            stroke="currentColor"
+                            strokeWidth="1.2"
+                            strokeMiterlimit={10}
+                          />
+                          <path d="M1.875 15.625C3.48047 13.7148 5.74688 12.5 8.4375 12.5C11.1281 12.5 13.3945 13.7148 15 15.625" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                          <path
+                            d="M16.875 11.875C17.5654 11.875 18.125 11.3154 18.125 10.625C18.125 9.93464 17.5654 9.375 16.875 9.375C16.1846 9.375 15.625 9.93464 15.625 10.625C15.625 11.3154 16.1846 11.875 16.875 11.875Z"
+                            stroke="currentColor"
+                            strokeWidth="1.2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path d="M16.875 9.375V8.4375" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M15.7922 10L14.9805 9.53125" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M15.7922 11.25L14.9805 11.7188" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M16.875 11.875V12.8125" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M17.9578 11.25L18.7695 11.7188" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M17.9578 10L18.7695 9.53125" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                        </g>
+                        <defs>
+                          <clipPath id="clip0_389_2900">
+                            <rect width={20} height={20} fill="white" />
+                          </clipPath>
+                        </defs>
+                      </svg>
+                    </i>
+                    <span className="item-name">Admin</span>
+                    <i className="right-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width={18} className="icon-18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </i>
+                  </a>
+                  <ul className="sub-nav collapse" id="admin-menu" data-bs-parent="#sidebar-menu">
+                    {menuAdmin.map((menu) => (
                       <li className="nav-item" key={menu.id}>
                         <button
-                          className={`nav-link btn-sidebar ${
-                            menu.path && location.pathname === menu.path ? "active" : ""
-                          }`}
+                          className={`nav-link btn-sidebar ${menu.path && location.pathname === menu.path ? "active" : ""
+                            }`}
                           onClick={() => {
                             if (menu.path) redirectPath(menu.path);
                           }}
@@ -218,45 +230,46 @@ export default function Sidebar() {
                         </button>
                       </li>
                     ))}
-                </ul>
-              </li>
+                  </ul>
+                </li>
+              )}
 
               {/* User menu */}
-              <li className="nav-item">
-                <a className={`nav-link ${menuUser.some(item => item.path === location.pathname) ? 'active' : ''}`} data-bs-toggle="collapse" href="#sidebar-user" role="button" aria-expanded="false" aria-controls="sidebar-user">
-                  <i className="icon" data-bs-toggle="tooltip" title="Users" data-bs-placement="right">
-                    <svg className="icon-20" xmlns="http://www.w3.org/2000/svg" width={20} height={20} viewBox="0 0 20 20" fill="none">
-                      <g clipPath="url(#clip0_389_11969)">
-                        <path
-                          d="M10 12.5C12.7614 12.5 15 10.2614 15 7.5C15 4.73858 12.7614 2.5 10 2.5C7.23858 2.5 5 4.73858 5 7.5C5 10.2614 7.23858 12.5 10 12.5Z"
-                          stroke="currentColor"
-                          strokeWidth="1.2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path d="M2.5 16.875C4.01328 14.2602 6.76172 12.5 10 12.5C13.2383 12.5 15.9867 14.2602 17.5 16.875" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                      </g>
-                      <defs>
-                        <clipPath id="clip0_389_11969">
-                          <rect width={20} height={20} fill="white" />
-                        </clipPath>
-                      </defs>
-                    </svg>
-                  </i>
-                  <span className="item-name">Users</span>
-                  <i className="right-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width={18} className="icon-18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </i>
-                </a>
-                <ul className="sub-nav collapse" id="sidebar-user" data-bs-parent="#sidebar-menu">
-                  {menuUser.map((menu) => (
+              {(role === "ROLE_ADMIN" || role === "ROLE_USER" || role === "ROLE_ARTIST") && (
+                <li className="nav-item">
+                  <a className={`nav-link ${menuUser.some(item => item.path === location.pathname) ? 'active' : ''}`} data-bs-toggle="collapse" href="#sidebar-user" role="button" aria-expanded="false" aria-controls="sidebar-user">
+                    <i className="icon" data-bs-toggle="tooltip" title="Users" data-bs-placement="right">
+                      <svg className="icon-20" xmlns="http://www.w3.org/2000/svg" width={20} height={20} viewBox="0 0 20 20" fill="none">
+                        <g clipPath="url(#clip0_389_11969)">
+                          <path
+                            d="M10 12.5C12.7614 12.5 15 10.2614 15 7.5C15 4.73858 12.7614 2.5 10 2.5C7.23858 2.5 5 4.73858 5 7.5C5 10.2614 7.23858 12.5 10 12.5Z"
+                            stroke="currentColor"
+                            strokeWidth="1.2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path d="M2.5 16.875C4.01328 14.2602 6.76172 12.5 10 12.5C13.2383 12.5 15.9867 14.2602 17.5 16.875" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                        </g>
+                        <defs>
+                          <clipPath id="clip0_389_11969">
+                            <rect width={20} height={20} fill="white" />
+                          </clipPath>
+                        </defs>
+                      </svg>
+                    </i>
+                    <span className="item-name">Users</span>
+                    <i className="right-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width={18} className="icon-18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </i>
+                  </a>
+                  <ul className="sub-nav collapse" id="sidebar-user" data-bs-parent="#sidebar-menu">
+                    {menuUser.map((menu) => (
                       <li className="nav-item" key={menu.id}>
                         <button
-                          className={`nav-link btn-sidebar ${
-                            menu.path && location.pathname === menu.path ? "active" : ""
-                          }`}
+                          className={`nav-link btn-sidebar ${menu.path && location.pathname === menu.path ? "active" : ""
+                            }`}
                           onClick={() => {
                             if (menu.path) redirectPath(menu.path);
                           }}
@@ -278,8 +291,9 @@ export default function Sidebar() {
                         </button>
                       </li>
                     ))}
-                </ul>
-              </li>
+                  </ul>
+                </li>
+              )}
             </ul>
           </div>
         </div>
@@ -291,7 +305,7 @@ export default function Sidebar() {
           <div className="scrollbar-thumb scrollbar-thumb-y" style={{ height: 724, transform: "translate3d(0px, 0px, 0px)" }} />
         </div>
         <div className="sidebar-footer"></div>
-      </aside>
+      </aside >
     </>
   );
 }

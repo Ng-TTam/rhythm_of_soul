@@ -60,7 +60,7 @@ public class FollowStreamConsumer {
     try {
       List<MapRecord<String, Object, Object>> messages = redisTemplate.opsForStream()
               .read(Consumer.from(consumerGroup, consumerName),
-                      StreamReadOptions.empty().count(10).block(Duration.ofMillis(60)),
+                      StreamReadOptions.empty().count(10).block(Duration.ofMillis(1000)),
                       StreamOffset.create(streamKey, ReadOffset.lastConsumed()));
 
       if (messages != null && !messages.isEmpty()) {

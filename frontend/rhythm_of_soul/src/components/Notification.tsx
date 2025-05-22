@@ -7,6 +7,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
+import { Link } from "react-router-dom";
 
 dayjs.extend(relativeTime);
 
@@ -28,7 +29,7 @@ const Notification: React.FC = () => {
       setIsLoading(false);
       return;
     }
-  
+
     const client = new Client({
       webSocketFactory: () => new SockJS("http://localhost:8081/ws"),
       reconnectDelay: 5000,
@@ -44,16 +45,16 @@ const Notification: React.FC = () => {
         console.error("WebSocket error:", frame.headers["message"]);
       },
     });
-  
+
     client.activate();
-  
+
     // ✅ Gọi API ở đây trong useEffect
     const fetchNotifications = async () => {
       try {
         setIsLoading(true);
         const unreadRes = await notificationService.getUnreadNotifications(userId);
         const unreadData = unreadRes.data || [];
-  
+
         if (unreadData.length > 0) {
           setNotifications(unreadData);
           setTotalUnread(unreadRes.total || 0);
@@ -68,14 +69,14 @@ const Notification: React.FC = () => {
         setIsLoading(false);
       }
     };
-  
+
     fetchNotifications();
-  
+
     return () => {
       client.deactivate();
     };
   }, [userId]);
-  
+
 
   const handleDropdownHide = async () => {
     try {
@@ -117,22 +118,14 @@ const Notification: React.FC = () => {
               <div className="text-center p-3 text-muted">No notifications</div>
             ) : (
               notifications.map((item) => (
-                <a
-                  href={item.referenceId}
-                  className="iq-sub-card"
-                  key={item.id}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <Link to={`/post/${item.referenceId}`} className="iq-sub-card" key={item.id}>
                   <div className="d-flex align-items-center">
                     <div className="ms-3 w-100">
-                      <h6 className="mb-0 text-primary text-decoration-underline">{item.message}</h6>
-                      <small className="text-muted">
-                        {dayjs(item.createdAt).fromNow()}
-                      </small>
+                      <h6 style={{ color: "black" }}>{item.message}</h6>
+                      <small className="text-muted">{dayjs(item.createdAt).fromNow()}</small>
                     </div>
                   </div>
-                </a>
+                </Link>
               ))
             )}
           </div>

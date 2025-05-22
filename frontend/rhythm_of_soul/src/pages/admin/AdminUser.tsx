@@ -6,6 +6,7 @@ import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
 import '../../styles/toast.css';
 import { getUsers, lockUser, unlockUser } from '../../services/api/accountService';
+import { useDebounce } from '../feed/hooks/useDebounce';
 
 interface User {
   id: string;
@@ -32,6 +33,8 @@ export default function AdminUser() {
   const [selectedUserStatus, setSelectedUserStatus] = useState<string | null>(null);
   const [lockReason, setLockReason] = useState('');
   const toast = useRef<Toast>(null);
+    const debouncedSearchKey = useDebounce(searchKey, 2000); // sau 2s mới gọi
+  
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -54,7 +57,7 @@ export default function AdminUser() {
 
   useEffect(() => {
     fetchUsers();
-  }, [currentPage, roleFilter, statusFilter, searchKey]);
+  }, [currentPage, roleFilter, statusFilter, debouncedSearchKey]);
 
   const handleLockUnlock = async (id: string, status: string | null) => {
     try {

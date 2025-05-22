@@ -104,7 +104,6 @@ public class UserController {
     }
 
     @GetMapping("/searchUser")
-    @PreAuthorize("hasAnyRole('USER', 'ARTIST')")
     public ResponseEntity<ApiResponse<PageResponse<UserResponse>>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -119,12 +118,18 @@ public class UserController {
 
     @GetMapping("/artist-requests")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<List<UserResponse>>> getArtistRequests() {
-        List<UserResponse> result = userService.getAllArtistRequestUsers();
-        return ResponseEntity.ok(ApiResponse.<List<UserResponse>>builder()
+    public ResponseEntity<ApiResponse<PageResponse<UserResponse>>> getArtistRequests(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String searchKey,
+            @RequestParam(required = false) String status) {
+
+        PageResponse<UserResponse> result = userService.getAllArtistRequestUsers(page, size, searchKey, status);
+        return ResponseEntity.ok(ApiResponse.<PageResponse<UserResponse>>builder()
                 .code(200)
                 .message("Fetched artist requests successfully")
                 .result(result)
                 .build());
     }
+
 }

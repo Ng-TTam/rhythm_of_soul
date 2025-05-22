@@ -55,12 +55,12 @@ public class NewContentRedisStreamConsumer {
     }
   }
 
-  @Scheduled(fixedDelay = 5000)
+  @Scheduled(fixedDelay = 500)
   public void listenForMessages() {
     try {
       List<MapRecord<String, Object, Object>> messages = redisTemplate.opsForStream()
               .read(Consumer.from(consumerGroup, consumerName),
-                      StreamReadOptions.empty().count(10).block(Duration.ofMillis(10)),
+                      StreamReadOptions.empty().count(10).block(Duration.ofMillis(100)),
                       StreamOffset.create(streamKey, ReadOffset.lastConsumed()));
 
       if (messages != null && !messages.isEmpty()) {

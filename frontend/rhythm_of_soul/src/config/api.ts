@@ -1,6 +1,6 @@
 import { config } from './environment';
 
-const contentURL = 'http://localhost:8484'
+const contentURL = 'http://localhost:8484/content'
 // Định nghĩa kiểu cho endpoints
 interface AuthEndpoints {
   login: string;
@@ -31,6 +31,9 @@ interface UserEndpoints {
   editComment: (commentId: string) => string;
   deleteComment: (commentId: string) => string;
   addSongToPlaylist: (playlistId: string, songId: string ) => string;
+  get_assigned_artist: string;
+  upgradeArtist: (userId: string) => string;
+  revokeArtist: (userId: string) => string;
 }
 
 interface ArtistEndpoints {
@@ -91,6 +94,9 @@ export const apiConfig = {
       addComment: `${contentURL}/content/comments`,
       editComment: (commentId: string, content: string) => `${contentURL}/content/comments?commentId=${commentId}`,
       deleteComment: (commentId: string) => `${contentURL}/content/comments?commentId=${commentId}`,
+      get_assigned_artist: `${config.apiBaseUrl}/identity/users/artist-requests`,
+      upgradeArtist: (userId: string) => `${config.apiBaseUrl}/identity/users/upgrade-artist/${userId}`,
+      revokeArtist: (userId: string) => `${config.apiBaseUrl}/identity/users/revoke-artist/${userId}`,
     },
     artist: {
       createAlbum: `${contentURL}/content/posts/album`,
