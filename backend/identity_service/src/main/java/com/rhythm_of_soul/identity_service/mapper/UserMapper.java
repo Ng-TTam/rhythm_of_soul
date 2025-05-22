@@ -1,11 +1,12 @@
 package com.rhythm_of_soul.identity_service.mapper;
 
-import com.rhythm_of_soul.identity_service.dto.request.UserUpdateRequest;
-import com.rhythm_of_soul.identity_service.dto.response.UserResponse;
-import com.rhythm_of_soul.identity_service.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+
+import com.rhythm_of_soul.identity_service.dto.request.UserUpdateRequest;
+import com.rhythm_of_soul.identity_service.dto.response.UserResponse;
+import com.rhythm_of_soul.identity_service.entity.User;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {

@@ -139,7 +139,7 @@ export default function UserProfile() {
                     loading="lazy"
                   />
                   {user?.artist && (
-                    <Badge bg="primary" className="position-absolute bottom-0 end-0 p-2 rounded-pill">
+                    <Badge bg="primary" className="p-2 rounded-pill d-flex align-items-center">
                       <FaMusic className="me-1" /> Artist
                     </Badge>
                   )}
@@ -292,7 +292,7 @@ export default function UserProfile() {
                 )}
               </Card.Header>
               <Card.Body className="pt-2">
-                <div className="text-center py-4">
+                <div className="text-center py-4 d-flex align-items-center flex-column">
                   <FaMusic size={40} className="text-muted mb-3 opacity-25" />
                   <p className="text-muted">No recent activity to display</p>
                 </div>

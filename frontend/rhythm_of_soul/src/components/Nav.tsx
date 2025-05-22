@@ -14,7 +14,6 @@ import { Spinner } from "react-bootstrap";
 import GuestNav from "./GuestNav";
 import { getUserRole } from "../utils/tokenManager";
 
-
 const ArtistRegisterModal = lazy(() => import("./artists/RegisterArtistDialog"));
 
 export default function Nav() {
@@ -128,18 +127,18 @@ export default function Nav() {
                         </a>
                       </li>
                       {userRole === "ROLE_ARTIST" && (
-                      <li className="nav-item">
-                        <a
-                          className={`nav-link ${location.pathname === "/albums" ? "active" : ""}`}
-                          aria-current="page"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            redirectPath(`/albums`);
-                          }}
-                        >
-                          <span className="item-name">Albums</span>
-                        </a>
-                      </li>
+                        <li className="nav-item">
+                          <a
+                            className={`nav-link ${location.pathname === "/albums" ? "active" : ""}`}
+                            aria-current="page"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              redirectPath(`/albums`);
+                            }}
+                          >
+                            <span className="item-name">Albums</span>
+                          </a>
+                        </li>
                       )}
                     </ul>
                   </div>
@@ -158,8 +157,8 @@ export default function Nav() {
                 <div className="search-box d-xl-block d-none">
                   <SearchBox />
                 </div>
+
                 <ul className="mb-2 navbar-nav ms-auto align-items-center navbar-list mb-lg-0">
-                  {/* Mobile search toggle */}
                   <li className="nav-item dropdown d-xl-none d-block">
                     <a href="#" className="nav-link" id="search-drop" data-bs-toggle="dropdown">
                       <svg width={24} height={24} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -170,23 +169,28 @@ export default function Nav() {
                         />
                       </svg>
                     </a>
-                    <ul className="dropdown-menu dropdown-menu-end p-3" aria-labelledby="search-drop">
-                      <li>
-                        <div className="iq-search-bar position-relative">
-                          <form action="#" className="searchbox">
-                            <input type="text" className="form-control bg-soft-primary" placeholder="Search here..." />
-                            <button className="d-lg-none d-flex btn btn-link" type="submit">
-                              <span className="material-symbols-outlined">search</span>
-                            </button>
-                          </form>
+                    <ul className="p-0 sub-drop dropdown-menu dropdown-menu-end" aria-labelledby="search-drop">
+                      <li className="">
+                        <div className="p-3 card-header justify-content-between border-bottom rounded-top">
+                          <div className="header-title">
+                            <div className="iq-search-bar device-search position-relative" style={{ right: "3.5em" }}>
+                              <div className="search-box search-input form-control bg-soft-primary">
+                                <SearchBox />
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </li>
                     </ul>
                   </li>
                   <li>
-                    {user?.artist === false && <button className="btn btn-soft-primary rounded-pill mb-1" onClick={handleOpen}>Upgrade Artist</button>}
+                    {user?.artist === false && (
+                      <button className="btn btn-soft-primary rounded-pill mb-1" onClick={handleOpen}>
+                        Upgrade Artist
+                      </button>
+                    )}
 
-                    {user?.artistProfile?.status === 'PENDING' && <div className="btn btn-outline-warning rounded-pill mt-2">Upgrade Pending</div>}
+                    {user?.artistProfile?.status === "PENDING" && <div className="btn btn-outline-warning rounded-pill mt-2">Upgrade Pending</div>}
 
                     {showModal && (
                       <Suspense fallback={<Spinner animation="border" />}>
@@ -195,26 +199,40 @@ export default function Nav() {
                     )}
                   </li>
 
-
                   {/* Notifications */}
                   <Notification />
 
                   {/* User Avatar & Dropdown */}
                   <li className="nav-item dropdown">
                     <a className="p-0 ps-3 nav-link d-flex align-items-center position-relative" href="#" id="profile-setting" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      <img src={user?.avatar || "/assets/images/default/avatar.jpg"} alt="User-Profile" className="theme-color-default-img img-fluid avatar avatar-40 avatar-rounded" loading="lazy" />
+                      <img
+                        src={user?.avatar || "/assets/images/default/avatar.jpg"}
+                        className="theme-color-default-img img-fluid avatar avatar-40 avatar-rounded"
+                        loading="lazy"
+                        style={{ objectFit: "cover", width: "40px", height: "40px" }}
+                      />
                       <div className="iq-profile-badge bg-success" />
                     </a>
                     <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="profile-setting">
                       <li>
-                        <a className="dropdown-item" onClick={(e) => { e.preventDefault(); redirectPath(`/userProfile`); }}>
+                        <a
+                          className="dropdown-item"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            redirectPath(`/userProfile`);
+                          }}
+                        >
                           Profile
                         </a>
                       </li>
                       <li>
-                        <a className="dropdown-item" href="#">Privacy Setting</a>
+                        <a className="dropdown-item" href="#">
+                          Privacy Setting
+                        </a>
                       </li>
-                      <li><hr className="dropdown-divider" /></li>
+                      <li>
+                        <hr className="dropdown-divider" />
+                      </li>
                       <li>
                         <a className="dropdown-item" href="/login" onClick={handleLogout}>
                           Logout
@@ -223,7 +241,6 @@ export default function Nav() {
                     </ul>
                   </li>
                 </ul>
-
               </div>
             </div>
           </nav>

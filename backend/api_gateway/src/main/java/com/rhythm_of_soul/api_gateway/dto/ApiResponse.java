@@ -17,6 +17,6 @@ public class ApiResponse<T> {
     private int code = 200;
 
     private String message;
-    private T data;
+    private T result;
     private Instant timeStamp = Instant.now();
 }

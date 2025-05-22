@@ -1,6 +1,5 @@
 package com.rhythm_of_soul.identity_service.service.impl;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,7 +7,6 @@ import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
 
-import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,12 +31,11 @@ import com.rhythm_of_soul.identity_service.repository.AccountRepository;
 import com.rhythm_of_soul.identity_service.repository.UserRepository;
 import com.rhythm_of_soul.identity_service.service.UserService;
 import com.rhythm_of_soul.identity_service.utils.JwtUtils;
-import jakarta.transaction.Transactional;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-
 
 @Slf4j
 @Service
@@ -207,7 +204,6 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-
     public PageResponse<UserResponse> getAllArtistRequestUsers(int page, int size, String searchKey, String status) {
         List<User> combinedUsers;
 
@@ -235,9 +231,8 @@ public class UserServiceImpl implements UserService {
         }
 
         // map sang UserResponse
-        List<UserResponse> allResponses = combinedUsers.stream()
-                .map(userMapper::toUserResponse)
-                .toList();
+        List<UserResponse> allResponses =
+                combinedUsers.stream().map(userMapper::toUserResponse).toList();
 
         // Phân trang thủ công
         int total = allResponses.size();
@@ -263,6 +258,4 @@ public class UserServiceImpl implements UserService {
                 .data(pageData)
                 .build();
     }
-
-
 }

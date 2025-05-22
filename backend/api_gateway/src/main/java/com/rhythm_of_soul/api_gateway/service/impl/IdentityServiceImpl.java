@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class IdentityServiceImpl implements IdentityService {
-    IdentityClient identityClient;
+    private final IdentityClient identityClient;
 
     IdentityServiceImpl(IdentityClient identityClient){ this.identityClient = identityClient;}
 

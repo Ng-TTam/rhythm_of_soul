@@ -11,6 +11,8 @@ import SkeletonPost from './SkeletonPost';
 import { CurrentUser, PostWithUserInfo } from '../../model/post/post';
 import {User} from '../../model/profile/UserProfile';
 import { getProfile } from '../../services/api/userService';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 const Layout: React.FC = () => {
 
   const [currentUser, setCurrentUser] = React.useState<CurrentUser>({
@@ -18,15 +20,17 @@ const Layout: React.FC = () => {
     username: '',
     avatar: '/assets/images/default/avatar.jpg',
   });
+
+  const user = useSelector((state: RootState) => state.user.currentUser);
   
   const fetchCurrentUser = async () => {
     try {
       const response = await getProfile();
       const user: User = response;
       setCurrentUser({
-        id: user.id,
-        username: user.firstName + ' ' + user.lastName,
-        avatar: user.avatar || '/assets/images/default/avatar.jpg',
+        id: user?.id ? user.id : '',
+        username: user?.firstName + ' ' + user?.lastName,
+        avatar: user?.avatar || '/assets/images/default/avatar.jpg',
       });
       console.log('Current user:', user);
     } catch (error) {

@@ -16,15 +16,15 @@ spring:
       default-filters:
         - StripPrefix=2
       routes:
-        - id: identity_service
+        - id: identity-service
           uri: ${app.services.identity}
           predicates:
-            - Path=${app.api-prefix}/identity/**
-        - id: content_service
+            - Path=${app.api-prefix}/**
+        - id: content-service
           uri: ${app.services.content}
           predicates:
             - Path=${app.api-prefix}/contents/**
-        - id: notification_service
+        - id: notification-service
           uri: ${app.services.notification}
           predicates:
             - Path=${app.api-prefix}/notifications/**

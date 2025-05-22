@@ -2,6 +2,7 @@ package com.rhythm_of_soul.content_service.repository;
 
 import com.rhythm_of_soul.content_service.common.Type;
 import com.rhythm_of_soul.content_service.entity.Post;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +10,7 @@ import java.util.List;
 @Repository
 public interface PostRepository extends MongoRepository<Post, String> {
 
-    List<Post> findAllByAccountId(String accountId);
+    List<Post> findAllByAccountId(String accountId, Pageable pageable);
     List<Post> findAllByAccountIdAndType(String accountId, Type type);
 
 //    @Query("{ $or: [ " +

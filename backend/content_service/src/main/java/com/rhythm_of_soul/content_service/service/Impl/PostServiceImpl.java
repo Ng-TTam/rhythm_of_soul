@@ -35,6 +35,9 @@ import io.minio.errors.*;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -215,7 +218,8 @@ public class PostServiceImpl implements  PostService {
     }
     @Override
     public List<PostResponse> getPosts(String accountId) {
-        List<Post> posts = postRepository.findAllByAccountId(accountId);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
+        List<Post> posts = postRepository.findAllByAccountId(accountId, pageable);
         return processPosts(posts, accountId);
     }
 
@@ -290,7 +294,15 @@ public class PostServiceImpl implements  PostService {
     @Override
     public List<PostResponse> searchPosts(String accountId, String keyword, String tag, Type type, int page, int size) {
         // Chuẩn hóa tham số
-        String normalizedKeyword = keyword != null ? keyword.trim().replaceAll("[^a-zA-Z0-9\\s]", "") : null;
+        String normalizedKeyword = null;
+
+        if (keyword != null) {
+            normalizedKeyword = keyword
+                    .replace("+", " ")
+                    .trim()
+                    .replaceAll("[^a-zA-Z0-9\\s]", "")
+                    .replaceAll("\\s{2,}", " ");
+        }
         String normalizedTag = tag != null ? tag.trim().toLowerCase() : null;
 
         if (page < 0 || size <= 0) {

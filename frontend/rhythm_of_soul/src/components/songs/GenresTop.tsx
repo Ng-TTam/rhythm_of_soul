@@ -31,10 +31,10 @@ export default function GenresTop() {
         {genres.map((item, index) => (
           <li className="swiper-slide mb-3 swiper-slide-duplicate" style={{ minWidth: "240.667px", width: "auto" }} key={index}>
             <img src={`../assets/images/dashboard/${item.img}`} className="mb-3 img-fluid rounded-3" alt="song-img" />
-            <a href="music-player.html" className="text-capitalize line-count-1 h5 d-block">
+            <a href="music-player.html" className="text-capitalize line-count-1 h5 d-block text-center">
               {item.title}
             </a>
-            <small className="fw-normal text-capitalize line-count-1">top 12 songs from travels and</small>
+            {/* <small className="fw-normal text-capitalize line-count-1">top 12 songs from travels and</small> */}
           </li>
         ))}
       </ul>

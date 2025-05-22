@@ -223,7 +223,7 @@ const PostDetail: React.FC = () => {
           isReposted={state.isReposted}
           likesCount={state.likesCount}
           repostsCount={state.repostsCount}
-          commentsCount={state.comments.length}
+          commentsCount={state.post.comment_count}
           viewCount={state.post.view_count}
           onLike={handleLike}
           onRepost={handleRepost}
