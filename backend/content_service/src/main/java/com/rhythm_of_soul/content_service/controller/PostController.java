@@ -172,7 +172,7 @@ public class PostController {
     }
     @GetMapping("/search")
     public ApiResponse<List<PostResponse>> searchPosts(
-            @RequestParam String accountId,
+            @RequestParam(required = false) String accountId,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String tag,
             @RequestParam(required = false) Type type,

@@ -41,6 +41,9 @@ public class FollowServiceImpl implements FollowService {
             if (followRepository.existsByFollowerAndFollowed(currentUser, followed)) {
                 throw new AppException(ErrorCode.ALREADY_FOLLOWING);
             }
+            if(currentUser.equals(followed)){
+                throw new AppException(ErrorCode.CAN_NOT_FOLLOW);
+            }
 
             Follow follow =
                     Follow.builder().follower(currentUser).followed(followed).build();

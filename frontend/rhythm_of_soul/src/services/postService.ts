@@ -245,4 +245,23 @@ export const editTextPost = async (postId: string, formData: any): Promise<APIRe
     }
   )
   return  response.data;
-}  
+} ;
+
+export const searchSongs = async (
+  accountId: string,
+  keyword: string,
+  tag: string,
+  page: number
+) => {
+  const response = await axios.get(`${API_BASE_URL}/posts/search`, {
+    params: {
+      accountId,
+      keyword,
+      tag,
+      type: "SONG",
+      page,
+      size: 10
+    },
+  });
+  return response.data.result;
+};

@@ -25,6 +25,8 @@ public enum ErrorCode {
             1007, "Account not verified, you need to verify your account to upgrade artist", HttpStatus.UNAUTHORIZED),
     ACCOUNT_ALREADY_LOCKED(1008, "Account is already locked", HttpStatus.CONFLICT),
     ACCOUNT_NOT_LOCKED(1009, "Account is not locked", HttpStatus.BAD_REQUEST),
+    ACCOUNT_NOT_ACTIVE(1010, "Account is not active", HttpStatus.BAD_REQUEST),
+
 
     // user - 2xxx
     INVALID_USERNAME(2001, "Username must be at least {min} characters", HttpStatus.BAD_REQUEST),
@@ -52,6 +54,7 @@ public enum ErrorCode {
     ALREADY_FOLLOWING(3000, "Follow already exists", HttpStatus.CONFLICT),
     FOLLOW_NOT_FOUND(3001, "Follow not found", HttpStatus.BAD_REQUEST),
     FOLLOW_NOT_PUSH(3002, "Follow push to redis failed", HttpStatus.BAD_REQUEST),
+    CAN_NOT_FOLLOW(3003, "Can't follow yourself", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

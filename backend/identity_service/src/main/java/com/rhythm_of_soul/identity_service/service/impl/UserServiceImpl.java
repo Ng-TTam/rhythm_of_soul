@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.rhythm_of_soul.identity_service.constant.Status;
 import jakarta.transaction.Transactional;
 
 import org.springframework.data.domain.Page;
@@ -159,16 +160,22 @@ public class UserServiceImpl implements UserService {
         Account account =
                 accountRepository.findByUser(user).orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
-        // save change of artist profile status and user is_artist
-        ArtistProfile artistProfile = user.getArtistProfile();
-        artistProfile.setStatus(ArtistProfileStatus.APPROVED);
-        user.setArtist(true);
+        if (account.getStatus() == Status.ACTIVE)
+            {
+            // save change of artist profile status and user is_artist
+            ArtistProfile artistProfile = user.getArtistProfile();
+            artistProfile.setStatus(ArtistProfileStatus.APPROVED);
+            user.setArtist(true);
 
-        userRepository.save(user);
+            userRepository.save(user);
 
-        // save change account
-        account.setRole(Role.ARTIST);
-        accountRepository.save(account);
+            // save change account
+            account.setRole(Role.ARTIST);
+            accountRepository.save(account);
+        }
+        else {
+                throw new AppException(ErrorCode.ACCOUNT_NOT_ACTIVE);
+        }
     }
 
     @Override

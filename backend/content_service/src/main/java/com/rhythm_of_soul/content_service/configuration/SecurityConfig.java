@@ -33,7 +33,8 @@ public class SecurityConfig {
     private static final String[] PUBLIC_ENDPOINTS = {
             "/posts/**",
             "/comments/**",
-            "/api/audio/**"
+            "/api/audio/**",
+            "/content/posts/search"
     };
 
     @Value("${jwt.signerKey}")
@@ -46,6 +47,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS)
                         .permitAll()
                         .requestMatchers(HttpMethod.POST, "/posts/**", "/comments/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/posts/search").permitAll()
                         .anyRequest()
                         .authenticated());
 

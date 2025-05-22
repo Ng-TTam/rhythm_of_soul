@@ -96,11 +96,31 @@ export default function AssignArtist() {
   };
 
   const confirmAssign = (userId: string) => {
+    const selectedUser = users.find(u => u.id === userId);
+
     confirmDialog({
       message: (
-        <div className="flex items-center gap-3 text-danger fw-bold">
-          <i className="pi pi-user-plus text-red-500 text-3xl animate-pulse"></i>
-          <span>Are you sure you want to assign the artist role?</span>
+        <div className="text-left">
+          <div className="flex items-center gap-3 text-danger fw-bold mb-3">
+            <i className="pi pi-user-plus text-red-500 text-2xl animate-pulse"></i>
+            <span>Are you sure you want to assign the artist role?</span>
+          </div>
+
+          {selectedUser?.artistProfile && (
+            <div className="mt-2 border-top pt-2">
+              <p><strong>Stage Name:</strong> {selectedUser.artistProfile.stageName}</p>
+              <p><strong>Bio:</strong> {selectedUser.artistProfile.bio}</p>
+              {selectedUser.artistProfile.facebookUrl && (
+                <p><strong>Facebook:</strong> <a href={selectedUser.artistProfile.facebookUrl} target="_blank" rel="noreferrer">{selectedUser.artistProfile.facebookUrl}</a></p>
+              )}
+              {selectedUser.artistProfile.instagramUrl && (
+                <p><strong>Instagram:</strong> <a href={selectedUser.artistProfile.instagramUrl} target="_blank" rel="noreferrer">{selectedUser.artistProfile.instagramUrl}</a></p>
+              )}
+              {selectedUser.artistProfile.youtubeUrl && (
+                <p><strong>YouTube:</strong> <a href={selectedUser.artistProfile.youtubeUrl} target="_blank" rel="noreferrer">{selectedUser.artistProfile.youtubeUrl}</a></p>
+              )}
+            </div>
+          )}
         </div>
       ),
       header: (
@@ -117,7 +137,8 @@ export default function AssignArtist() {
       rejectClassName: "bg-gray-300 text-gray-800 fw-semibold px-5 py-2 rounded-lg hover:bg-gray-400 transition-transform transform hover:scale-105",
     });
   };
-  
+
+
   const confirmRevoke = (userId: string) => {
     confirmDialog({
       message: (
@@ -139,7 +160,7 @@ export default function AssignArtist() {
       acceptClassName: "bg-warning text-white fw-bold px-5 py-2 rounded-lg shadow-lg hover:bg-orange-600 transition-transform transform hover:scale-105",
       rejectClassName: "bg-gray-300 text-gray-800 fw-semibold px-5 py-2 rounded-lg hover:bg-gray-400 transition-transform transform hover:scale-105",
     });
-  };  
+  };
 
 
   return (
