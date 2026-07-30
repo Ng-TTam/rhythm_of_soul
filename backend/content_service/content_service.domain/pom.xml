@@ -4,10 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.rhythm_of_soul</groupId>
-    <artifactId>content_service.domain</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <parent>
+        <groupId>com.rhythm_of_soul</groupId>
+        <artifactId>content_service</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
 
+    <artifactId>content_service.domain</artifactId>
     <properties>
         <maven.compiler.source>23</maven.compiler.source>
         <maven.compiler.target>23</maven.compiler.target>
