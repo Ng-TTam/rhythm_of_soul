@@ -27,7 +27,7 @@
         <dependency>
             <groupId>com.rhythm_of_soul</groupId>
             <artifactId>content_service.infrastructure</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

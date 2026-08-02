@@ -1,8 +1,21 @@
-package com.rhythm_of_soul.domain.model.entity;
+package com.rhythm_of_soul.infrastructure.persistence.model;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.*;
 
 import java.time.Instant;
 
-public class Comment {
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "likes")
+public class CommentEntity {
+    @Id
     private String id;
     private String postId;
     private String accountId;
@@ -15,4 +28,3 @@ public class Comment {
     private Instant createdAt;
     private Instant updatedAt;
 }
-
