@@ -7,8 +7,11 @@
 	<artifactId>content_service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
+        <modules>
+            <module>content_service.start</module>
+        </modules>
 
-<!--	<modules>-->
+        <!--	<modules>-->
 <!--		<module>rhythm_of_soul.controller</module>-->
 <!--		<module>rhythm_of_soul.application</module>-->
 <!--		<module>rhythm_of_soul.infrastructure</module>-->
@@ -44,13 +47,9 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-mongodb</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>io.minio</groupId>
 			<artifactId>minio</artifactId>
-			<version>8.5.7</version> <!-- Bạn có thể thay bằng version mới nhất -->
+			<version>8.5.7</version>
 		</dependency>
 
 		<dependency>

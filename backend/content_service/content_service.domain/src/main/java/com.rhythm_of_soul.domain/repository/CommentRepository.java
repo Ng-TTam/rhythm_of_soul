@@ -10,5 +10,5 @@ public interface CommentRepository {
     List<Comment> findAllByPostId(String postId);
     List<Comment> findByPostIdAndParentIdIsNullOrderByCreatedAtDesc(String postId, Pageable pageable);
     List<Comment> findByParentIdOrderByCreatedAtAsc(String parentId, Pageable pageable);
-    void deleteByParentId(String parentId);
+    void deleteWithChild(String commentId);
 }
