@@ -1,18 +1,15 @@
 package com.rhythm_of_soul.controller.http;
 
-import com.rhythm_of_soul.domain.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/posts")
-public class PostController {
-    private final PostService postService;
-
-
-
+public class LikeController {
 }
