@@ -1,18 +1,17 @@
-package com.rhythm_of_soul.content_service.exception;
+package com.rhythm_of_soul.application.exception;
 
 
+import com.rhythm_of_soul.application.model.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.rhythm_of_soul.content_service.dto.ApiResponse;
-
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.AccessDeniedException;
 
-//@ControllerAdvice(basePackages = "com.rhythm_of_soul.identity_service.api")
+@ControllerAdvice(basePackages = "com.rhythm_of_soul.identity_service.api")
 @Slf4j
 public class GlobalExceptionHandler {
 

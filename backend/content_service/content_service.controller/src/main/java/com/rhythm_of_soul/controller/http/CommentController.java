@@ -1,10 +1,10 @@
 package com.rhythm_of_soul.controller.http;
 
-import com.rhythm_of_soul.controller.model.request.CommentCreationRequest;
-import com.rhythm_of_soul.controller.model.request.CommentUpdateRequest;
-import com.rhythm_of_soul.controller.model.response.ApiResponse;
-import com.rhythm_of_soul.controller.model.response.CommentResponse;
-import com.rhythm_of_soul.domain.service.CommentService;
+import com.rhythm_of_soul.application.model.request.CommentCreationRequest;
+import com.rhythm_of_soul.application.model.request.CommentUpdateRequest;
+import com.rhythm_of_soul.application.model.response.ApiResponse;
+import com.rhythm_of_soul.application.model.response.CommentResponse;
+import com.rhythm_of_soul.application.service.comment.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class CommentController {
     public ApiResponse<CommentResponse> createComment(@Valid @RequestBody CommentCreationRequest commentCreationRequest) {
 
         return ApiResponse.<CommentResponse>builder()
-//                .result(commentService.createComment(commentCreationRequest))
+                .result(commentService.createComment(commentCreationRequest))
                 .build();
     }
 
@@ -33,7 +33,7 @@ public class CommentController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "5") int size) {
         return ApiResponse.<List<CommentResponse>>builder()
-//                .result(commentService.getTopLevelComments(postId, page, size))
+                .result(commentService.getTopLevelComments(postId, page, size))
                 .build();
     }
 
@@ -43,7 +43,7 @@ public class CommentController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "5") int size) {
         return ApiResponse.<List<CommentResponse>>builder()
-//                .result(commentService.getReplies(parentCommentId, page, size))
+                .result(commentService.getReplies(parentCommentId, page, size))
                 .build();
     }
 
@@ -53,7 +53,7 @@ public class CommentController {
             @Valid @RequestBody CommentUpdateRequest request) {
         return ApiResponse.<CommentResponse>builder()
                 .message("Comment updated")
-//                .result(commentService.updateComment(commentId, request))
+                .result(commentService.updateComment(commentId, request))
                 .build();
     }
 
