@@ -2,7 +2,7 @@ package com.rhythm_of_soul.controller.http;
 
 import com.rhythm_of_soul.application.model.request.CommentCreationRequest;
 import com.rhythm_of_soul.application.model.request.CommentUpdateRequest;
-import com.rhythm_of_soul.application.model.response.ApiResponse;
+import com.rhythm_of_soul.domain.model.response.ApiResponse;
 import com.rhythm_of_soul.application.model.response.CommentResponse;
 import com.rhythm_of_soul.application.service.comment.CommentService;
 import jakarta.validation.Valid;

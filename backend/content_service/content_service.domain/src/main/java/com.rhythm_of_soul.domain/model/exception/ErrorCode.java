@@ -1,4 +1,4 @@
-package com.rhythm_of_soul.application.exception;
+package com.rhythm_of_soul.domain.model.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;

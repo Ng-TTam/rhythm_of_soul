@@ -1,4 +1,4 @@
-package com.rhythm_of_soul.application.exception;
+package com.rhythm_of_soul.domain.model.exception;
 
 public class AppException extends RuntimeException {
 

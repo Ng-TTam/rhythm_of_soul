@@ -1,7 +1,12 @@
 package com.rhythm_of_soul.domain.model.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.Instant;
 
+@Getter
+@Setter
 public class Comment {
     private String id;
     private String postId;

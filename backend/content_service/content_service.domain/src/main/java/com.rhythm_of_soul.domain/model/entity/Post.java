@@ -1,9 +1,13 @@
 package com.rhythm_of_soul.domain.model.entity;
 
 import com.rhythm_of_soul.domain.model.enums.Type;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 
+@Getter
+@Setter
 public class Post {
     private String id;
     private String accountId;
