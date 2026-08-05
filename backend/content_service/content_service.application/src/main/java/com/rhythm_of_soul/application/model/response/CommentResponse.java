@@ -16,16 +16,16 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CommentResponse {
-    String id;          // comment_id
-    String accountId;      // Người comment
-    String content;     // Nội dung comment
-    String parentId ;    // ID comment cha (nếu là reply)
+    String id;
+    String accountId;
+    String content;
+    String parentId ;
     String username;
     String userAvatar;
     boolean userIsArtist;
-    Instant createdAt; // Thời gian tạo comment
+    Instant createdAt;
     Instant updatedAt;
-    List<CommentResponse> child_comments;// Danh sách comment con (nếu có)
+    List<CommentResponse> child_comments;
     // Constructor
     public CommentResponse(String id, String accountId, String parentId, Instant createdAt, Instant updatedAt, String content,boolean userIsArtist) {
         this.id = id;

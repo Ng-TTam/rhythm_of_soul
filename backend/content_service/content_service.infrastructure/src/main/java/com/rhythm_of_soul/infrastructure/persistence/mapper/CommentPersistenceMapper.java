@@ -5,6 +5,6 @@ import com.rhythm_of_soul.infrastructure.persistence.model.CommentEntity;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface CommentMapper {
+public interface CommentPersistenceMapper {
     Comment toDomain(CommentEntity commentEntity);
 }

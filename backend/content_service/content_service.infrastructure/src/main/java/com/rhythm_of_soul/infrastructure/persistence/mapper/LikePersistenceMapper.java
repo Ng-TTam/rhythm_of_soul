@@ -5,6 +5,6 @@ import com.rhythm_of_soul.infrastructure.persistence.model.LikeEntity;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface LikeMapper {
+public interface LikePersistenceMapper {
     Like toDomain(LikeEntity likeEntity);
 }

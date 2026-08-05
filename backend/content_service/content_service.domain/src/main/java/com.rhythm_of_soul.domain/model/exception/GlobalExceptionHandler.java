@@ -1,7 +1,7 @@
-package com.rhythm_of_soul.application.exception;
+package com.rhythm_of_soul.domain.model.exception;
 
 
-import com.rhythm_of_soul.application.model.response.ApiResponse;
+import com.rhythm_of_soul.domain.model.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;

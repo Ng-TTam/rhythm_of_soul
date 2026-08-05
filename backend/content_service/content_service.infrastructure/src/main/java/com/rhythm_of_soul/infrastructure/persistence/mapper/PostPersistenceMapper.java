@@ -5,7 +5,7 @@ import com.rhythm_of_soul.infrastructure.persistence.model.PostEntity;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface PostMapper {
+public interface PostPersistenceMapper {
 
     Post toDomain(PostEntity postEntity);
 }

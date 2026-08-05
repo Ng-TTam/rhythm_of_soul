@@ -1,4 +1,4 @@
-package com.rhythm_of_soul.application.exception.validator;
+package com.rhythm_of_soul.application.exception;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

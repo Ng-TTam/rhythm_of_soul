@@ -1,4 +1,4 @@
-package com.rhythm_of_soul.application.model.response;
+package com.rhythm_of_soul.domain.model.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;

@@ -1,6 +1,6 @@
 package com.rhythm_of_soul.application.model.request;
 
-import com.rhythm_of_soul.application.exception.validator.ValidPostRequest;
+import com.rhythm_of_soul.application.exception.ValidPostRequest;
 import com.rhythm_of_soul.domain.model.enums.Type;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
