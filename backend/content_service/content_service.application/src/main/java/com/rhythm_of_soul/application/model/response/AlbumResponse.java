@@ -1,6 +1,6 @@
 package com.rhythm_of_soul.application.model.response;
 
-import com.rhythm_of_soul.content_service.common.Tag;
+import com.rhythm_of_soul.domain.model.enums.Tag;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -14,20 +14,20 @@ import java.util.List;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AlbumResponse {
-    String id; // album_id
-    String title; // Tên album
-    String imageUrl; // Đường dẫn đến ảnh bìa album
-    String coverUrl; // Đường dẫn đến ảnh bìa album
-    String accountId; // ID người tạo album
-    int tracks; // Số lượng bài hát trong album
-    List<Tag> tags; // Danh sách tag của album
-    Instant createdAt; // Thời gian phát hành album
+    String id;
+    String title;
+    String imageUrl;
+    String coverUrl;
+    String accountId;
+    int tracks;
+    List<Tag> tags;
+    Instant createdAt;
     Boolean isPublic;
-    String caption; // Mô tả album
-    Instant updatedAt; // Thời gian cập nhật album
-    Instant scheduledAt; // Thời gian phát hành album
-    int viewCount; // Số lượt xem album
-    int likeCount; // Số lượt thích album
-    int commentCount; // Số lượng bình luận album
-    Boolean isLiked; // Trạng thái đã thích album hay chưa
+    String caption;
+    Instant updatedAt;
+    Instant scheduledAt;
+    int viewCount;
+    int likeCount;
+    int commentCount;
+    Boolean isLiked;
 }

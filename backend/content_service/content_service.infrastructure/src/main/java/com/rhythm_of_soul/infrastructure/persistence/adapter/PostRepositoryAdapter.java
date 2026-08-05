@@ -7,9 +7,9 @@ import com.rhythm_of_soul.domain.model.exception.ErrorCode;
 import com.rhythm_of_soul.domain.repository.PostRepository;
 import com.rhythm_of_soul.infrastructure.persistence.mapper.PostPersistenceMapper;
 import com.rhythm_of_soul.infrastructure.persistence.repository.PostJpaRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.awt.print.Pageable;
 import java.util.List;
 
 @Component
@@ -28,6 +28,15 @@ public class PostRepositoryAdapter implements PostRepository {
                 .map(postMapper::toDomain)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
     }
+
+    @Override
+    public List<Post> findAllByType(Type type, Pageable pageable) {
+        return postJpaRepository.findAllByType(type, pageable)
+                .stream()
+                .map(postMapper::toDomain)
+                .toList();
+    }
+
 
     @Override
     public List<Post> findAllByAccountId(String accountId, Pageable pageable) {

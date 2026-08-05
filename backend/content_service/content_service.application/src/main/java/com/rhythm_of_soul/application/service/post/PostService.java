@@ -5,6 +5,7 @@ import com.rhythm_of_soul.application.model.response.*;
 import com.rhythm_of_soul.domain.model.enums.Tag;
 import com.rhythm_of_soul.domain.model.enums.Type;
 import io.minio.errors.*;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -20,7 +21,6 @@ public interface PostService {
             InvalidResponseException, XmlParserException, InternalException;
     PostResponse createPost(String accountId, PostRequest postRequest);
     PostResponse addSong(String postId, String songIds);
-    List<PostResponse> getPosts(String accountId);
 
     List<PostResponse> getSongs(String accountId);
     List<PostResponse> getPlaylists(String accountId);
@@ -45,7 +45,7 @@ public interface PostService {
     PostResponse updatePlaylist(String playlistId, EditPlaylist postRequest);
     PostDetailResponse getPostDetail(String accountId, String postId);
     PostResponse getPost(String postId);
-    List<SongResponse> getListSongs();
+    List<SongResponse> getListSongs(Pageable pageable);
     String createFile(MultipartFile file, String type)
             throws IOException, ServerException, InsufficientDataException,
             ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException,
