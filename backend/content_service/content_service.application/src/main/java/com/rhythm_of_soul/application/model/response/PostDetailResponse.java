@@ -1,7 +1,6 @@
 package com.rhythm_of_soul.application.model.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.rhythm_of_soul.content_service.dto.PostResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

@@ -28,7 +28,6 @@ public class IdentityClientImpl  implements IdentityClient {
   public List<String> getFollowerIds(String userId) {
     String url = identityServiceUrl + "/" + userId + "/followersIds";
 
-    // Lấy JWT token từ context (nếu đang dùng Bearer Token auth)
     String token = null;
     var auth = SecurityContextHolder.getContext().getAuthentication();
     if (auth instanceof JwtAuthenticationToken jwtAuth) {
