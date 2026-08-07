@@ -21,7 +21,6 @@ public class CommentController {
 
     @PostMapping
     public ApiResponse<CommentResponse> createComment(@Valid @RequestBody CommentCreationRequest commentCreationRequest) {
-
         return ApiResponse.<CommentResponse>builder()
                 .result(commentService.createComment(commentCreationRequest))
                 .build();
