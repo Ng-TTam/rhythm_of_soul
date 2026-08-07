@@ -19,11 +19,15 @@ import com.rhythm_of_soul.domain.repository.PostRepository;
 import com.rhythm_of_soul.infrastructure.config.MinioConfig;
 import com.rhythm_of_soul.application.service.comment.impl.CommentManager;
 import com.rhythm_of_soul.infrastructure.utils.SaveFileMinio;
+import com.rhythm_of_soul.infrastructure.utils.SecurityUtils;
 import io.minio.errors.*;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.keyvalue.core.CriteriaAccessor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,6 +52,9 @@ public class PostServiceImpl implements PostService {
     MinioConfig minioConfig;
     IdentityClient identityClient;
     RedisPublisher redisPublisher;
+
+    // TODO: in this class can be implement by CQRS pattern
+    //  apply factory and strategy pattern for create post with each type
 
     @Override
     public PostResponse storeFile(MultipartFile song, MultipartFile cover, MultipartFile image, String account_id, List<Tag> tags, String title, String caption, String isPublic) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
@@ -167,12 +174,43 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<BasicPlaylistResponse> getBasicPlaylists(String accountId, String songId) {
-        return List.of();
+        List<Post> posts = postRepository.findAllByAccountIdAndType(accountId, Type.PLAYLIST);
+        List<BasicPlaylistResponse> basicPlaylistResponses = new ArrayList<>();
+        for(Post post : posts){
+            if(post.getContent().getSongIds() == null || !post.getContent().getSongIds().contains(songId)){
+                BasicPlaylistResponse basicPlaylistResponse = BasicPlaylistResponse.builder()
+                        .id(post.getId())
+                        .name(post.getContent().getTitle())
+                        .build();
+                basicPlaylistResponses.add(basicPlaylistResponse);
+            }
+        }
+        return basicPlaylistResponses;
     }
 
     @Override
     public PostResponse updateSong(String songId, EditPostSong postRequest) {
-        return null;
+        Post post = postRepository.findById(songId);
+        if(post.getType() != Type.SONG){
+            throw new RuntimeException("Post is not a song");
+        }
+        post.setUpdatedAt(Instant.now());
+        post.setCaption(postRequest.getCaption());
+        post.setPublic(postRequest.getIsPublic());
+        Content content = post.getContent();
+        content.setTitle(postRequest.getTitle());
+        if(!postRequest.getImageUrl().contains("http://localhost:9000")) content.setImageUrl(postRequest.getImageUrl());
+        if(!postRequest.getCoverUrl().contains("http://localhost:9000")) content.setCoverUrl(postRequest.getCoverUrl());
+        content.setTags(postRequest.getTags());
+        post.setContent(content);
+        postRepository.save(post);
+        PostResponse postResponse = postMapper.toPostResponse(post);
+        ContentResponse contentResponse = postResponse.getContent();
+        contentResponse.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
+        contentResponse.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
+        postResponse.setContent(contentResponse);
+        postResponse.set_liked(likeRepository.existsByAccountIdAndPostId(post.getAccountId(), post.getId()));
+        return postResponse;
     }
 
     @Override
@@ -287,17 +325,105 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public String createFile(MultipartFile file, String type) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        return "";
+        // TODO: change this code implement using factory pattern
+        try{
+            switch (type){
+                case "song":
+                    return saveFileMinio.saveFile(file, minioConfig.getSongsBucket());
+                case "cover":
+                    return saveFileMinio.saveFile(file, minioConfig.getCoversBucket());
+                case "image":
+                    return saveFileMinio.saveFile(file, minioConfig.getImagesBucket());
+            }
+        }catch (Exception e){
+            log.error("Error while creating file", e);
+            throw new RuntimeException("Error while creating file", e);
+        }
+        return null;
     }
 
     @Override
+    @PreAuthorize("hasRole('ARTIST')")
     public AlbumResponse createAlbum(AlbumCreationRequest postRequest) {
-        return null;
+        String accountId = SecurityUtils.getCurrentAccountId();
+        try {
+            Post post = Post.builder()
+                    .id(UUID.randomUUID().toString())
+                    .accountId(accountId)
+                    .createdAt(Instant.now())
+                    .updatedAt(null)
+                    .likeCount(0)
+                    .type(Type.ALBUM)
+                    .content(Content.builder()
+                            .tags(postRequest.getTags())
+                            .title(postRequest.getTitle())
+                            .imageUrl(postRequest.getImage())
+                            .coverUrl(postRequest.getCover())
+                            .songIds(postRequest.getSongIds())
+                            .build())
+                    .commentCount(0)
+                    .viewCount(0)
+                    .isPublic(postRequest.getIsPublic())
+                    .scheduledAt(postRequest.getSheduleAt())
+                    .build();
+            postRepository.save(post);
+            return AlbumResponse.builder()
+                    .id(post.getId())
+                    .title(post.getContent().getTitle())
+                    .imageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()))
+                    .coverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()))
+                    .tracks(post.getContent().getSongIds() != null ? post.getContent().getSongIds().size() : 0)
+                    .createdAt(post.getCreatedAt())
+                    .updatedAt(post.getUpdatedAt() != null ? post.getUpdatedAt() : null)
+                    .tags(post.getContent().getTags())
+                    .isPublic(post.isPublic())
+                    .accountId(post.getAccountId())
+                    .viewCount(post.getViewCount())
+                    .likeCount(post.getLikeCount())
+                    .isLiked(false)
+                    .commentCount(post.getCommentCount())
+                    .scheduledAt(post.getScheduledAt() != null ? post.getScheduledAt() : null)
+                    .build();
+        }catch (Exception e){
+            log.error("Error while creating album", e);
+            throw new RuntimeException("Error while creating album", e);
+        }
     }
 
     @Override
+    @PreAuthorize("hasRole('USER') or hasRole('ARTIST')")
     public PostResponse createPlaylist(PlaylistCreationRequest postRequest) {
-        return null;
+        String accountId = SecurityUtils.getCurrentAccountId();
+        try {
+            Post post = Post.builder()
+                    .id(UUID.randomUUID().toString())
+                    .accountId(accountId)
+                    .createdAt(Instant.now())
+                    .updatedAt(null)
+                    .likeCount(0)
+                    .type(Type.PLAYLIST)
+                    .content(Content.builder()
+                            .tags(postRequest.getTags())
+                            .title(postRequest.getTitle())
+                            .imageUrl(postRequest.getImage())
+                            .coverUrl(postRequest.getCover())
+                            .build())
+                    .commentCount(0)
+                    .viewCount(0)
+                    .isPublic(postRequest.getIsPublic())
+                    .build();
+            postRepository.save(post);
+            PostResponse postResponse = postMapper.toPostResponse(post);
+            ContentResponse content = postResponse.getContent();
+            content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
+            content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
+            postResponse.setContent(content);
+            postResponse.set_liked(false);
+            return postResponse;
+        }catch (Exception e){
+            log.error("Error while creating playlist", e);
+            throw new RuntimeException("Error while creating playlist", e);
+        }
     }
 
     @Override
@@ -314,7 +440,18 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostResponse updatePostText(String postId, EditText postRequest) {
-        return null;
+        Post post = postRepository.findById(postId);
+        if(post.getType() != Type.TEXT){
+            // TODO: change to app exception definition
+            throw new RuntimeException("Post is not a text");
+        }
+        post.setUpdatedAt(Instant.now());
+        post.setCaption(postRequest.getCaption());
+        post.setPublic(postRequest.getIsPublic());
+        postRepository.save(post);
+        PostResponse postResponse = postMapper.toPostResponse(post);
+        postResponse.set_liked(likeRepository.existsByAccountIdAndPostId(post.getAccountId(), post.getId()));
+        return postResponse;
     }
 
     public List<PostResponse> processPosts(List<Post> posts, String accountId) {

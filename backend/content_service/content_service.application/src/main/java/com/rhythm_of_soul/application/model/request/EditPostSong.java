@@ -1,6 +1,6 @@
 package com.rhythm_of_soul.application.model.request;
 
-import com.rhythm_of_soul.content_service.common.Tag;
+import com.rhythm_of_soul.domain.model.enums.Tag;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
