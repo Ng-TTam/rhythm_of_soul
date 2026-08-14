@@ -16,6 +16,21 @@ spring:
     multipart:
       max-file-size: 2000MB
       max-request-size: 2000MB
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 10
+        concurrency: 3
+        max-concurrency: 5
+
+    publisher-confirm-type: correlated
+    publisher-returns: true
 
 minio:
   url: http://localhost:9000

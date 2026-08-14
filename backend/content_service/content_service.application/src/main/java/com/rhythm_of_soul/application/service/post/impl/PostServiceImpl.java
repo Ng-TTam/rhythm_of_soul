@@ -6,7 +6,7 @@ import com.rhythm_of_soul.application.model.request.*;
 import com.rhythm_of_soul.application.model.response.*;
 import com.rhythm_of_soul.application.service.Identity.IdentityClient;
 import com.rhythm_of_soul.application.service.post.PostService;
-import com.rhythm_of_soul.application.service.redis_publisher.RedisPublisher;
+import com.rhythm_of_soul.application.service.publisher.RedisPublisher;
 import com.rhythm_of_soul.domain.model.entity.Comment;
 import com.rhythm_of_soul.domain.model.entity.Content;
 import com.rhythm_of_soul.domain.model.entity.Like;
@@ -25,8 +25,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.keyvalue.core.CriteriaAccessor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,7 +61,74 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostResponse createPost(String accountId, PostRequest postRequest) {
-        return null;
+        try{
+            Post post = postMapper.toPost(postRequest);
+            switch (postRequest.getType()){
+                case SONG:
+                    post.setContent(Content.builder()
+                            .tags(postRequest.getContent().getTags())
+                            .title(postRequest.getContent().getTitle())
+                            .mediaUrl(postRequest.getContent().getMediaUrl())
+                            .coverUrl(postRequest.getContent().getCoverUrl())
+                            .imageUrl(postRequest.getContent().getImageUrl())
+                            .build());
+                    break;
+                case ALBUM, PLAYLIST:
+                    post.setContent(Content.builder()
+                            .tags(postRequest.getContent().getTags())
+                            .title(postRequest.getContent().getTitle())
+                            .imageUrl(postRequest.getContent().getImageUrl())
+                            .coverUrl(postRequest.getContent().getCoverUrl())
+                            .songIds(postRequest.getContent().getSongIds())
+                            .build());
+                    break;
+                case REPOST:
+                    post.setContent(Content.builder()
+                            .originalPostId(postRequest.getContent().getOriginalPostId())
+                            .build());
+                    break;
+                case TEXT:
+                    break;
+
+            }
+            // set accountId using accountId in token
+            post.setAccountId(accountId);
+
+            postRepository.save(post);
+            PostResponse postResponse = postMapper.toPostResponse(post);
+            if(post.getType() == Type.TEXT) {
+                return postResponse;
+            }
+            ContentResponse content = postResponse.getContent();
+            content.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()));
+            content.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()));
+            postResponse.setContent(content);
+            if(postRequest.getType() == Type.ALBUM || postRequest.getType() == Type.PLAYLIST){
+                if(post.getContent().getSongIds() != null)  postResponse.getContent().setSongIds(getSongs(postRequest.getContent().getSongIds()));
+
+            }
+            postResponse.set_liked(false);
+
+            List<String> followerIds = identityClient.getFollowerIds(accountId);
+            log.info("Fetched followerIds: {}", followerIds);
+
+            //TODO: logic can be wrote in notice service
+            for (String followerId : followerIds) {
+                NewContentEvent event = new NewContentEvent(
+                        identityClient.getUserInfoByAccountId(accountId).getUserId(),
+                        identityClient.getUserInfoByAccountId(accountId).getName(),
+                        post.getType().name(),
+                        followerId,
+                        post.getId() // referenceId là id bài post
+                );
+                redisPublisher.publishNewContentEvent(event);
+                log.info("success push to ìd: {}", followerId);
+            }
+            return postResponse;
+        }catch (Exception e){
+            log.error("Error while creating post", e);
+            throw new RuntimeException("Error while creating post", e);
+        }
     }
 
     @Override

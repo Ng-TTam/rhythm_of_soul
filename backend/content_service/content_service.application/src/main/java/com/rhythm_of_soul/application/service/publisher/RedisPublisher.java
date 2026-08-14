@@ -1,4 +1,4 @@
-package com.rhythm_of_soul.application.service.redis_publisher;
+package com.rhythm_of_soul.application.service.publisher;
 
 import com.rhythm_of_soul.application.model.request.LikeCommentRequest;
 import com.rhythm_of_soul.application.model.request.NewContentEvent;
