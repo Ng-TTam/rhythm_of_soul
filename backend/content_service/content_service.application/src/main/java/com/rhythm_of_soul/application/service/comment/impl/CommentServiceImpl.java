@@ -8,7 +8,7 @@ import com.rhythm_of_soul.application.model.request.LikeCommentRequest;
 import com.rhythm_of_soul.application.model.response.CommentResponse;
 import com.rhythm_of_soul.application.service.Identity.IdentityClient;
 import com.rhythm_of_soul.application.service.comment.CommentService;
-import com.rhythm_of_soul.application.service.redis_publisher.RedisPublisher;
+import com.rhythm_of_soul.application.service.publisher.RedisPublisher;
 import com.rhythm_of_soul.domain.model.entity.Comment;
 import com.rhythm_of_soul.domain.model.entity.Post;
 import com.rhythm_of_soul.domain.repository.CommentRepository;

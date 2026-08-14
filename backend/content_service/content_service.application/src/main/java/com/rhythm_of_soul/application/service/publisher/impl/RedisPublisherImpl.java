@@ -1,9 +1,9 @@
-package com.rhythm_of_soul.application.service.redis_publisher.impl;
+package com.rhythm_of_soul.application.service.publisher.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rhythm_of_soul.application.model.request.LikeCommentRequest;
 import com.rhythm_of_soul.application.model.request.NewContentEvent;
-import com.rhythm_of_soul.application.service.redis_publisher.RedisPublisher;
+import com.rhythm_of_soul.application.service.publisher.RedisPublisher;
 import com.rhythm_of_soul.infrastructure.utils.AESUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
