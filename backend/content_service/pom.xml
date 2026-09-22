@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-	<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-		<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.rhythm_of_soul</groupId>
 	<artifactId>content_service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-        <modules>
-            <module>content_service.start</module>
-        </modules>
 
-        <!--	<modules>-->
-<!--		<module>rhythm_of_soul.controller</module>-->
-<!--		<module>rhythm_of_soul.application</module>-->
-<!--		<module>rhythm_of_soul.infrastructure</module>-->
-<!--		<module>rhythm_of_soul.domain</module>-->
-<!--	</modules>-->
+	<modules>
+		<module>content_service.domain</module>
+		<module>content_service.application</module>
+		<module>content_service.infrastructure</module>
+		<module>content_service.controller</module>
+		<module>content_service.start</module>
+	</modules>
 	
 	<properties>
 		<maven.compiler.source>23</maven.compiler.source>
@@ -119,23 +117,10 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-							<version>${projectlombok-lombok.version}</version>
-						</path>
-					</annotationProcessorPaths>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
+					<source>23</source>
+					<target>23</target>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.projectlombok</groupId>

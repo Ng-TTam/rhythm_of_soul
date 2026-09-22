@@ -5,6 +5,7 @@ import com.rhythm_of_soul.application.model.request.CommentUpdateRequest;
 import com.rhythm_of_soul.application.model.response.CommentResponse;
 import com.rhythm_of_soul.domain.model.entity.Comment;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface CommentMapper {
@@ -12,5 +13,5 @@ public interface CommentMapper {
 
     Comment toComment(CommentCreationRequest request);
 
-    void updateComment(Comment comment, CommentUpdateRequest request);
+    void updateComment(@MappingTarget Comment comment, CommentUpdateRequest request);
 }

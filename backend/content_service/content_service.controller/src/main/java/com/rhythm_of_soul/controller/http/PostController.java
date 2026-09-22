@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.rmi.ServerException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -26,15 +25,14 @@ import java.util.List;
 @RequestMapping("/posts")
 public class PostController {
     private final PostService postService;
-//    private final ListeningHistoryService listeningHistoryService;
 
     @PostMapping("/upload")
-    ApiResponse<PostResponse> uploadFile(@RequestParam("song") MultipartFile song ,
-                                         @RequestParam("image") MultipartFile image ,
+    ApiResponse<PostResponse> uploadFile(@RequestParam("song") MultipartFile song,
+                                         @RequestParam("image") MultipartFile image,
                                          @RequestParam("cover") MultipartFile cover,
                                          @RequestParam("tags") List<Tag> tags,
                                          @RequestParam("title") String title,
-                                         @RequestParam(name = "caption" , required = false ) String caption,
+                                         @RequestParam(name = "caption", required = false) String caption,
                                          @RequestParam("isPublic") String isPublic
     ) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         var account_id = SecurityUtils.getCurrentAccountId();
@@ -46,102 +44,70 @@ public class PostController {
     }
 
     @PostMapping("/uploadFile")
-    ApiResponse<String> uploadFile(@RequestParam("file") MultipartFile file ,
+    ApiResponse<String> uploadFile(@RequestParam("file") MultipartFile file,
                                    @RequestParam("type") String type) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         return ApiResponse.<String>builder()
                 .message("File uploaded successfully")
-//                .result(postService.createFile(file, type))
+                .result(postService.createFile(file, type))
                 .build();
     }
-    @PutMapping ("/updateSong/{songId}")
-    ApiResponse<PostResponse> updateSong(@PathVariable String songId,
-                                         @RequestBody EditPostSong editPostSong) {
-        return ApiResponse.<PostResponse>builder()
-                .message("File uploaded successfully")
-                .result(postService.updateSong(songId,editPostSong))
-                .build();
-    }
-    @PutMapping("/updateAlbum/{albumId}")
-    ApiResponse<AlbumResponse> updateAlbum(@PathVariable String albumId,
-                                           @RequestBody EditAlbum editAlbum) {
-        return ApiResponse.<AlbumResponse>builder()
-                .message("File uploaded successfully")
-                .result(postService.updateAlbum(albumId,editAlbum))
-                .build();
-    }
-    @PutMapping("/updatePlaylist/{playlistId}")
-    ApiResponse<PostResponse> updatePlaylist(@PathVariable String playlistId,
-                                             @RequestBody EditPlaylist editPlaylist) {
-        return ApiResponse.<PostResponse>builder()
-                .message("File uploaded successfully")
-                .result(postService.updatePlaylist(playlistId,editPlaylist))
-                .build();
-    }
-    @PutMapping("/updatePostText/{postId}")
-    ApiResponse<PostResponse> updatePostText(@PathVariable String postId,
-                                             @RequestBody EditText editPostText) {
-        return ApiResponse.<PostResponse>builder()
-                .message("File uploaded successfully")
-                .result(postService.updatePostText(postId,editPostText))
-                .build();
-    }
+
     @PostMapping
     ApiResponse<PostResponse> createPost(@Valid @RequestBody PostRequest postRequest) {
-        // get accountId in token
         String accountId = SecurityUtils.getCurrentAccountId();
         log.info("Creating post for accountId: {}", accountId);
         return ApiResponse.<PostResponse>builder()
                 .message("Post created successfully")
-                .result(postService.createPost(accountId ,postRequest))
+                .result(postService.createPost(accountId, postRequest))
                 .build();
+    }
 
-    }
-    @PostMapping("/album")
-    ApiResponse<AlbumResponse> createAlbum(@RequestBody AlbumCreationRequest postRequest) {
-        return ApiResponse.<AlbumResponse>builder()
-                .message("Album created successfully")
-                .result(postService.createAlbum(postRequest))
-                .build();
-    }
-    @PostMapping("/playlist")
-    ApiResponse<PostResponse> createPlaylist(@RequestBody PlaylistCreationRequest postRequest) {
+    @PutMapping("/{postId}")
+    ApiResponse<PostResponse> updatePost(@PathVariable String postId,
+                                         @RequestBody PostRequest postRequest) {
         return ApiResponse.<PostResponse>builder()
-                .message("Playlist created successfully")
-                .result(postService.createPlaylist(postRequest))
+                .message("Post updated successfully")
+                .result(postService.updatePost(postId, postRequest))
                 .build();
     }
+
     @GetMapping("/{accountId}/album")
     ApiResponse<List<AlbumResponse>> getAlbum(@PathVariable String accountId) {
         return ApiResponse.<List<AlbumResponse>>builder()
-                .message("Album created successfully")
+                .message("Album retrieved successfully")
                 .result(postService.getAlbum(accountId))
                 .build();
     }
+
     @GetMapping("/playlist/{accountId}")
-    ApiResponse<List<BasicPlaylistResponse>> getPlaylist(@PathVariable String accountId , @RequestParam("songId") String songId) {
+    ApiResponse<List<BasicPlaylistResponse>> getPlaylist(@PathVariable String accountId, @RequestParam("songId") String songId) {
         return ApiResponse.<List<BasicPlaylistResponse>>builder()
-                .message("Playlist created successfully")
-                .result(postService.getBasicPlaylists(accountId,songId))
+                .message("Playlist retrieved successfully")
+                .result(postService.getBasicPlaylists(accountId, songId))
                 .build();
     }
-    @PutMapping("/{postId}")
-    ApiResponse<PostResponse> addSongs( @PathVariable String postId,@RequestParam("songId") String songId) {
+
+    @PutMapping("/{postId}/add-song")
+    ApiResponse<PostResponse> addSongs(@PathVariable String postId, @RequestParam("songId") String songId) {
         return ApiResponse.<PostResponse>builder()
                 .result(postService.addSong(postId, songId))
                 .build();
     }
+
     @GetMapping("/{accountId}")
     ApiResponse<List<PostResponse>> getPosts(@PathVariable String accountId) {
         return ApiResponse.<List<PostResponse>>builder()
 //                .result(postService.getPosts(accountId))
                 .build();
     }
+
     @GetMapping("/{accountId}/songs")
     ApiResponse<List<PostResponse>> getSongs(@PathVariable String accountId) {
         return ApiResponse.<List<PostResponse>>builder()
                 .result(postService.getSongs(accountId))
                 .build();
     }
+
     @GetMapping("/{accountId}/playlists")
     ApiResponse<List<PostResponse>> getPlaylists(@PathVariable String accountId) {
         return ApiResponse.<List<PostResponse>>builder()
@@ -156,12 +122,14 @@ public class PostController {
                 .result(postService.getPostDetail(accountId, postId))
                 .build();
     }
+
     @GetMapping("/{postId}/comments")
     ApiResponse<List<CommentResponse>> getComments(@PathVariable String postId) {
         return ApiResponse.<List<CommentResponse>>builder()
                 .result(postService.getComments(postId))
                 .build();
     }
+
     @GetMapping("/search")
     public ApiResponse<List<PostResponse>> searchPosts(
             @RequestParam(required = false) String accountId,
@@ -181,7 +149,7 @@ public class PostController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         String accountId = SecurityUtils.getCurrentAccountId();
-        if (accountId == null){
+        if (accountId == null) {
             return ApiResponse.<List<PostResponse>>builder()
                     .result(List.of())
                     .build();

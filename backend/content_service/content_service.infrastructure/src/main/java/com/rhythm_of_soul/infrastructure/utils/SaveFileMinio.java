@@ -1,6 +1,6 @@
 package com.rhythm_of_soul.infrastructure.utils;
 
-import com.rhythm_of_soul.content_service.config.MinioConfig;
+import com.rhythm_of_soul.infrastructure.config.MinioConfig;
 import io.minio.*;
 import io.minio.errors.*;
 import io.minio.http.Method;
@@ -13,36 +13,39 @@ import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 public class SaveFileMinio {
     private final MinioClient minioClient;
     private final MinioConfig minioConfig;
-        public  String saveFile(MultipartFile file, String bucket) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-            String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
-            InputStream inputStream = file.getInputStream();
+    public String saveFile(MultipartFile file, String bucket) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
-            // Tạo bucket nếu chưa có
-            boolean isExist = minioClient.bucketExists(
-                    BucketExistsArgs.builder()
-                            .bucket(bucket)
-                            .build());
-            if (!isExist) {
-                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
-            }
+        InputStream inputStream = file.getInputStream();
 
-            // Upload
-            minioClient.putObject(
-                    PutObjectArgs.builder()
-                            .bucket(bucket)
-                            .object(filename)
-                            .stream(inputStream, file.getSize(), -1)
-                            .contentType(file.getContentType())
-                            .build()
-            );
-            return filename;
+        // Tạo bucket nếu chưa có
+        boolean isExist = minioClient.bucketExists(
+                BucketExistsArgs.builder()
+                        .bucket(bucket)
+                        .build());
+        if (!isExist) {
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
         }
+
+        // Upload
+        minioClient.putObject(
+                PutObjectArgs.builder()
+                        .bucket(bucket)
+                        .object(filename)
+                        .stream(inputStream, file.getSize(), -1)
+                        .contentType(file.getContentType())
+                        .build()
+        );
+        return filename;
+    }
+
     public String generatePresignedUrl(String bucketName, String objectName) {
         try {
             return minioClient.getPresignedObjectUrl(
@@ -58,4 +61,4 @@ public class SaveFileMinio {
             return null;
         }
     }
-    }
+}

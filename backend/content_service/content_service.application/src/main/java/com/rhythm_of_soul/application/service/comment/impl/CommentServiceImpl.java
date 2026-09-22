@@ -14,6 +14,7 @@ import com.rhythm_of_soul.domain.model.entity.Post;
 import com.rhythm_of_soul.domain.repository.CommentRepository;
 import com.rhythm_of_soul.domain.repository.PostRepository;
 import com.rhythm_of_soul.infrastructure.utils.SecurityUtils;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -39,6 +40,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     @PreAuthorize("hasRole('USER') or hasRole('ARTIST')")
+    @RateLimiter(name = "identity")
     public CommentResponse createComment(CommentCreationRequest request) {
         Post post = postRepository.findById(request.getPostId());
 

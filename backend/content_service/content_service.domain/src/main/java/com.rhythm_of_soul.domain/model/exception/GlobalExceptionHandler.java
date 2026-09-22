@@ -1,6 +1,5 @@
 package com.rhythm_of_soul.domain.model.exception;
 
-
 import com.rhythm_of_soul.domain.model.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,10 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.AccessDeniedException;
 
-@ControllerAdvice(basePackages = "com.rhythm_of_soul.identity_service.api")
+@ControllerAdvice(basePackages = "com.rhythm_of_soul.controller")
 @Slf4j
 public class GlobalExceptionHandler {
-
 
     @ExceptionHandler(value = Exception.class)
     ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException exception) {
