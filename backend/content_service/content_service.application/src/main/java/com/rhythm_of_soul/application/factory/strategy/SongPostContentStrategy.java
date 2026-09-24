@@ -4,29 +4,20 @@ import com.rhythm_of_soul.application.model.request.ContentRequest;
 import com.rhythm_of_soul.application.model.response.ContentResponse;
 import com.rhythm_of_soul.domain.model.entity.Content;
 import com.rhythm_of_soul.domain.model.enums.Type;
-import com.rhythm_of_soul.domain.model.exception.AppException;
-import com.rhythm_of_soul.domain.model.exception.ErrorCode;
 import com.rhythm_of_soul.infrastructure.config.MinioConfig;
 import com.rhythm_of_soul.infrastructure.utils.SaveFileMinio;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-public class SongPostContentStrategy implements PostContentStrategy {
-    private final SaveFileMinio saveFileMinio;
-    private final MinioConfig minioConfig;
+public class SongPostContentStrategy extends AbstractPostContentStrategy {
+
+    public SongPostContentStrategy(SaveFileMinio saveFileMinio, MinioConfig minioConfig) {
+        super(saveFileMinio, minioConfig);
+    }
 
     @Override
     public Type getType() {
         return Type.SONG;
-    }
-
-    @Override
-    public void validate(ContentRequest request) {
-        if (request == null) {
-            throw new AppException(ErrorCode.INVALID_POST_TYPE);
-        }
     }
 
     @Override
@@ -47,15 +38,10 @@ public class SongPostContentStrategy implements PostContentStrategy {
         if (existingContent == null) {
             return createContent(request);
         }
-        if (request.getTitle() != null) existingContent.setTitle(request.getTitle());
-        if (request.getMediaUrl() != null) existingContent.setMediaUrl(request.getMediaUrl());
-        if (request.getImageUrl() != null && !request.getImageUrl().contains("http://localhost:9000")) {
-            existingContent.setImageUrl(request.getImageUrl());
+        updateCommonFields(existingContent, request);
+        if (request.getMediaUrl() != null && isNewUploadedUrl(request.getMediaUrl())) {
+            existingContent.setMediaUrl(request.getMediaUrl());
         }
-        if (request.getCoverUrl() != null && !request.getCoverUrl().contains("http://localhost:9000")) {
-            existingContent.setCoverUrl(request.getCoverUrl());
-        }
-        if (request.getTags() != null) existingContent.setTags(request.getTags());
         return existingContent;
     }
 
@@ -64,11 +50,9 @@ public class SongPostContentStrategy implements PostContentStrategy {
         if (content == null || contentResponse == null) {
             return contentResponse;
         }
-        if (content.getImageUrl() != null) {
-            contentResponse.setImageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), content.getImageUrl()));
-        }
-        if (content.getCoverUrl() != null) {
-            contentResponse.setCoverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), content.getCoverUrl()));
+        enrichImageAndCoverUrls(content, contentResponse);
+        if (content.getMediaUrl() != null && !content.getMediaUrl().isBlank()) {
+            contentResponse.setMediaUrl(saveFileMinio.generatePresignedUrl(minioConfig.getSongsBucket(), content.getMediaUrl()));
         }
         return contentResponse;
     }
