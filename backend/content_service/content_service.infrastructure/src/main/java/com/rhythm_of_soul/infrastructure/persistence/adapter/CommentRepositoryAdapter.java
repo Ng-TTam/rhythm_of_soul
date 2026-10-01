@@ -7,9 +7,9 @@ import com.rhythm_of_soul.domain.repository.CommentRepository;
 import com.rhythm_of_soul.infrastructure.persistence.mapper.CommentPersistenceMapper;
 import com.rhythm_of_soul.infrastructure.persistence.repository.CommentJpaRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.awt.print.Pageable;
 import java.util.List;
 
 @Component

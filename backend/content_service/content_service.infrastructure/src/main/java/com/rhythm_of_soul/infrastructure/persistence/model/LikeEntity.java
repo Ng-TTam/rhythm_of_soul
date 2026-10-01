@@ -12,7 +12,6 @@ import java.time.Instant;
 @AllArgsConstructor
 @Entity
 @Table(name = "likes")
-@IdClass(PostLikeId.class)
 public class LikeEntity {
     @EmbeddedId
     private PostLikeId id;

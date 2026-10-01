@@ -4,6 +4,9 @@ import com.rhythm_of_soul.application.model.request.ContentRequest;
 import com.rhythm_of_soul.application.model.response.ContentResponse;
 import com.rhythm_of_soul.domain.model.entity.Content;
 import com.rhythm_of_soul.domain.model.enums.Type;
+import com.rhythm_of_soul.domain.model.exception.AppException;
+import com.rhythm_of_soul.domain.model.exception.ErrorCode;
+import com.rhythm_of_soul.domain.repository.PostRepository;
 import com.rhythm_of_soul.infrastructure.config.MinioConfig;
 import com.rhythm_of_soul.infrastructure.utils.SaveFileMinio;
 import org.springframework.stereotype.Component;
@@ -11,13 +14,24 @@ import org.springframework.stereotype.Component;
 @Component
 public class SongPostContentStrategy extends AbstractPostContentStrategy {
 
-    public SongPostContentStrategy(SaveFileMinio saveFileMinio, MinioConfig minioConfig) {
-        super(saveFileMinio, minioConfig);
+    public SongPostContentStrategy(SaveFileMinio saveFileMinio, MinioConfig minioConfig, PostRepository postRepository) {
+        super(saveFileMinio, minioConfig, postRepository);
     }
 
     @Override
     public Type getType() {
         return Type.SONG;
+    }
+
+    @Override
+    public void validate(ContentRequest request) {
+        super.validate(request);
+        if (request.getTitle() == null || request.getTitle().isBlank()) {
+            throw new AppException(ErrorCode.INVALID_POST_TYPE);
+        }
+        if (request.getMediaUrl() == null || request.getMediaUrl().isBlank()) {
+            throw new AppException(ErrorCode.INVALID_POST_TYPE);
+        }
     }
 
     @Override

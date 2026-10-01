@@ -11,13 +11,13 @@ spring:
   application:
     name: rythm.com
   datasource:
-    url: jdbc:postgresql://localhost:5432/music_social
-    username: postgres
-    password: postgres
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/music_social}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -29,7 +29,7 @@ spring:
   data:
     redis:
       host: 127.0.0.1
-      port: 6319
+      port: 6379
       password: ""
       lettuce:
         pool:
@@ -38,6 +38,14 @@ spring:
           min-idle: 5
       #          max-wait: -1ms
       connect-timeout: 30000
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin123
+    virtual-host: /
+
   threads:
     virtual:
       enabled: true

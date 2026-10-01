@@ -1,8 +1,8 @@
 package com.rhythm_of_soul.domain.repository;
 
 import com.rhythm_of_soul.domain.model.entity.Comment;
+import org.springframework.data.domain.Pageable;
 
-import java.awt.print.Pageable;
 import java.util.List;
 
 public interface CommentRepository {

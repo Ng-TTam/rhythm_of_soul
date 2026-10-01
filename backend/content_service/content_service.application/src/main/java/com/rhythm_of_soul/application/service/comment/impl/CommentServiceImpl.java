@@ -22,7 +22,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.print.Pageable;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -88,12 +87,12 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<CommentResponse> getTopLevelComments(String postId, int page, int size) {
         List<Comment> comments = commentRepository
-                .findByPostIdAndParentIdIsNullOrderByCreatedAtDesc(postId, (Pageable) PageRequest.of(page, size));
+                .findByPostIdAndParentIdIsNullOrderByCreatedAtDesc(postId, PageRequest.of(page, size));
         return comments.stream()
                 .map(comment -> {
                     CommentResponse res = commentMapper.toCommentResponse(comment);
                     List<Comment> children = commentRepository
-                            .findByParentIdOrderByCreatedAtAsc(comment.getId(), (Pageable) PageRequest.of(0, 3));
+                            .findByParentIdOrderByCreatedAtAsc(comment.getId(), PageRequest.of(0, 3));
                     res.setChild_comments(children.stream()
                             .map(commentMapper::toCommentResponse)
                             .collect(Collectors.toList()));
@@ -105,7 +104,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<CommentResponse> getReplies(String parentCommentId, int page, int size) {
         List<Comment> replies = commentRepository.findByParentIdOrderByCreatedAtAsc(
-                parentCommentId, (Pageable) PageRequest.of(page, size)
+                parentCommentId, PageRequest.of(page, size)
         );
         return replies.stream()
                 .map(commentMapper::toCommentResponse)

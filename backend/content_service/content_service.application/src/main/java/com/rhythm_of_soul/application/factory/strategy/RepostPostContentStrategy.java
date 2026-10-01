@@ -6,10 +6,17 @@ import com.rhythm_of_soul.domain.model.entity.Content;
 import com.rhythm_of_soul.domain.model.enums.Type;
 import com.rhythm_of_soul.domain.model.exception.AppException;
 import com.rhythm_of_soul.domain.model.exception.ErrorCode;
+import com.rhythm_of_soul.domain.repository.PostRepository;
+import com.rhythm_of_soul.infrastructure.config.MinioConfig;
+import com.rhythm_of_soul.infrastructure.utils.SaveFileMinio;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RepostPostContentStrategy implements PostContentStrategy {
+public class RepostPostContentStrategy extends AbstractPostContentStrategy {
+
+    public RepostPostContentStrategy(SaveFileMinio saveFileMinio, MinioConfig minioConfig, PostRepository postRepository) {
+        super(saveFileMinio, minioConfig, postRepository);
+    }
 
     @Override
     public Type getType() {
@@ -18,7 +25,8 @@ public class RepostPostContentStrategy implements PostContentStrategy {
 
     @Override
     public void validate(ContentRequest request) {
-        if (request == null || request.getOriginalPostId() == null || request.getOriginalPostId().isBlank()) {
+        super.validate(request);
+        if (request.getOriginalPostId() == null || request.getOriginalPostId().isBlank()) {
             throw new AppException(ErrorCode.INVALID_POST_TYPE);
         }
     }
