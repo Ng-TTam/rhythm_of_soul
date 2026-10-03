@@ -15,7 +15,6 @@ import com.rhythm_of_soul.domain.model.entity.Comment;
 import com.rhythm_of_soul.domain.model.entity.Content;
 import com.rhythm_of_soul.domain.model.entity.Like;
 import com.rhythm_of_soul.domain.model.entity.Post;
-import com.rhythm_of_soul.domain.model.enums.Tag;
 import com.rhythm_of_soul.domain.model.enums.Type;
 import com.rhythm_of_soul.domain.model.exception.AppException;
 import com.rhythm_of_soul.domain.model.exception.ErrorCode;
@@ -25,8 +24,6 @@ import com.rhythm_of_soul.domain.repository.PostRepository;
 import com.rhythm_of_soul.infrastructure.config.MinioConfig;
 import com.rhythm_of_soul.application.service.comment.impl.CommentManager;
 import com.rhythm_of_soul.infrastructure.utils.SaveFileMinio;
-import com.rhythm_of_soul.infrastructure.utils.SecurityUtils;
-import io.minio.errors.*;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -34,9 +31,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.*;
 
@@ -58,11 +52,6 @@ public class PostServiceImpl implements PostService {
     FileUploadFactory fileUploadFactory;
 
     @Override
-    public PostResponse storeFile(MultipartFile song, MultipartFile cover, MultipartFile image, String account_id, List<Tag> tags, String title, String caption, String isPublic) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        return null;
-    }
-
-    @Override
     public PostResponse createPost(String accountId, PostRequest postRequest) {
         Post post = postMapper.toPost(postRequest);
 
@@ -76,12 +65,8 @@ public class PostServiceImpl implements PostService {
 
         postRepository.save(post);
         PostResponse postResponse = postMapper.toPostResponse(post);
-        postResponse.setContent(strategy.enrichContentResponse(post.getContent(), postResponse.getContent()));
-
-        if (postRequest.getType() == Type.ALBUM || postRequest.getType() == Type.PLAYLIST) {
-            if (post.getContent() != null && post.getContent().getSongIds() != null && postResponse.getContent() != null) {
-                postResponse.getContent().setSongIds(getSongs(post.getContent().getSongIds()));
-            }
+        if (post.getContent() != null) {
+            postResponse.setContent(strategy.enrichContentResponse(post.getContent(), postResponse.getContent()));
         }
         postResponse.set_liked(false);
 
@@ -124,10 +109,8 @@ public class PostServiceImpl implements PostService {
 
         postRepository.save(post);
         PostResponse postResponse = postMapper.toPostResponse(post);
-        postResponse.setContent(strategy.enrichContentResponse(post.getContent(), postResponse.getContent()));
-
-        if ((post.getType() == Type.ALBUM || post.getType() == Type.PLAYLIST) && post.getContent() != null && post.getContent().getSongIds() != null && postResponse.getContent() != null) {
-            postResponse.getContent().setSongIds(getSongs(post.getContent().getSongIds()));
+        if (post.getContent() != null) {
+            postResponse.setContent(strategy.enrichContentResponse(post.getContent(), postResponse.getContent()));
         }
 
         postResponse.set_liked(likeRepository.existsByAccountIdAndPostId(post.getAccountId(), post.getId()));
@@ -152,30 +135,8 @@ public class PostServiceImpl implements PostService {
 
         PostContentStrategy strategy = postContentFactory.getStrategy(post.getType());
         ContentResponse content = strategy.enrichContentResponse(post.getContent(), postResponse.getContent());
-        if (content != null) {
-            content.setSongIds(getSongs(songList));
-        }
         postResponse.setContent(content);
         return postResponse;
-    }
-
-    private List<SongResponse> getSongs(List<String> songIds) {
-        List<SongResponse> songsResponse = new ArrayList<>();
-        for (String songId : songIds) {
-            Post songPost = postRepository.findById(songId);
-            if (songPost == null) {
-                throw new AppException(ErrorCode.SONG_NOT_FOUND);
-            }
-            songsResponse.add(SongResponse.builder()
-                    .songId(songPost.getId())
-                    .title(songPost.getContent().getTitle())
-                    .mediaUrl(songPost.getContent().getMediaUrl())
-                    .imageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), songPost.getContent().getImageUrl()))
-                    .coverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), songPost.getContent().getCoverUrl()))
-                    .tags(songPost.getContent().getTags())
-                    .build());
-        }
-        return songsResponse;
     }
 
     @Override
@@ -203,9 +164,6 @@ public class PostServiceImpl implements PostService {
             PostResponse postResponse = postMapper.toPostResponse(post);
             if (post.getContent() != null) {
                 ContentResponse content = strategy.enrichContentResponse(post.getContent(), postResponse.getContent());
-                if (post.getContent().getSongIds() != null && content != null) {
-                    content.setSongIds(getSongs(post.getContent().getSongIds()));
-                }
                 postResponse.setContent(content);
             }
             postResponse.set_liked(likeRepository.existsByAccountIdAndPostId(accountId, post.getId()));
@@ -221,13 +179,13 @@ public class PostServiceImpl implements PostService {
         for (Post post : posts) {
             AlbumResponse albumResponse = AlbumResponse.builder()
                     .id(post.getId())
-                    .title(post.getContent().getTitle())
-                    .imageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()))
-                    .coverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()))
-                    .tracks(post.getContent().getSongIds() != null ? post.getContent().getSongIds().size() : 0)
+                    .title(post.getContent() != null ? post.getContent().getTitle() : null)
+                    .imageUrl(post.getContent() != null ? saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()) : null)
+                    .coverUrl(post.getContent() != null ? saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()) : null)
+                    .tracks(post.getContent() != null && post.getContent().getSongIds() != null ? post.getContent().getSongIds().size() : 0)
                     .createdAt(post.getCreatedAt())
                     .updatedAt(post.getUpdatedAt() != null ? post.getUpdatedAt() : null)
-                    .tags(post.getContent().getTags())
+                    .tags(post.getContent() != null ? post.getContent().getTags() : null)
                     .isPublic(post.isPublic())
                     .accountId(post.getAccountId())
                     .viewCount(post.getViewCount())
@@ -247,7 +205,7 @@ public class PostServiceImpl implements PostService {
         List<Post> posts = postRepository.findAllByAccountIdAndType(accountId, Type.PLAYLIST);
         List<BasicPlaylistResponse> basicPlaylistResponses = new ArrayList<>();
         for (Post post : posts) {
-            if (post.getContent().getSongIds() == null || !post.getContent().getSongIds().contains(songId)) {
+            if (post.getContent() != null && (post.getContent().getSongIds() == null || !post.getContent().getSongIds().contains(songId))) {
                 BasicPlaylistResponse basicPlaylistResponse = BasicPlaylistResponse.builder()
                         .id(post.getId())
                         .name(post.getContent().getTitle())
@@ -277,9 +235,6 @@ public class PostServiceImpl implements PostService {
         if (post.getContent() != null) {
             PostContentStrategy strategy = postContentFactory.getStrategy(post.getType());
             ContentResponse content = strategy.enrichContentResponse(post.getContent(), postResponse.getContent());
-            if ((post.getType() == Type.ALBUM || post.getType() == Type.PLAYLIST) && content != null) {
-                if (post.getContent().getSongIds() != null) content.setSongIds(getSongs(post.getContent().getSongIds()));
-            }
             postResponse.setContent(content);
         }
 
@@ -301,9 +256,6 @@ public class PostServiceImpl implements PostService {
         if (post.getContent() != null) {
             PostContentStrategy strategy = postContentFactory.getStrategy(post.getType());
             ContentResponse content = strategy.enrichContentResponse(post.getContent(), postResponse.getContent());
-            if ((post.getType() == Type.ALBUM || post.getType() == Type.PLAYLIST) && content != null) {
-                if (post.getContent().getSongIds() != null) content.setSongIds(getSongs(post.getContent().getSongIds()));
-            }
             postResponse.setContent(content);
         }
 
@@ -315,20 +267,22 @@ public class PostServiceImpl implements PostService {
         List<Post> posts = postRepository.findAllByType(Type.SONG, pageable);
         List<SongResponse> songsResponse = new ArrayList<>();
         for (Post post : posts) {
-            songsResponse.add(SongResponse.builder()
-                    .songId(post.getId())
-                    .title(post.getContent().getTitle())
-                    .mediaUrl(post.getContent().getMediaUrl())
-                    .imageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()))
-                    .coverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()))
-                    .tags(post.getContent().getTags())
-                    .build());
+            if (post.getContent() != null) {
+                songsResponse.add(SongResponse.builder()
+                        .songId(post.getId())
+                        .title(post.getContent().getTitle())
+                        .mediaUrl(post.getContent().getMediaUrl())
+                        .imageUrl(saveFileMinio.generatePresignedUrl(minioConfig.getImagesBucket(), post.getContent().getImageUrl()))
+                        .coverUrl(saveFileMinio.generatePresignedUrl(minioConfig.getCoversBucket(), post.getContent().getCoverUrl()))
+                        .tags(post.getContent().getTags())
+                        .build());
+            }
         }
         return songsResponse;
     }
 
     @Override
-    public String createFile(MultipartFile file, String type) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public String createFile(MultipartFile file, String type) {
         FileUploadStrategy strategy = fileUploadFactory.getStrategy(type);
         String bucketName = strategy.getBucketName(minioConfig);
         return saveFileMinio.saveFile(file, bucketName);

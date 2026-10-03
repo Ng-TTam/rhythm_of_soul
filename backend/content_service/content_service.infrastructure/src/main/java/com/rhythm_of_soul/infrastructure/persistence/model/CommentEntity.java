@@ -13,7 +13,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "likes")
+@Table(name = "comments")
 public class CommentEntity {
     @Id
     private String id;

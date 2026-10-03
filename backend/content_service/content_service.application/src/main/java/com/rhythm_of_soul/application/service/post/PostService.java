@@ -1,23 +1,14 @@
 package com.rhythm_of_soul.application.service.post;
 
-import com.rhythm_of_soul.application.model.request.*;
+import com.rhythm_of_soul.application.model.request.PostRequest;
 import com.rhythm_of_soul.application.model.response.*;
-import com.rhythm_of_soul.domain.model.enums.Tag;
 import com.rhythm_of_soul.domain.model.enums.Type;
-import io.minio.errors.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public interface PostService {
-    PostResponse storeFile(MultipartFile song, MultipartFile cover , MultipartFile image , String account_id, List<Tag> tags, String title, String caption, String isPublic)
-            throws IOException, ServerException, InsufficientDataException,
-            ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException,
-            InvalidResponseException, XmlParserException, InternalException;
     PostResponse createPost(String accountId, PostRequest postRequest);
     PostResponse updatePost(String postId, PostRequest postRequest);
     PostResponse addSong(String postId, String songIds);
@@ -43,9 +34,6 @@ public interface PostService {
     PostDetailResponse getPostDetail(String accountId, String postId);
     PostResponse getPost(String postId);
     List<SongResponse> getListSongs(Pageable pageable);
-    String createFile(MultipartFile file, String type)
-            throws IOException, ServerException, InsufficientDataException,
-            ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException,
-            InvalidResponseException, XmlParserException, InternalException;
+    String createFile(MultipartFile file, String type);
     List<CommentResponse> getComments(String postId);
 }

@@ -3,20 +3,15 @@ package com.rhythm_of_soul.controller.http;
 import com.rhythm_of_soul.application.model.request.*;
 import com.rhythm_of_soul.application.model.response.*;
 import com.rhythm_of_soul.application.service.post.PostService;
-import com.rhythm_of_soul.domain.model.enums.Tag;
 import com.rhythm_of_soul.domain.model.enums.Type;
 import com.rhythm_of_soul.domain.model.response.ApiResponse;
 import com.rhythm_of_soul.infrastructure.utils.SecurityUtils;
-import io.minio.errors.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @Slf4j
@@ -26,26 +21,9 @@ import java.util.List;
 public class PostController {
     private final PostService postService;
 
-    @PostMapping("/upload")
-    ApiResponse<PostResponse> uploadFile(@RequestParam("song") MultipartFile song,
-                                         @RequestParam("image") MultipartFile image,
-                                         @RequestParam("cover") MultipartFile cover,
-                                         @RequestParam("tags") List<Tag> tags,
-                                         @RequestParam("title") String title,
-                                         @RequestParam(name = "caption", required = false) String caption,
-                                         @RequestParam("isPublic") String isPublic
-    ) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        var account_id = SecurityUtils.getCurrentAccountId();
-
-        return ApiResponse.<PostResponse>builder()
-                .message("File uploaded successfully")
-//                .result(postService.storeFile(song,cover,image, account_id, tags, title, caption, isPublic))
-                .build();
-    }
-
     @PostMapping("/uploadFile")
     ApiResponse<String> uploadFile(@RequestParam("file") MultipartFile file,
-                                   @RequestParam("type") String type) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+                                   @RequestParam("type") String type) {
         return ApiResponse.<String>builder()
                 .message("File uploaded successfully")
                 .result(postService.createFile(file, type))
@@ -97,7 +75,6 @@ public class PostController {
     @GetMapping("/{accountId}")
     ApiResponse<List<PostResponse>> getPosts(@PathVariable String accountId) {
         return ApiResponse.<List<PostResponse>>builder()
-//                .result(postService.getPosts(accountId))
                 .build();
     }
 
@@ -156,7 +133,6 @@ public class PostController {
         }
         return ApiResponse.<List<PostResponse>>builder()
                 .message("Get history listened successfully")
-//                .result(listeningHistoryService.getSongPostsListened(accountId, page, size))
                 .build();
     }
 
@@ -166,7 +142,6 @@ public class PostController {
             @RequestParam(defaultValue = "10") int size) {
         return ApiResponse.<List<PostResponse>>builder()
                 .message("Top songs in weekly")
-//                .result(listeningHistoryService.getTopSongPosts(page, size))
                 .build();
     }
 
@@ -174,8 +149,6 @@ public class PostController {
     public ApiResponse<Void> recordListen(
             @RequestParam String sessionId,
             @RequestParam String postId) {
-        String accountId = SecurityUtils.getCurrentAccountId();
-//        listeningHistoryService.recordListen(accountId, sessionId, postId);
         return ApiResponse.<Void>builder().build();
     }
 
@@ -189,7 +162,6 @@ public class PostController {
     @GetMapping("/songs")
     ApiResponse<List<SongResponse>> getListSongs() {
         return ApiResponse.<List<SongResponse>>builder()
-//                .result(postService.getListSongs())
                 .build();
     }
 }
