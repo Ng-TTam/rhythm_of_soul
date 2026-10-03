@@ -3,11 +3,14 @@ package com.rhythm_of_soul.infrastructure.persistence.adapter;
 import com.rhythm_of_soul.domain.model.entity.Like;
 import com.rhythm_of_soul.domain.repository.LikeRepository;
 import com.rhythm_of_soul.infrastructure.persistence.mapper.LikePersistenceMapper;
+import com.rhythm_of_soul.infrastructure.persistence.model.LikeEntity;
+import com.rhythm_of_soul.infrastructure.persistence.model.PostLikeId;
 import com.rhythm_of_soul.infrastructure.persistence.repository.LikeJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.List;
 
 @Component
@@ -22,7 +25,7 @@ public class LikeRepositoryAdapter implements LikeRepository {
 
     @Override
     public boolean exists(String postId, String userId) {
-        return likeJpaRepository.exists(postId, userId);
+        return likeJpaRepository.existsByIdAccountIdAndIdPostId(userId, postId);
     }
 
     @Override
@@ -41,7 +44,11 @@ public class LikeRepositoryAdapter implements LikeRepository {
 
     @Override
     public void save(String postId, String userId) {
-        likeJpaRepository.save(postId, userId);
+        LikeEntity entity = LikeEntity.builder()
+                .id(PostLikeId.builder().postId(postId).accountId(userId).build())
+                .createdAt(Instant.now())
+                .build();
+        likeJpaRepository.save(entity);
     }
 
     @Override
