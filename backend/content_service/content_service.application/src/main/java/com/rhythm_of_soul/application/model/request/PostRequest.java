@@ -2,6 +2,7 @@ package com.rhythm_of_soul.application.model.request;
 
 import com.rhythm_of_soul.application.exception.ValidPostRequest;
 import com.rhythm_of_soul.domain.model.enums.Type;
+import jakarta.validation.Valid;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -16,5 +17,6 @@ public class PostRequest {
     Type type;
     String caption;
     Boolean isPublic;
+    @Valid
     ContentRequest content;
 }
