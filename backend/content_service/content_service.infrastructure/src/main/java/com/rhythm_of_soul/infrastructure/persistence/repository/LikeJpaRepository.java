@@ -11,11 +11,6 @@ import java.util.List;
 
 @Repository
 public interface LikeJpaRepository extends JpaRepository<LikeEntity, PostLikeId> {
-    boolean exists(String postId, String userId);
-
-    void save(String postId, String userId);
-
-    void delete(String postId, String userId);
 
     Page<LikeEntity> findByIdPostId(String postId, Pageable pageable);
 

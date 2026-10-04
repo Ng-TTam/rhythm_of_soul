@@ -15,5 +15,15 @@ import java.time.Instant;
 public class LikeEntity {
     @EmbeddedId
     private PostLikeId id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "post_id", 
+            insertable = false, 
+            updatable = false, 
+            foreignKey = @ForeignKey(name = "fk_likes_post")
+    )
+    private PostEntity post;
+
     private Instant createdAt;
 }

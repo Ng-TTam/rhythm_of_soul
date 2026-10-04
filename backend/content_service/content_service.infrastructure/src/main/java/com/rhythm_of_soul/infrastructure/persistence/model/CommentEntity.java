@@ -17,7 +17,18 @@ import java.time.Instant;
 public class CommentEntity {
     @Id
     private String id;
+    @jakarta.persistence.Column(name = "post_id")
     private String postId;
+    
+    @jakarta.persistence.ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
+    @jakarta.persistence.JoinColumn(
+            name = "post_id", 
+            insertable = false, 
+            updatable = false, 
+            foreignKey = @jakarta.persistence.ForeignKey(name = "fk_comments_post")
+    )
+    private PostEntity post;
+
     private String accountId;
     private String content;
     private String parentId;
