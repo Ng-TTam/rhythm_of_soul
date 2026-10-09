@@ -5,7 +5,7 @@ import com.rhythm_of_soul.application.model.request.CommentCreationRequest;
 import com.rhythm_of_soul.application.model.response.CommentResponse;
 import com.rhythm_of_soul.application.service.Identity.IdentityClient;
 import com.rhythm_of_soul.application.service.comment.impl.CommentServiceImpl;
-import com.rhythm_of_soul.application.service.publisher.RedisPublisher;
+import com.rhythm_of_soul.application.service.publisher.NotificationEventPublisher;
 import com.rhythm_of_soul.domain.model.entity.Comment;
 import com.rhythm_of_soul.domain.model.entity.Post;
 import com.rhythm_of_soul.domain.repository.CommentRepository;
@@ -29,11 +29,25 @@ class CreateCommentTest {
     @Mock private PostRepository postRepository;
     @Mock private CommentRepository commentRepository;
     @Mock private IdentityClient identityClient;
-    @Mock private RedisPublisher redisPublisher;
+    @Mock private NotificationEventPublisher notificationEventPublisher;
     @Mock private CommentMapper commentMapper;
 
     @InjectMocks
     private CommentServiceImpl commentService;
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUp() {
+        lenient().when(commentMapper.toComment(any(CommentCreationRequest.class))).thenAnswer(invocation -> {
+            CommentCreationRequest r = invocation.getArgument(0);
+            return Comment.builder()
+                    .postId(r.getPostId())
+                    .content(r.getContent())
+                    .parentId(r.getParentId())
+                    .username(r.getUsername())
+                    .userAvatar(r.getUserAvatar())
+                    .build();
+        });
+    }
 
     @Test
     @DisplayName("Create top-level comment successfully")
@@ -76,9 +90,11 @@ class CreateCommentTest {
                 .build();
 
         Post post = Post.builder().id("post-1").commentCount(5).build();
+        Comment parentComment = Comment.builder().id("cmt-parent").postId("post-1").build();
         Comment savedReply = Comment.builder().id("cmt-2").postId("post-1").parentId("cmt-parent").build();
 
         when(postRepository.findById("post-1")).thenReturn(post);
+        when(commentRepository.findById("cmt-parent")).thenReturn(parentComment);
         when(postRepository.save(any(Post.class))).thenReturn(post);
         when(commentRepository.save(any(Comment.class))).thenReturn(savedReply);
 
@@ -148,4 +164,24 @@ class CreateCommentTest {
             verify(commentRepository).save(any(Comment.class));
         }
     }
+
+    @Test
+    @DisplayName("Create reply with invalid parent comment throws Exception")
+    void createComment_Reply_InvalidParent_ThrowsException() {
+        CommentCreationRequest req = CommentCreationRequest.builder()
+                .postId("post-1")
+                .content("Great reply!")
+                .username("user2")
+                .parentId("cmt-parent")
+                .build();
+
+        Post post = Post.builder().id("post-1").commentCount(5).build();
+        Comment parentComment = Comment.builder().id("cmt-parent").postId("post-2").build(); // Different post ID
+
+        when(postRepository.findById("post-1")).thenReturn(post);
+        when(commentRepository.findById("cmt-parent")).thenReturn(parentComment);
+
+        assertThrows(com.rhythm_of_soul.domain.model.exception.AppException.class, () -> commentService.createComment(req));
+    }
 }
+
