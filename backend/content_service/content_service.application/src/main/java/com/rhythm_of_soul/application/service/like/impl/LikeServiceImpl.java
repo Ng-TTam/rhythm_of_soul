@@ -3,7 +3,7 @@ package com.rhythm_of_soul.application.service.like.impl;
 import com.rhythm_of_soul.application.model.request.LikeCommentRequest;
 import com.rhythm_of_soul.application.service.Identity.IdentityClient;
 import com.rhythm_of_soul.application.service.like.LikeService;
-import com.rhythm_of_soul.application.service.publisher.RedisPublisher;
+import com.rhythm_of_soul.application.service.publisher.NotificationEventPublisher;
 import com.rhythm_of_soul.domain.model.entity.Like;
 import com.rhythm_of_soul.domain.model.entity.Post;
 import com.rhythm_of_soul.domain.repository.LikeRepository;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class LikeServiceImpl implements LikeService {
     LikeRepository likeRepository;
     PostRepository postRepository;
-    RedisPublisher redisPublisher;
+    NotificationEventPublisher notificationEventPublisher;
     IdentityClient identityClient;
 
     @Override
@@ -58,7 +58,7 @@ public class LikeServiceImpl implements LikeService {
             event.setAuthorName(identityClient.getUserInfoByAccountId(accountId).getName());         // tên người like
             event.setType("LIKE");
 
-            redisPublisher.publishLikeCommentEvent(event);
+            notificationEventPublisher.publishNotificationEvent(event);
         } catch (Exception e) {
             log.error("Failed to send like event", e);
         }

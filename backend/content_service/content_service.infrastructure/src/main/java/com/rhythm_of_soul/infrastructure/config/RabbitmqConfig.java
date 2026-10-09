@@ -32,4 +32,29 @@ public class RabbitmqConfig {
                 .to(contentExchange)
                 .with(CONTENT_ROUTING_KEY);
     }
+
+    // Notification Queue Config
+    public static final String NOTIFICATION_EXCHANGE = "notification.exchange";
+    public static final String NOTIFICATION_QUEUE = "notification.queue";
+    public static final String NOTIFICATION_ROUTING_KEY = "notification.created";
+
+    @Bean
+    public DirectExchange notificationExchange() {
+        return new DirectExchange(NOTIFICATION_EXCHANGE);
+    }
+
+    @Bean
+    public Queue notificationQueue() {
+        return QueueBuilder
+                .durable(NOTIFICATION_QUEUE)
+                .build();
+    }
+
+    @Bean
+    public Binding notificationBinding() {
+        return BindingBuilder
+                .bind(notificationQueue())
+                .to(notificationExchange())
+                .with(NOTIFICATION_ROUTING_KEY);
+    }
 }

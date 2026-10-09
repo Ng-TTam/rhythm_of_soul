@@ -8,9 +8,11 @@ import com.rhythm_of_soul.application.model.request.LikeCommentRequest;
 import com.rhythm_of_soul.application.model.response.CommentResponse;
 import com.rhythm_of_soul.application.service.Identity.IdentityClient;
 import com.rhythm_of_soul.application.service.comment.CommentService;
-import com.rhythm_of_soul.application.service.publisher.RedisPublisher;
+import com.rhythm_of_soul.application.service.publisher.NotificationEventPublisher;
 import com.rhythm_of_soul.domain.model.entity.Comment;
 import com.rhythm_of_soul.domain.model.entity.Post;
+import com.rhythm_of_soul.domain.model.exception.AppException;
+import com.rhythm_of_soul.domain.model.exception.ErrorCode;
 import com.rhythm_of_soul.domain.repository.CommentRepository;
 import com.rhythm_of_soul.domain.repository.PostRepository;
 import com.rhythm_of_soul.infrastructure.utils.SecurityUtils;
@@ -33,7 +35,7 @@ public class CommentServiceImpl implements CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final IdentityClient identityClient;
-    private final RedisPublisher redisPublisher;
+    private final NotificationEventPublisher notificationEventPublisher;
     private final CommentMapper commentMapper;
 
     @Override
@@ -43,21 +45,17 @@ public class CommentServiceImpl implements CommentService {
     public CommentResponse createComment(CommentCreationRequest request) {
         Post post = postRepository.findById(request.getPostId());
 
-        // validate in validation to check comment parent is existed
-//        if (request.getParentId() != null) {
-//            commentRepository.findById(request.getParentId())
-//                    .orElseThrow(() -> new AppException(ErrorCode.COMMENT_NOT_FOUND));
-//        }
+        if (request.getParentId() != null && !request.getParentId().trim().isEmpty()) {
+            Comment parentComment = commentRepository.findById(request.getParentId());
+            if (!parentComment.getPostId().equals(request.getPostId())) {
+                throw new AppException(ErrorCode.COMMENT_NOT_FOUND);
+            }
+        }
 
         post.setCommentCount(post.getCommentCount() + 1);
         postRepository.save(post);
 
-        Comment comment = new Comment();
-        comment.setPostId(request.getPostId());
-        comment.setContent(request.getContent());
-        comment.setParentId(request.getParentId());
-        comment.setUsername(request.getUsername());
-        comment.setUserAvatar(request.getUserAvatar());
+        Comment comment = commentMapper.toComment(request);
         comment.setAccountId(SecurityUtils.getCurrentAccountId());
         comment.setUserIsArtist("ROLE_ARTIST".equals(SecurityUtils.getRoleFromToken()));
         Instant now = Instant.now();
@@ -66,7 +64,7 @@ public class CommentServiceImpl implements CommentService {
 
         Comment saved = commentRepository.save(comment);
 
-        // Send comment event vào Redis Stream
+        // Send comment event vào RabbitMQ Notification Queue
         try {
             LikeCommentRequest event = new LikeCommentRequest();
             event.setAuthorId(identityClient.getUserInfoByAccountId(comment.getAccountId()).getUserId());             // người bình luận
@@ -75,10 +73,9 @@ public class CommentServiceImpl implements CommentService {
             event.setPostAuthorId(identityClient.getUserInfoByAccountId(post.getAccountId()).getUserId());            // chủ bài viết
             event.setType("COMMENT");
 
-            redisPublisher.publishLikeCommentEvent(event);
-            log.info("push message successfully");
+            notificationEventPublisher.publishNotificationEvent(event);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to publish notification event", e);
         }
 
         return new CommentResponse();

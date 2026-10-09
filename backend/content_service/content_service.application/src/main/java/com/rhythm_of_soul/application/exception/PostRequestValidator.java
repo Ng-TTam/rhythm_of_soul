@@ -2,7 +2,6 @@ package com.rhythm_of_soul.application.exception;
 
 import com.rhythm_of_soul.application.model.request.ContentRequest;
 import com.rhythm_of_soul.application.model.request.PostRequest;
-import com.rhythm_of_soul.domain.model.enums.Type;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
