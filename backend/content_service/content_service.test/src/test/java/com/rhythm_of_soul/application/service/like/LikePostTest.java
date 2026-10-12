@@ -4,7 +4,7 @@ import com.rhythm_of_soul.application.model.request.LikeCommentRequest;
 import com.rhythm_of_soul.application.model.response.UserBasicInfoResponse;
 import com.rhythm_of_soul.application.service.Identity.IdentityClient;
 import com.rhythm_of_soul.application.service.like.impl.LikeServiceImpl;
-import com.rhythm_of_soul.application.service.publisher.RedisPublisher;
+import com.rhythm_of_soul.application.service.publisher.NotificationEventPublisher;
 import com.rhythm_of_soul.domain.model.entity.Post;
 import com.rhythm_of_soul.domain.repository.LikeRepository;
 import com.rhythm_of_soul.domain.repository.PostRepository;
@@ -25,7 +25,7 @@ class LikePostTest {
 
     @Mock private LikeRepository likeRepository;
     @Mock private PostRepository postRepository;
-    @Mock private RedisPublisher redisPublisher;
+    @Mock private NotificationEventPublisher notificationEventPublisher;
     @Mock private IdentityClient identityClient;
 
     @InjectMocks
@@ -46,7 +46,6 @@ class LikePostTest {
         when(postRepository.save(any(Post.class))).thenReturn(post);
         doNothing().when(likeRepository).save(POST_ID, ACCOUNT_ID);
         when(identityClient.getUserInfoByAccountId(anyString())).thenReturn(userInfo);
-        doNothing().when(redisPublisher).publishLikeCommentEvent(any(LikeCommentRequest.class));
 
         boolean result = likeService.like(ACCOUNT_ID, POST_ID);
 
